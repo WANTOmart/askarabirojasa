@@ -2,57 +2,78 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Data Transaksi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Transaksi - Askara Zayyan</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
         body { background-color: #f4f6f9; }
         .header { background-color: #0d47a1; color: white; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .btn-back { color: white; text-decoration: none; font-size: 14px; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 6px; }
         .container { padding: 20px; max-width: 1000px; margin: 0 auto; }
-        .table-responsive { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; }
-        th { background-color: #0d47a1; color: white; padding: 15px; text-align: left; }
+        .table-responsive { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+        th { background-color: #0d47a1; color: white; padding: 15px; }
         td { padding: 15px; border-bottom: 1px solid #eee; }
         .btn-hapus { background: #c62828; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+        .add-link { color: white; font-size: 24px; text-decoration: none; }
     </style>
 </head>
 <body>
+
 <div class="header">
-    <a href="dashboard.html" style="color:white; text-decoration:none;">⬅ Kembali</a>
+    <a href="#" onclick="window.history.back();" class="btn-back">⬅ Kembali</a>
     <h1>Data Transaksi</h1>
-    <a href="tambah_transaksi.html" style="color:white; font-size: 24px; text-decoration:none;">➕</a>
+    <a href="tambah_transaksi.html" class="add-link">➕</a>
 </div>
+
 <div class="container">
     <div class="table-responsive">
         <table>
             <thead>
                 <tr>
-                    <th>No. Nota</th><th>Pelanggan</th><th>Layanan</th><th>Biaya</th><th>Status</th><th>Aksi</th>
+                    <th>No. Nota</th>
+                    <th>Pelanggan</th>
+                    <th>Layanan</th>
+                    <th>Total Biaya</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
                 </tr>
             </thead>
-            <tbody id="isiTabel"></tbody>
+            <tbody id="isiTabel">
+                </tbody>
         </table>
     </div>
 </div>
 
 <script>
+    // Fungsi memuat data dari LocalStorage
     function renderTabel() {
         let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
         let tbody = document.getElementById("isiTabel");
         tbody.innerHTML = "";
+        
         transaksi.forEach((t, index) => {
             tbody.innerHTML += `<tr>
-                <td>${t.nota}</td><td>${t.pelanggan}</td><td>${t.layanan}</td>
-                <td>Rp ${parseInt(t.biaya).toLocaleString()}</td><td>${t.status}</td>
+                <td>${t.nota}</td>
+                <td>${t.pelanggan}</td>
+                <td>${t.layanan}</td>
+                <td><strong>${t.biaya}</strong></td>
+                <td>${t.status}</td>
                 <td><button class="btn-hapus" onclick="hapus(${index})">Hapus</button></td>
             </tr>`;
         });
     }
+
+    // Fungsi menghapus data
     function hapus(index) {
-        let transaksi = JSON.parse(localStorage.getItem("dataTransaksi"));
-        transaksi.splice(index, 1);
-        localStorage.setItem("dataTransaksi", JSON.stringify(transaksi));
-        renderTabel();
+        if(confirm("Yakin ingin menghapus data ini?")) {
+            let transaksi = JSON.parse(localStorage.getItem("dataTransaksi"));
+            transaksi.splice(index, 1);
+            localStorage.setItem("dataTransaksi", JSON.stringify(transaksi));
+            renderTabel();
+        }
     }
+
     renderTabel();
 </script>
 </body>
