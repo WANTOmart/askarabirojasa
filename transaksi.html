@@ -4,47 +4,70 @@
     <meta charset="UTF-8">
     <title>Data Transaksi - Askara Zayyan</title>
     <style>
-        body { font-family: sans-serif; background: #f4f6f9; padding: 20px; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background-color: #f4f6f9; padding: 20px; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #0d47a1; color: white; padding: 10px; }
-        td { padding: 10px; border-bottom: 1px solid #ddd; }
-        .btn-add { text-decoration: none; background: #0d47a1; color: white; padding: 10px 20px; border-radius: 5px; }
-        .btn-del { background: #d32f2f; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 3px; }
+        .btn-back { text-decoration: none; background: #546e7a; color: white; padding: 8px 15px; border-radius: 6px; }
+        .btn-add { text-decoration: none; background: #0d47a1; color: white; padding: 8px 15px; border-radius: 6px; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background: #0d47a1; color: white; padding: 12px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        .btn-del { background: #c62828; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; }
     </style>
 </head>
 <body>
+
 <div class="container">
     <div class="header">
+        <a href="#" onclick="window.history.back();" class="btn-back">⬅ Kembali</a>
         <h1>Data Transaksi</h1>
         <a href="tambah_transaksi.html" class="btn-add">Tambah (+)</a>
     </div>
+
     <table>
         <thead>
-            <tr><th>No. Nota</th><th>Pelanggan</th><th>Layanan</th><th>Biaya</th><th>Status</th><th>Aksi</th></tr>
+            <tr>
+                <th>No. Nota</th>
+                <th>Pelanggan</th>
+                <th>Layanan</th>
+                <th>Biaya</th>
+                <th>Status</th>
+                <th>Aksi</th>
+            </tr>
         </thead>
         <tbody id="isiTabel"></tbody>
     </table>
 </div>
 
 <script>
-    function render() {
-        let data = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-        let html = "";
-        data.forEach((t, i) => {
-            html += `<tr><td>${t.nota}</td><td>${t.pelanggan}</td><td>${t.layanan}</td><td>${t.biaya}</td><td>${t.status}</td>
-            <td><button class="btn-del" onclick="hapus(${i})">Hapus</button></td></tr>`;
+    function renderTabel() {
+        let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+        let tbody = document.getElementById("isiTabel");
+        tbody.innerHTML = "";
+        
+        transaksi.forEach((t, index) => {
+            tbody.innerHTML += `<tr>
+                <td>${t.nota}</td>
+                <td>${t.pelanggan}</td>
+                <td>${t.layanan}</td>
+                <td>${t.biaya}</td>
+                <td>${t.status}</td>
+                <td><button class="btn-del" onclick="hapus(${index})">Hapus</button></td>
+            </tr>`;
         });
-        document.getElementById("isiTabel").innerHTML = html;
     }
-    function hapus(i) {
-        let data = JSON.parse(localStorage.getItem("dataTransaksi"));
-        data.splice(i, 1);
-        localStorage.setItem("dataTransaksi", JSON.stringify(data));
-        render();
+
+    function hapus(index) {
+        if(confirm("Yakin ingin menghapus transaksi ini?")) {
+            let data = JSON.parse(localStorage.getItem("dataTransaksi"));
+            data.splice(index, 1);
+            localStorage.setItem("dataTransaksi", JSON.stringify(data));
+            renderTabel();
+        }
     }
-    render();
+
+    renderTabel();
 </script>
 </body>
 </html>
