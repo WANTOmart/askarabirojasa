@@ -2,50 +2,107 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Tambah Transaksi</title>
+    <title>Data Transaksi</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f4f6f9; padding: 20px; }
-        .box { background: white; padding: 20px; border-radius: 10px; max-width: 500px; margin: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #0d47a1; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .form-box { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; }
+        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
+        button { padding: 10px; background: #0d47a1; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background: #0d47a1; color: white; padding: 12px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        .btn-hapus { background: #c62828; padding: 5px 10px; color: white; border: none; border-radius: 4px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="box">
-    <h2>Tambah Transaksi Baru</h2>
-    <input type="text" id="nota" placeholder="No. Nota (Contoh: #TRX-004)">
-    <input type="text" id="pelanggan" placeholder="Nama Pelanggan">
-    <input type="text" id="layanan" placeholder="Layanan">
-    <input type="number" id="biaya" placeholder="Total Biaya (Angka saja)">
-    <select id="status">
-        <option value="Selesai">Selesai</option>
-        <option value="Diproses">Diproses</option>
-        <option value="Menunggu Loket">Menunggu Loket</option>
-    </select>
-    <button onclick="simpanTransaksi()">Simpan Transaksi</button>
+<div class="container">
+    <h2>Data Transaksi</h2>
+    
+    <div class="form-box">
+        <input type="text" id="nota" placeholder="No. Nota">
+        <input type="text" id="nama" placeholder="Nama Pelanggan">
+        <select id="layanan">
+            <option value="Perpanjangan STNK Tahunan">Perpanjangan STNK Tahunan</option>
+            <option value="Perpanjangan STNK 5 Tahunan">Perpanjangan STNK 5 Tahunan</option>
+            <option value="Mutasi Keluar Daerah">Mutasi Keluar Daerah</option>
+            <option value="Balik Nama Mobil">Balik Nama Mobil</option>
+            <option value="Cabut Berkas">Cabut Berkas</option>
+        </select>
+        <input type="number" id="biaya" placeholder="Biaya (Rp)">
+        <select id="status">
+            <option value="Selesai">Selesai</option>
+            <option value="Diproses">Diproses</option>
+            <option value="Menunggu Loket">Menunggu Loket</option>
+        </select>
+        <button onclick="tambahTransaksi()">Tambah (+)</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>No. Nota</th>
+                <th>Pelanggan</th>
+                <th>Layanan</th>
+                <th>Biaya</th>
+                <th>Status</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody id="isiTabel"></tbody>
+    </table>
 </div>
 
 <script>
-    function simpanTransaksi() {
+    let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+
+    function renderTabel() {
+        let tbody = document.getElementById("isiTabel");
+        tbody.innerHTML = "";
+        transaksi.forEach((t, index) => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${t.nota}</td>
+                    <td>${t.nama}</td>
+                    <td>${t.layanan}</td>
+                    <td>Rp ${parseInt(t.biaya).toLocaleString()}</td>
+                    <td>${t.status}</td>
+                    <td><button class="btn-hapus" onclick="hapus(${index})">Hapus</button></td>
+                </tr>
+            `;
+        });
+    }
+
+    function tambahTransaksi() {
         let t = {
             nota: document.getElementById("nota").value,
-            pelanggan: document.getElementById("pelanggan").value,
+            nama: document.getElementById("nama").value,
             layanan: document.getElementById("layanan").value,
             biaya: document.getElementById("biaya").value,
             status: document.getElementById("status").value
         };
 
-        if(!t.nota || !t.pelanggan) { alert("Isi Nota dan Pelanggan!"); return; }
+        if(!t.nota || !t.nama) { alert("Isi Nota dan Pelanggan!"); return; }
 
-        let data = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-        data.push(t);
-        localStorage.setItem("dataTransaksi", JSON.stringify(data));
+        transaksi.push(t);
+        localStorage.setItem("dataTransaksi", JSON.stringify(transaksi));
+        renderTabel();
         
-        alert("Data berhasil disimpan!");
-        window.location.href = "transaksi.html"; // Kembali ke halaman tabel
+        // Bersihkan input
+        document.getElementById("nota").value = "";
+        document.getElementById("nama").value = "";
     }
-</script>
 
+    function hapus(index) {
+        if(confirm("Hapus data ini?")) {
+            transaksi.splice(index, 1);
+            localStorage.setItem("dataTransaksi", JSON.stringify(transaksi));
+            renderTabel();
+        }
+    }
+
+    renderTabel();
+</script>
 </body>
 </html>
