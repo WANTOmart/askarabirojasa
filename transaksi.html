@@ -2,79 +2,49 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Transaksi - Askara Zayyan</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background-color: #f4f6f9; }
-        .header { background-color: #0d47a1; color: white; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
-        .btn-back { color: white; text-decoration: none; font-size: 14px; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 6px; }
-        .container { padding: 20px; max-width: 1000px; margin: 0 auto; }
-        .table-responsive { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden; }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
-        th { background-color: #0d47a1; color: white; padding: 15px; }
-        td { padding: 15px; border-bottom: 1px solid #eee; }
-        .btn-hapus { background: #c62828; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
-        .add-link { color: white; font-size: 24px; text-decoration: none; }
+        body { font-family: sans-serif; background: #f4f6f9; padding: 20px; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #0d47a1; color: white; padding: 10px; }
+        td { padding: 10px; border-bottom: 1px solid #ddd; }
+        .btn-add { text-decoration: none; background: #0d47a1; color: white; padding: 10px 20px; border-radius: 5px; }
+        .btn-del { background: #d32f2f; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 3px; }
     </style>
 </head>
 <body>
-
-<div class="header">
-    <a href="#" onclick="window.history.back();" class="btn-back">⬅ Kembali</a>
-    <h1>Data Transaksi</h1>
-    <a href="tambah_transaksi.html" class="add-link">➕</a>
-</div>
-
 <div class="container">
-    <div class="table-responsive">
-        <table>
-            <thead>
-                <tr>
-                    <th>No. Nota</th>
-                    <th>Pelanggan</th>
-                    <th>Layanan</th>
-                    <th>Total Biaya</th>
-                    <th>Status</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody id="isiTabel">
-                </tbody>
-        </table>
+    <div class="header">
+        <h1>Data Transaksi</h1>
+        <a href="tambah_transaksi.html" class="btn-add">Tambah (+)</a>
     </div>
+    <table>
+        <thead>
+            <tr><th>No. Nota</th><th>Pelanggan</th><th>Layanan</th><th>Biaya</th><th>Status</th><th>Aksi</th></tr>
+        </thead>
+        <tbody id="isiTabel"></tbody>
+    </table>
 </div>
 
 <script>
-    // Fungsi memuat data dari LocalStorage
-    function renderTabel() {
-        let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-        let tbody = document.getElementById("isiTabel");
-        tbody.innerHTML = "";
-        
-        transaksi.forEach((t, index) => {
-            tbody.innerHTML += `<tr>
-                <td>${t.nota}</td>
-                <td>${t.pelanggan}</td>
-                <td>${t.layanan}</td>
-                <td><strong>${t.biaya}</strong></td>
-                <td>${t.status}</td>
-                <td><button class="btn-hapus" onclick="hapus(${index})">Hapus</button></td>
-            </tr>`;
+    function render() {
+        let data = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+        let html = "";
+        data.forEach((t, i) => {
+            html += `<tr><td>${t.nota}</td><td>${t.pelanggan}</td><td>${t.layanan}</td><td>${t.biaya}</td><td>${t.status}</td>
+            <td><button class="btn-del" onclick="hapus(${i})">Hapus</button></td></tr>`;
         });
+        document.getElementById("isiTabel").innerHTML = html;
     }
-
-    // Fungsi menghapus data
-    function hapus(index) {
-        if(confirm("Yakin ingin menghapus data ini?")) {
-            let transaksi = JSON.parse(localStorage.getItem("dataTransaksi"));
-            transaksi.splice(index, 1);
-            localStorage.setItem("dataTransaksi", JSON.stringify(transaksi));
-            renderTabel();
-        }
+    function hapus(i) {
+        let data = JSON.parse(localStorage.getItem("dataTransaksi"));
+        data.splice(i, 1);
+        localStorage.setItem("dataTransaksi", JSON.stringify(data));
+        render();
     }
-
-    renderTabel();
+    render();
 </script>
 </body>
 </html>
