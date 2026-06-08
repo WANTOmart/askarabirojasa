@@ -2,112 +2,68 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Kendaraan - Askara Zayyan</title>
+    <title>Data Kendaraan</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background-color: #f4f6f9; }
-        .header { background-color: #0d47a1; color: white; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
-        .btn-back { color: white; text-decoration: none; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 6px; }
-        .container { padding: 20px; max-width: 900px; margin: 0 auto; }
-        .form-section { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: 10px; }
-        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
-        button { background-color: #0d47a1; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .table-responsive { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden; }
-        table { width: 100%; border-collapse: collapse; }
-        th { background-color: #0d47a1; color: white; padding: 15px; text-align: left; }
-        td { padding: 15px; border-bottom: 1px solid #eee; }
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; }
-        .badge-mobil { background-color: #e3f2fd; color: #0d47a1; }
-        .badge-motor { background-color: #e8f5e9; color: #2e7d32; }
+        body { font-family: sans-serif; background: #f4f6f9; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        input { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 8px 15px; background: #0d47a1; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #0d47a1; color: white; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <a href="dashboard.html" class="btn-back">⬅ Kembali</a>
-    <h1>Data Kendaraan</h1>
-</div>
+<div class="card">
+    <h2>Tambah Kendaraan</h2>
+    <input type="text" id="plat" placeholder="Plat Nomor">
+    <input type="text" id="pemilik" placeholder="Nama Pemilik">
+    <button onclick="tambahBaris()">Tambah Data (+)</button>
 
-<div class="container">
-    <div class="form-section">
-        <h3>Tambah Kendaraan Baru</h3>
-        <div class="form-grid">
-            <input type="text" id="plat" placeholder="Plat Nomor">
-            <input type="text" id="pemilik" placeholder="Nama Pemilik">
-            <input type="text" id="merk" placeholder="Merk / Tipe">
-            <select id="jenis">
-                <option value="Mobil">Mobil</option>
-                <option value="Motor">Motor</option>
-            </select>
-            <input type="text" id="rangka" placeholder="No. Rangka">
-            <button onclick="tambahData()">Simpan Data</button>
-        </div>
-    </div>
-
-    <div class="table-responsive">
-        <table>
-            <thead>
-                <tr>
-                    <th>Plat Nomor</th>
-                    <th>Pemilik</th>
-                    <th>Merk / Tipe</th>
-                    <th>Jenis</th>
-                    <th>No. Rangka</th>
-                </tr>
-            </thead>
-            <tbody id="tabel-body">
-                </tbody>
-        </table>
-    </div>
+    <table id="tabelKendaraan">
+        <thead>
+            <tr>
+                <th>Plat Nomor</th>
+                <th>Pemilik</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>L 1234 AB</td>
+                <td>Budi Santoso</td>
+            </tr>
+        </tbody>
+    </table>
 </div>
 
 <script>
-    // Data awal
-    let listKendaraan = [
-        { plat: "L 1234 AB", pemilik: "Budi Santoso", merk: "Honda Vario 160", jenis: "Motor", rangka: "MH1KF1111KKXXXXXX" },
-        { plat: "W 9876 CD", pemilik: "Andi Setiawan", merk: "Toyota Avanza Veloz", jenis: "Mobil", rangka: "MHF11BK33KKXXXXXX" }
-    ];
+    function tambahBaris() {
+        // 1. Ambil nilai dari input
+        var plat = document.getElementById("plat").value;
+        var pemilik = document.getElementById("pemilik").value;
 
-    function renderTabel() {
-        let tbody = document.getElementById("tabel-body");
-        tbody.innerHTML = "";
-        listKendaraan.forEach(item => {
-            let badge = item.jenis === "Mobil" ? "badge-mobil" : "badge-motor";
-            tbody.innerHTML += `
-                <tr>
-                    <td><strong>${item.plat}</strong></td>
-                    <td>${item.pemilik}</td>
-                    <td>${item.merk}</td>
-                    <td><span class="badge ${badge}">${item.jenis}</span></td>
-                    <td>${item.rangka}</td>
-                </tr>
-            `;
-        });
-    }
+        // 2. Cek apakah input kosong
+        if (plat === "" || pemilik === "") {
+            alert("Harap isi Plat dan Pemilik!");
+            return;
+        }
 
-    function tambahData() {
-        let plat = document.getElementById("plat").value;
-        let pemilik = document.getElementById("pemilik").value;
-        let merk = document.getElementById("merk").value;
-        let jenis = document.getElementById("jenis").value;
-        let rangka = document.getElementById("rangka").value;
+        // 3. Tambahkan ke tabel
+        var table = document.getElementById("tabelKendaraan").getElementsByTagName('tbody')[0];
+        var newRow = table.insertRow();
+        var cell1 = newRow.insertCell(0);
+        var cell2 = newRow.insertCell(1);
 
-        if(!plat || !pemilik) { alert("Minimal isi Plat dan Pemilik ya!"); return; }
+        cell1.innerHTML = plat;
+        cell2.innerHTML = pemilik;
 
-        listKendaraan.push({ plat, pemilik, merk, jenis, rangka });
-        renderTabel();
-        
-        // Bersihkan input
+        // 4. Reset input
         document.getElementById("plat").value = "";
         document.getElementById("pemilik").value = "";
-        document.getElementById("merk").value = "";
-        document.getElementById("rangka").value = "";
+        
+        console.log("Data berhasil ditambah!");
     }
-
-    // Jalankan pertama kali
-    renderTabel();
 </script>
 
 </body>
