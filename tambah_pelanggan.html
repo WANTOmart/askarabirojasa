@@ -2,52 +2,63 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Tambah Pelanggan</title>
+    <title>Data Pelanggan</title>
     <style>
         body { font-family: sans-serif; background: #f4f6f9; padding: 20px; }
-        .box { background: white; padding: 20px; border-radius: 10px; max-width: 400px; margin: auto; }
-        input { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background: #0d47a1; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px; }
+        .container { max-width: 500px; margin: auto; }
+        .header { background: #0d47a1; color: white; padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn-back { color: white; text-decoration: none; background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 5px; }
+        .item { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .btn-hapus { background: #c62828; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="box">
-    <h2>Tambah Pelanggan</h2>
-    <input type="text" id="nama" placeholder="Nama Lengkap">
-    <input type="text" id="hp" placeholder="Nomor HP">
-    <input type="text" id="alamat" placeholder="Alamat">
-    <button id="btnSimpan">Simpan Data</button>
+<div class="container">
+    <div class="header">
+        <a href="#" onclick="window.history.back();" class="btn-back">⬅ Kembali</a>
+        <h2>Daftar Pelanggan</h2>
+    </div>
+
+    <div id="daftarList">
+        </div>
 </div>
 
 <script>
-    // Memastikan elemen ada sebelum menjalankan script
-    document.getElementById("btnSimpan").addEventListener("click", function() {
-        let nama = document.getElementById("nama").value;
-        let hp = document.getElementById("hp").value;
-        let alamat = document.getElementById("alamat").value;
-
-        if (nama === "" || hp === "") {
-            alert("Nama dan HP harus diisi!");
+    function muatData() {
+        let container = document.getElementById("daftarList");
+        let data = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
+        
+        container.innerHTML = "";
+        
+        if (data.length === 0) {
+            container.innerHTML = "<p style='text-align:center;'>Belum ada pelanggan.</p>";
             return;
         }
 
-        // Ambil data lama
-        let data = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
-        
-        // Tambah data baru
-        data.push({ nama: nama, hp: hp, alamat: alamat });
-        
-        // Simpan kembali
-        localStorage.setItem("dataPelanggan", JSON.stringify(data));
-        
-        alert("Data berhasil disimpan!");
-        
-        // Kosongkan form
-        document.getElementById("nama").value = "";
-        document.getElementById("hp").value = "";
-        document.getElementById("alamat").value = "";
-    });
+        data.forEach((p, index) => {
+            container.innerHTML += `
+                <div class="item">
+                    <div>
+                        <strong>${p.nama}</strong><br>
+                        <small>${p.hp} - ${p.alamat}</small>
+                    </div>
+                    <button class="btn-hapus" onclick="hapus(${index})">Hapus</button>
+                </div>
+            `;
+        });
+    }
+
+    function hapus(index) {
+        if (confirm("Hapus pelanggan ini?")) {
+            let data = JSON.parse(localStorage.getItem("dataPelanggan"));
+            data.splice(index, 1);
+            localStorage.setItem("dataPelanggan", JSON.stringify(data));
+            muatData();
+        }
+    }
+
+    muatData();
 </script>
 
 </body>
