@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Sistem - Askara Zayyan</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background: #f4f6f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 15px; }
+        .login-container { background: white; padding: 40px 30px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; max-width: 400px; width: 100%; border-top: 8px solid #0d47a1; }
+        .img-logo-login { width: 120px; height: 120px; object-fit: contain; margin-bottom: 15px; }
+        .login-container h2 { color: #0d47a1; font-size: 24px; margin-bottom: 5px; }
+        .login-container p { color: #666; font-size: 14px; margin-bottom: 25px; line-height: 1.4; }
+        
+        /* Gaya Formulir */
+        .form-group { text-align: left; margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 13px; color: #555; margin-bottom: 5px; font-weight: 500; }
+        .form-control { width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; transition: 0.2s; }
+        .form-control:focus { outline: none; border-color: #0d47a1; box-shadow: 0 0 0 3px rgba(13, 71, 161, 0.1); }
+        
+        /* Tombol */
+        .btn-submit { width: 100%; padding: 14px; background-color: #0d47a1; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 10px; }
+        .btn-submit:hover { background-color: #0a3981; transform: translateY(-1px); }
+        .btn-submit:active { transform: translateY(0); }
+        
+        /* Pesan Error */
+        #error-msg { color: #d32f2f; font-size: 13px; margin-top: 15px; display: none; background-color: #ffebee; padding: 10px; border-radius: 6px; }
+        
+        .footer-text { font-size: 11px; color: #aaa; margin-top: 25px; }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <img src="GAMBAR/logo-az.jpeg" alt="Logo Askara Zayyan" class="img-logo-login">
+    
+    <h2>ASKARA ZAYYAN</h2>
+    <p>Biro Jasa STNK Bermotor<br>Masuk ke sistem aplikasi</p>
+    
+    <form id="loginForm">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" class="form-control" placeholder="Masukkan username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" class="form-control" placeholder="Masukkan password" required>
+        </div>
+        
+        <button type="submit" class="btn-submit">Masuk Sekarang</button>
+    </form>
+    
+    <div id="error-msg">Username atau Password salah!</div>
+    
+    <div class="footer-text">Askara Zayyan Jasa STNK © 2026</div>
+</div>
+
+<script>
+    // Data login diperbarui sesuai permintaan
+    const users = {
+        'askara': { 'pass': '090121', 'redirect': 'dashboard.html' },
+        'pegawai': { 'pass': 'pegawai123', 'redirect': 'dashboard-pegawai.html' }
+    };
+
+    const form = document.getElementById('loginForm');
+    const errorMsg = document.getElementById('error-msg');
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault(); 
+        
+        const userInput = document.getElementById('username').value.trim();
+        const passInput = document.getElementById('password').value.trim();
+        
+        errorMsg.style.display = 'none'; 
+
+        if (users[userInput]) {
+            if (users[userInput].pass === passInput) {
+                window.location.href = users[userInput].redirect;
+            } else {
+                showError();
+            }
+        } else {
+            showError();
+        }
+    });
+
+    function showError() {
+        errorMsg.style.display = 'block';
+        document.getElementById('password').value = ''; 
+    }
+</script>
+
+</body>
+</html>
