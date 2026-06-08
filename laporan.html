@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Keuangan - Askara Zayyan</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background-color: #f4f6f9; }
+        .header { background-color: #0d47a1; color: white; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .header .btn-back { color: white; text-decoration: none; font-size: 14px; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 6px; }
+        .header h1 { font-size: 18px; }
+        .container { padding: 20px; max-width: 900px; margin: 0 auto; }
+        
+        /* Ringkasan */
+        .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .card h3 { color: #333; margin-bottom: 15px; font-size: 16px; border-bottom: 2px solid #0d47a1; padding-bottom: 5px; display: inline-block; }
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px; color: #555; }
+        .info-row strong.plus { color: #2e7d32; }
+        .info-row strong.minus { color: #c62828; }
+        
+        /* Form Input */
+        .form-section { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        .form-grid { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 10px; margin-top: 10px; }
+        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+        button { background-color: #0d47a1; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        button:hover { background-color: #0a3780; }
+
+        /* Tabel */
+        .table-section { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; margin-top: 10px; }
+        th { background-color: #f8f9fa; color: #333; padding: 12px; font-weight: 600; border-bottom: 2px solid #eee; }
+        td { padding: 12px; border-bottom: 1px solid #eee; color: #333; }
+        .txt-masuk { color: #2e7d32; font-weight: bold; }
+        .txt-keluar { color: #c62828; font-weight: bold; }
+        .badge-tipe { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .bg-masuk { background-color: #e8f5e9; color: #2e7d32; }
+        .bg-keluar { background-color: #ffebee; color: #c62828; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <a href="dashboard.html" class="btn-back">⬅ Kembali</a>
+    <h1>Laporan Keuangan</h1>
+    <span>📊</span>
+</div>
+
+<div class="container">
+    <!-- Ringkasan Kas -->
+    <div class="report-grid">
+        <div class="card">
+            <h3>Total Kas Bulan Ini</h3>
+            <div class="info-row"><span>Total Pendapatan:</span><strong class="plus" id="total-masuk">+ Rp 0</strong></div>
+            <div class="info-row"><span>Total Pengeluaran:</span><strong class="minus" id="total-keluar">- Rp 0</strong></div>
+        </div>
+        <div class="card">
+            <h3>Sisa Saldo Bersih</h3>
+            <div class="info-row" style="margin-top: 15px;">
+                <span>Keuntungan Bersih:</span>
+                <span id="saldo-bersih" style="font-size: 20px; font-weight: bold; color: #0d47a1;">Rp 0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form Tambah Data Baru -->
+    <div class="form-section">
+        <h3>Tambah Transaksi Baru</h3>
+        <div class="form-grid">
+            <input type="text" id="ket" placeholder="Keterangan (Contoh: Jasa STNK Budi)">
+            <input type="number" id="jumlah" placeholder="Jumlah (Rupiah)">
+            <select id="jenis">
+                <option value="masuk">Uang Masuk</option>
+                <option value="keluar">Uang Keluar</option>
+            </select>
+            <button onclick="tambahData()">Tambah</button>
+        </div>
+    </div>
+
+    <!-- Tabel Data -->
+    <div class="table-section">
+        <h3>Rincian Kas Masuk & Keluar</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Keterangan / Deskripsi</th>
+                    <th>Jenis</th>
+                    <th>Jumlah (Rupiah)</th>
+                </tr>
+            </thead>
+            <tbody id="isi-tabel">
+                <!-- Data otomatis muncul di sini -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Data bawaan awal biar tabel tidak kosong saat dibuka
+    let dataKas = [
+        { ket: "DP Perpanjang STNK 5 Tahunan - Budi Santoso", jumlah: 500000, jenis: "masuk" },
+        { ket: "Bayar Pajak Mobil Veloz ke SAMSAT", jumlah: 2800000, jenis: "keluar" },
+        { ket: "Pelunasan Balik Nama Mobil - Andi Setiawan", jumlah: 3500000, jenis: "masuk" }
+    ];
+
+    function formatRupiah(angka) {
+        return "Rp " + angka.toLocaleString('id-ID');
+    }
+
+    function hitungDanTampilkan() {
+        let tbody = document.getElementById("isi-tabel");
+        tbody.innerHTML = ""; // Bersihkan tabel terlebih dahulu
+        
+        let totalMasuk = 0;
+        let totalKeluar = 0;
+
+        dataKas.forEach(item => {
+            let tr = document.createElement("tr");
+            
+            let tdKet = document.createElement("td");
+            tdKet.innerText = item.ket;
+            
+            let tdJenis = document.createElement("td");
+            if(item.jenis === "masuk") {
+                tdJenis.innerHTML = '<span class="badge-tipe bg-masuk">Masuk</span>';
+                totalMasuk += item.jumlah;
+            } else {
+                tdJenis.innerHTML = '<span class="badge-tipe bg-keluar">Keluar</span>';
+                totalKeluar += item.jumlah;
+            }
+
+            let tdJumlah = document.createElement("td");
+            if(item.jenis === "masuk") {
+                tdJumlah.className = "txt-masuk";
+                tdJumlah.innerText = "+ " + formatRupiah(item.jumlah);
+            } else {
+                tdJumlah.className = "txt-keluar";
+                tdJumlah.innerText = "- " + formatRupiah(item.jumlah);
+            }
+
+            tr.appendChild(tdKet);
+            tr.appendChild(tdJenis);
+            tr.appendChild(tdJumlah);
+            tbody.appendChild(tr);
+        });
+
+        // Update angka ringkasan di atas
+        document.getElementById("total-masuk").innerText = "+ " + formatRupiah(totalMasuk);
+        document.getElementById("total-keluar").innerText = "- " + formatRupiah(totalKeluar);
+        document.getElementById("saldo-bersih").innerText = formatRupiah(totalMasuk - totalKeluar);
+    }
+
+    function tambahData() {
+        let inputKet = document.getElementById("ket");
+        let inputJumlah = document.getElementById("jumlah");
+        let inputJenis = document.getElementById("jenis");
+
+        if(inputKet.value === "" || inputJumlah.value === "") {
+            alert("Harap isi keterangan dan jumlah uangnya ya!");
+            return;
+        }
+
+        // Masukkan data baru ke dalam list array
+        dataKas.push({
+            ket: inputKet.value,
+            jumlah: parseInt(inputJumlah.value),
+            jenis: inputJenis.value
+        });
+
+        // Bersihkan form setelah klik tambah
+        inputKet.value = "";
+        inputJumlah.value = "";
+
+        // Hitung ulang dan update tampilan tabel
+        hitungDanTampilkan();
+    }
+
+    // Jalankan kalkulasi otomatis saat pertama kali halaman dibuka
+    hitungDanTampilkan();
+</script>
+
+</body>
+</html>
