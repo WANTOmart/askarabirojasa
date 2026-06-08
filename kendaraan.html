@@ -8,16 +8,12 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
         body { background-color: #f4f6f9; }
         .header { background-color: #0d47a1; color: white; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
-        .header .btn-back { color: white; text-decoration: none; font-size: 14px; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 6px; }
+        .btn-back { color: white; text-decoration: none; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 6px; }
         .container { padding: 20px; max-width: 900px; margin: 0 auto; }
-        
-        /* Form Input */
         .form-section { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: 10px; }
         input, select { padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
         button { background-color: #0d47a1; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        
-        /* Tabel */
         .table-responsive { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden; }
         table { width: 100%; border-collapse: collapse; }
         th { background-color: #0d47a1; color: white; padding: 15px; text-align: left; }
@@ -37,7 +33,7 @@
 <div class="container">
     <div class="form-section">
         <h3>Tambah Kendaraan Baru</h3>
-        <div class="form-grid" style="margin-top:15px;">
+        <div class="form-grid">
             <input type="text" id="plat" placeholder="Plat Nomor">
             <input type="text" id="pemilik" placeholder="Nama Pemilik">
             <input type="text" id="merk" placeholder="Merk / Tipe">
@@ -46,7 +42,7 @@
                 <option value="Motor">Motor</option>
             </select>
             <input type="text" id="rangka" placeholder="No. Rangka">
-            <button onclick="tambahData()">Tambah</button>
+            <button onclick="tambahData()">Simpan Data</button>
         </div>
     </div>
 
@@ -68,6 +64,29 @@
 </div>
 
 <script>
+    // Data awal
+    let listKendaraan = [
+        { plat: "L 1234 AB", pemilik: "Budi Santoso", merk: "Honda Vario 160", jenis: "Motor", rangka: "MH1KF1111KKXXXXXX" },
+        { plat: "W 9876 CD", pemilik: "Andi Setiawan", merk: "Toyota Avanza Veloz", jenis: "Mobil", rangka: "MHF11BK33KKXXXXXX" }
+    ];
+
+    function renderTabel() {
+        let tbody = document.getElementById("tabel-body");
+        tbody.innerHTML = "";
+        listKendaraan.forEach(item => {
+            let badge = item.jenis === "Mobil" ? "badge-mobil" : "badge-motor";
+            tbody.innerHTML += `
+                <tr>
+                    <td><strong>${item.plat}</strong></td>
+                    <td>${item.pemilik}</td>
+                    <td>${item.merk}</td>
+                    <td><span class="badge ${badge}">${item.jenis}</span></td>
+                    <td>${item.rangka}</td>
+                </tr>
+            `;
+        });
+    }
+
     function tambahData() {
         let plat = document.getElementById("plat").value;
         let pemilik = document.getElementById("pemilik").value;
@@ -75,32 +94,20 @@
         let jenis = document.getElementById("jenis").value;
         let rangka = document.getElementById("rangka").value;
 
-        if(!plat || !pemilik || !merk || !rangka) {
-            alert("Mohon isi semua data!");
-            return;
-        }
+        if(!plat || !pemilik) { alert("Minimal isi Plat dan Pemilik ya!"); return; }
 
-        let tbody = document.getElementById("tabel-body");
-        let tr = document.createElement("tr");
-
-        let badgeClass = jenis === "Mobil" ? "badge-mobil" : "badge-motor";
-
-        tr.innerHTML = `
-            <td><strong>${plat}</strong></td>
-            <td>${pemilik}</td>
-            <td>${merk}</td>
-            <td><span class="badge ${badgeClass}">${jenis}</span></td>
-            <td>${rangka}</td>
-        `;
-
-        tbody.appendChild(tr);
-
-        // Reset input
+        listKendaraan.push({ plat, pemilik, merk, jenis, rangka });
+        renderTabel();
+        
+        // Bersihkan input
         document.getElementById("plat").value = "";
         document.getElementById("pemilik").value = "";
         document.getElementById("merk").value = "";
         document.getElementById("rangka").value = "";
     }
+
+    // Jalankan pertama kali
+    renderTabel();
 </script>
 
 </body>
