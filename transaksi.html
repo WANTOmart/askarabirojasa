@@ -8,8 +8,9 @@
         body { background-color: #f4f6f9; padding: 20px; }
         .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .btn-back { text-decoration: none; background: #546e7a; color: white; padding: 8px 15px; border-radius: 6px; }
-        .btn-add { text-decoration: none; background: #0d47a1; color: white; padding: 8px 15px; border-radius: 6px; font-weight: bold; }
+        .btn-nav { text-decoration: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; }
+        .btn-back { background: #546e7a; color: white; }
+        .btn-add { background: #0d47a1; color: white; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th { background: #0d47a1; color: white; padding: 12px; text-align: left; }
         td { padding: 12px; border-bottom: 1px solid #eee; }
@@ -20,9 +21,9 @@
 
 <div class="container">
     <div class="header">
-        <a href="#" onclick="window.history.back();" class="btn-back">⬅ Kembali</a>
+        <a href="dashboard.html" class="btn-nav btn-back">⬅ Kembali ke Dashboard</a>
         <h1>Data Transaksi</h1>
-        <a href="tambah_transaksi.html" class="btn-add">Tambah (+)</a>
+        <a href="tambah_transaksi.html" class="btn-nav btn-add">Tambah (+)</a>
     </div>
 
     <table>
