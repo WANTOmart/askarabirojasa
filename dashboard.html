@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Askara Zayyan</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background-color: #f4f6f9; }
+        .header { background-color: #0d47a1; color: white; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .img-logo-dashboard { width: 80px; height: 80px; object-fit: contain; }
+        .header h1 { font-size: 20px; font-weight: 600; }
+        .header .sub-title { font-size: 14px; color: #e3f2fd; }
+        
+        /* Gaya Tombol Log Out */
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .btn-logout { background-color: #c62828; color: white; text-decoration: none; padding: 8px 15px; border-radius: 6px; font-size: 13px; font-weight: bold; transition: 0.2s; }
+        .btn-logout:hover { background-color: #b71c1c; transform: translateY(-1px); }
+
+        .container { padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .welcome-box { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .welcome-text h2 { color: #333; font-size: 20px; }
+        .welcome-text p { color: #666; font-size: 14px; margin-top: 5px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; }
+        .stat-card .label { font-size: 12px; color: #888; text-transform: uppercase; font-weight: bold; }
+        .stat-card .value { font-size: 24px; font-weight: bold; color: #333; margin: 10px 0; }
+        .stat-card.income .value { color: #2e7d32; }
+        .menu-section { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .menu-section h3 { margin-bottom: 20px; color: #333; border-bottom: 2px solid #0d47a1; padding-bottom: 5px; display: inline-block; }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; }
+        .menu-item { background: #f8f9fa; border: 1px solid #e9ecef; padding: 20px 10px; border-radius: 10px; text-align: center; cursor: pointer; transition: 0.2s; text-decoration: none; color: #333; font-weight: 500; font-size: 14px; }
+        .menu-item:hover { background: #0d47a1; color: white; transform: translateY(-3px); }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="header-left">
+        <img src="GAMBAR/logo-az.jpeg" alt="Logo Askara Zayyan" class="img-logo-dashboard">
+        <div>
+            <h1>Dashboard Admin</h1>
+            <div class="sub-title">Askara Zayyan (Owner)</div>
+        </div>
+    </div>
+    <div class="header-right">
+        <span style="font-weight: 500; margin-right: 10px;">Biro Jasa STNK</span>
+        <a href="index.html" class="btn-logout">🚪 Keluar</a>
+    </div>
+</div>
+<div class="container">
+    <div class="welcome-box">
+        <div class="welcome-text">
+            <h2>Selamat Datang, Admin</h2>
+            <p>BIRO JASA STNK BERMOTOR ASKARA ZAYYAN</p>
+        </div>
+    </div>
+    <div class="stats-grid">
+        <div class="stat-card"><span class="label">Total Pelanggan</span><span class="value">128 Orang</span></div>
+        <div class="stat-card"><span class="label">Kendaraan</span><span class="value">156 Unit</span></div>
+        <div class="stat-card"><span class="label">Transaksi Hari Ini</span><span class="value">12 Transaksi</span></div>
+        <div class="stat-card income"><span class="label">Pendapatan Hari Ini</span><span class="value">Rp 5.760.000</span></div>
+    </div>
+    <div class="menu-section">
+        <h3>Menu Utama</h3>
+        <div class="menu-grid">
+            <a href="pelanggan.html" class="menu-item">👤 Pelanggan</a>
+            <a href="kendaraan.html" class="menu-item">🚗 Kendaraan</a>
+            <a href="transaksi.html" class="menu-item">📝 Transaksi</a>
+            <a href="tracking.html" class="menu-item">🔍 Tracking</a>
+            <a href="laporan.html" class="menu-item">📊 Laporan</a>
+            <a href="tandaterima.html" class="menu-item">🧾 Tanda Terima</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
