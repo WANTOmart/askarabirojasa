@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Tambah Transaksi</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f4f6f9; }
+        .box { background: white; padding: 20px; border-radius: 10px; max-width: 400px; margin: auto; }
+        input, select { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px; }
+        button { width: 100%; padding: 10px; background: #0d47a1; color: white; border: none; cursor: pointer; border-radius: 5px; }
+    </style>
+</head>
+<body>
+<div class="box">
+    <h2>Tambah Data</h2>
+    <input type="text" id="nota" placeholder="No. Nota">
+    <input type="text" id="pelanggan" placeholder="Nama Pelanggan">
+    <select id="layanan">
+        <option>Perpanjang STNK Tahunan</option>
+        <option>Perpanjang STNK 5 Tahunan</option>
+        <option>Mutasi Keluar Daerah</option>
+        <option>Balik Nama Mobil</option>
+        <option>Cabut Berkas</option>
+    </select>
+    <input type="text" id="biaya" placeholder="Total Biaya (Contoh: Rp 1.000.000)">
+    <select id="status"><option>Selesai</option><option>Diproses</option><option>Menunggu Loket</option></select>
+    <button onclick="simpan()">Simpan Data</button>
+</div>
+
+<script>
+    function simpan() {
+        let t = {
+            nota: document.getElementById("nota").value,
+            pelanggan: document.getElementById("pelanggan").value,
+            layanan: document.getElementById("layanan").value,
+            biaya: document.getElementById("biaya").value,
+            status: document.getElementById("status").value
+        };
+        let data = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+        data.push(t);
+        localStorage.setItem("dataTransaksi", JSON.stringify(data));
+        window.location.href = "transaksi.html";
+    }
+</script>
+</body>
+</html>
