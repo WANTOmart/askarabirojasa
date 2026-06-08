@@ -6,13 +6,13 @@
     <style>
         body { font-family: sans-serif; padding: 20px; background: #f4f6f9; }
         .box { background: white; padding: 20px; border-radius: 10px; max-width: 400px; margin: auto; }
-        input, select { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px; }
-        button { width: 100%; padding: 10px; background: #0d47a1; color: white; border: none; cursor: pointer; border-radius: 5px; }
+        input, select { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; }
+        button { width: 100%; padding: 10px; background: #0d47a1; color: white; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
 <div class="box">
-    <h2>Tambah Data</h2>
+    <h2>Input Data Baru</h2>
     <input type="text" id="nota" placeholder="No. Nota">
     <input type="text" id="pelanggan" placeholder="Nama Pelanggan">
     <select id="layanan">
@@ -22,7 +22,7 @@
         <option>Balik Nama Mobil</option>
         <option>Cabut Berkas</option>
     </select>
-    <input type="text" id="biaya" placeholder="Total Biaya (Contoh: Rp 1.000.000)">
+    <input type="text" id="biaya" placeholder="Total Biaya">
     <select id="status"><option>Selesai</option><option>Diproses</option><option>Menunggu Loket</option></select>
     <button onclick="simpan()">Simpan Data</button>
 </div>
