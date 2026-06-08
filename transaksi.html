@@ -2,68 +2,50 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Transaksi - Askara Zayyan</title>
+    <title>Tambah Transaksi</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background-color: #f4f6f9; }
-        .header { background-color: #0d47a1; color: white; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
-        .header .btn-back { color: white; text-decoration: none; font-size: 14px; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 6px; }
-        .header h1 { font-size: 18px; }
-        .container { padding: 20px; max-width: 1000px; margin: 0 auto; }
-        .table-responsive { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden; }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
-        th { background-color: #0d47a1; color: white; padding: 15px; font-weight: 600; }
-        td { padding: 15px; border-bottom: 1px solid #eee; color: #333; }
-        .badge { padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; }
-        .badge-success { background-color: #e8f5e9; color: #2e7d32; }
-        .badge-warning { background-color: #fff3e0; color: #ef6c00; }
-        .badge-info { background-color: #e3f2fd; color: #0d47a1; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f6f9; padding: 20px; }
+        .box { background: white; padding: 20px; border-radius: 10px; max-width: 500px; margin: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #0d47a1; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
-<div class="header">
-    <a href="dashboard.html" class="btn-back">⬅ Kembali</a>
-    <h1>Data Transaksi</h1>
-    <span style="font-size: 18px;">➕</span>
+
+<div class="box">
+    <h2>Tambah Transaksi Baru</h2>
+    <input type="text" id="nota" placeholder="No. Nota (Contoh: #TRX-004)">
+    <input type="text" id="pelanggan" placeholder="Nama Pelanggan">
+    <input type="text" id="layanan" placeholder="Layanan">
+    <input type="number" id="biaya" placeholder="Total Biaya (Angka saja)">
+    <select id="status">
+        <option value="Selesai">Selesai</option>
+        <option value="Diproses">Diproses</option>
+        <option value="Menunggu Loket">Menunggu Loket</option>
+    </select>
+    <button onclick="simpanTransaksi()">Simpan Transaksi</button>
 </div>
-<div class="container">
-    <div class="table-responsive">
-        <table>
-            <thead>
-                <tr>
-                    <th>No. Nota</th>
-                    <th>Pelanggan</th>
-                    <th>Layanan</th>
-                    <th>Total Biaya</th>
-                    <th>Status Berkas</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>#TRX-001</td>
-                    <td>Budi Santoso</td>
-                    <td>Perpanjang STNK 5 Tahunan</td>
-                    <td><strong>Rp 1.250.000</strong></td>
-                    <td><span class="badge badge-success">Selesai</span></td>
-                </tr>
-                <tr>
-                    <td>#TRX-002</td>
-                    <td>Andi Setiawan</td>
-                    <td>Balik Nama Mobil</td>
-                    <td><strong>Rp 3.500.000</strong></td>
-                    <td><span class="badge badge-warning">Diproses</span></td>
-                </tr>
-                <tr>
-                    <td>#TRX-003</td>
-                    <td>Rina Handayani</td>
-                    <td>Mutasi Keluar Keluar Daerah</td>
-                    <td><strong>Rp 1.010.000</strong></td>
-                    <td><span class="badge badge-info">Menunggu Loket</span></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+
+<script>
+    function simpanTransaksi() {
+        let t = {
+            nota: document.getElementById("nota").value,
+            pelanggan: document.getElementById("pelanggan").value,
+            layanan: document.getElementById("layanan").value,
+            biaya: document.getElementById("biaya").value,
+            status: document.getElementById("status").value
+        };
+
+        if(!t.nota || !t.pelanggan) { alert("Isi Nota dan Pelanggan!"); return; }
+
+        let data = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+        data.push(t);
+        localStorage.setItem("dataTransaksi", JSON.stringify(data));
+        
+        alert("Data berhasil disimpan!");
+        window.location.href = "transaksi.html"; // Kembali ke halaman tabel
+    }
+</script>
+
 </body>
 </html>
