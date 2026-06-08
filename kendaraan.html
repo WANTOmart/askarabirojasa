@@ -5,94 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Kendaraan - Askara Zayyan</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Arial, sans-serif;
-        }
-        body {
-            background-color: #f4f6f9;
-        }
-        .header {
-            background-color: #0d47a1;
-            color: white;
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .header .btn-back {
-            color: white;
-            text-decoration: none;
-            font-size: 14px;
-            background: rgba(255,255,255,0.2);
-            padding: 5px 12px;
-            border-radius: 6px;
-        }
-        .header h1 {
-            font-size: 18px;
-        }
-        .container {
-            padding: 20px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        .search-box {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-        }
-        .search-box input {
-            width: 100%;
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-        }
-        .table-responsive {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            overflow: hidden;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 14px;
-        }
-        th {
-            background-color: #0d47a1;
-            color: white;
-            padding: 15px;
-            font-weight: 600;
-        }
-        td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            color: #333;
-        }
-        tr:hover {
-            background-color: #f8f9fa;
-        }
-        .badge {
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: bold;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background-color: #f4f6f9; }
+        .header { background-color: #0d47a1; color: white; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .header .btn-back { color: white; text-decoration: none; font-size: 14px; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 6px; }
+        .container { padding: 20px; max-width: 900px; margin: 0 auto; }
+        
+        /* Form Input */
+        .form-section { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
+        button { background-color: #0d47a1; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        
+        /* Tabel */
+        .table-responsive { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background-color: #0d47a1; color: white; padding: 15px; text-align: left; }
+        td { padding: 15px; border-bottom: 1px solid #eee; }
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; }
         .badge-mobil { background-color: #e3f2fd; color: #0d47a1; }
         .badge-motor { background-color: #e8f5e9; color: #2e7d32; }
-        .total-count {
-            margin-top: 15px;
-            font-size: 13px;
-            color: #666;
-            font-weight: 500;
-        }
     </style>
 </head>
 <body>
@@ -100,16 +32,24 @@
 <div class="header">
     <a href="dashboard.html" class="btn-back">⬅ Kembali</a>
     <h1>Data Kendaraan</h1>
-    <span style="font-size: 18px;">➕</span>
 </div>
 
 <div class="container">
-    <!-- Kolom Pencarian -->
-    <div class="search-box">
-        <input type="text" placeholder="🔍 Cari Plat Nomor, No Rangka, atau Pemilik...">
+    <div class="form-section">
+        <h3>Tambah Kendaraan Baru</h3>
+        <div class="form-grid" style="margin-top:15px;">
+            <input type="text" id="plat" placeholder="Plat Nomor">
+            <input type="text" id="pemilik" placeholder="Nama Pemilik">
+            <input type="text" id="merk" placeholder="Merk / Tipe">
+            <select id="jenis">
+                <option value="Mobil">Mobil</option>
+                <option value="Motor">Motor</option>
+            </select>
+            <input type="text" id="rangka" placeholder="No. Rangka">
+            <button onclick="tambahData()">Tambah</button>
+        </div>
     </div>
 
-    <!-- Tabel Data Kendaraan -->
     <div class="table-responsive">
         <table>
             <thead>
@@ -121,48 +61,47 @@
                     <th>No. Rangka</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td><strong>L 1234 AB</strong></td>
-                    <td>Budi Santoso</td>
-                    <td>Honda Vario 160</td>
-                    <td><span class="badge badge-motor">Motor</span></td>
-                    <td>MH1KF1111KKXXXXXX</td>
-                </tr>
-                <tr>
-                    <td><strong>W 9876 CD</strong></td>
-                    <td>Andi Setiawan</td>
-                    <td>Toyota Avanza Veloz</td>
-                    <td><span class="badge badge-mobil">Mobil</span></td>
-                    <td>MHF11BK33KKXXXXXX</td>
-                </tr>
-                <tr>
-                    <td><strong>L 4321 XY</strong></td>
-                    <td>Rina Handayani</td>
-                    <td>Honda Brio RS</td>
-                    <td><span class="badge badge-mobil">Mobil</span></td>
-                    <td>MHF22CK44LLXXXXXX</td>
-                </tr>
-                <tr>
-                    <td><strong>L 5566 HH</strong></td>
-                    <td>Mohammad Hasan</td>
-                    <td>Yamaha NMAX 155</td>
-                    <td><span class="badge badge-motor">Motor</span></td>
-                    <td>MH1SG2222MMXXXXXX</td>
-                </tr>
-                <tr>
-                    <td><strong>W 2244 SN</strong></td>
-                    <td>Siti Nurhaliza</td>
-                    <td>Honda Beat FI</td>
-                    <td><span class="badge badge-motor">Motor</span></td>
-                    <td>MH1JF3333NNXXXXXX</td>
-                </tr>
-            </tbody>
+            <tbody id="tabel-body">
+                </tbody>
         </table>
     </div>
-
-    <div class="total-count">Total 156 Unit Kendaraan Tercatat</div>
 </div>
+
+<script>
+    function tambahData() {
+        let plat = document.getElementById("plat").value;
+        let pemilik = document.getElementById("pemilik").value;
+        let merk = document.getElementById("merk").value;
+        let jenis = document.getElementById("jenis").value;
+        let rangka = document.getElementById("rangka").value;
+
+        if(!plat || !pemilik || !merk || !rangka) {
+            alert("Mohon isi semua data!");
+            return;
+        }
+
+        let tbody = document.getElementById("tabel-body");
+        let tr = document.createElement("tr");
+
+        let badgeClass = jenis === "Mobil" ? "badge-mobil" : "badge-motor";
+
+        tr.innerHTML = `
+            <td><strong>${plat}</strong></td>
+            <td>${pemilik}</td>
+            <td>${merk}</td>
+            <td><span class="badge ${badgeClass}">${jenis}</span></td>
+            <td>${rangka}</td>
+        `;
+
+        tbody.appendChild(tr);
+
+        // Reset input
+        document.getElementById("plat").value = "";
+        document.getElementById("pemilik").value = "";
+        document.getElementById("merk").value = "";
+        document.getElementById("rangka").value = "";
+    }
+</script>
 
 </body>
 </html>
