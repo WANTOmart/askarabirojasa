@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tanda Terima - Askara Zayyan</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background-color: #f4f6f9; }
+        .header { background-color: #0d47a1; color: white; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .header .btn-back { color: white; text-decoration: none; font-size: 14px; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 6px; }
+        .header h1 { font-size: 18px; }
+        .container { padding: 20px; max-width: 600px; margin: 0 auto; }
+        .nota-box { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 8px solid #0d47a1; }
+        .nota-header { display: flex; align-items: center; gap: 25px; border-bottom: 2px solid #0d47a1; padding-bottom: 20px; margin-bottom: 25px; }
+        .img-logo { width: 120px; height: 120px; object-fit: contain; }
+        .nota-title { text-align: left; }
+        .nota-title h2 { color: #0d47a1; font-size: 24px; letter-spacing: 0.5px; }
+        .nota-title p { font-size: 13px; color: #555; margin-top: 5px; line-height: 1.5; }
+        .nota-details { margin-bottom: 20px; font-size: 14px; line-height: 2.2; border-bottom: 1px dashed #ccc; padding-bottom: 15px; }
+        .nota-details .row { display: flex; justify-content: space-between; }
+        .nota-details span.label { color: #666; width: 150px; display: inline-block; }
+        .nota-details span.value { color: #333; flex: 1; text-align: left; }
+        .btn-print { width: 100%; background: #2e7d32; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 15px; }
+        .btn-print:hover { background: #236327; }
+        @media print {
+            body { background: white; }
+            .header, .btn-print { display: none; }
+            .container { padding: 0; }
+            .nota-box { border: none; box-shadow: none; padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <a href="dashboard.html" class="btn-back">⬅ Kembali</a>
+    <h1>Cetak Tanda Terima</h1>
+    <span>🧾</span>
+</div>
+<div class="container">
+    <div class="nota-box">
+        <div class="nota-header">
+            <img src="GAMBAR/logo-az.jpeg" alt="Logo Askara Zayyan" class="img-logo">
+            <div class="nota-title">
+                <h2>ASKARA ZAYYAN</h2>
+                <p><strong>Biro Jasa STNK Bermotor</strong><br>Cepat • Aman • Terpercaya<br>Telp: 081358197419</p>
+            </div>
+        </div>
+        <div class="nota-details">
+            <div class="row"><span class="label">No. Tanda Terima:</span><span class="value"><strong>#TT-2026-0045</strong></span></div>
+            <div class="row"><span class="label">Tanggal Berkas:</span><span class="value">08 Juni 2026</span></div>
+            <div class="row"><span class="label">Nama Pelanggan:</span><span class="value">Budi Santoso</span></div>
+            <div class="row"><span class="label">Kendaraan / Plat:</span><span class="value">Honda Vario 160 / L 1234 AB</span></div>
+            <div class="row"><span class="label">Jenis Layanan:</span><span class="value">Perpanjang STNK 5 Tahunan</span></div>
+            <div class="row"><span class="label">Total Biaya Jasa:</span><span class="value">Rp 1.250.000</span></div>
+            <div class="row"><span class="label">Status Pembayaran:</span><span class="value" style="color: #2e7d32; font-weight: bold;">DP Masuk Rp 500.000</span></div>
+            <div class="row"><span class="label">Sisa Pelunasan:</span><span class="value" style="color: #c62828; font-weight: bold;">Rp 750.000</span></div>
+        </div>
+        <button class="btn-print" onclick="window.print()">🖨️ Cetak Nota Resmi</button>
+    </div>
+</div>
+</body>
+</html>
