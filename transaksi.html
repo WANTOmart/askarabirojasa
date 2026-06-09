@@ -117,7 +117,15 @@
         let t = dataTransaksi[index];
         let printWindow = window.open('', '_blank');
         printWindow.document.write(`
-            <html><body>
+    <html><body>
+        <div style="text-align:center;">
+            <img src="logo.jpg" style="width:100px;">
+            <h2>BIRO JASA STNK ASKARA ZAYYAN</h2>
+        </div>
+        <hr>
+        ... (sisanya biarkan seperti semula)
+    </body></html>
+`);
                 <h2 style="text-align:center;">BIRO JASA STNK ASKARA ZAYYAN</h2>
                 <p>Nota: ${t.nota} | Tgl: ${t.tanggal}</p>
                 <hr>
