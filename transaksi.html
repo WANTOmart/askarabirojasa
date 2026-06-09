@@ -7,74 +7,50 @@
 
 <style>
 
-*{
-    box-sizing:border-box;
-    font-family:Segoe UI,sans-serif;
-}
-
 body{
+    font-family:Segoe UI,sans-serif;
     background:#f4f6f9;
     padding:20px;
 }
 
 .container{
-    max-width:1400px;
+    max-width:1000px;
     margin:auto;
     background:white;
     padding:20px;
-    border-radius:12px;
+    border-radius:10px;
     box-shadow:0 2px 10px rgba(0,0,0,.1);
 }
 
-.header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+h2{
     margin-bottom:20px;
 }
 
-.btn{
-    text-decoration:none;
-    padding:10px 15px;
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+}
+
+input,select{
+    padding:10px;
+    border:1px solid #ddd;
     border-radius:5px;
-    color:white;
-    font-weight:bold;
 }
 
-.back{
-    background:#546e7a;
-}
-
-.add{
+button{
     background:#0d47a1;
-}
-
-.info-box{
-    display:flex;
-    gap:15px;
-    margin-bottom:20px;
-}
-
-.card{
-    flex:1;
-    background:#f7f9fc;
-    padding:15px;
-    border-radius:8px;
-}
-
-.card h3{
-    color:#666;
-    margin-bottom:5px;
-}
-
-.card p{
-    font-size:22px;
-    font-weight:bold;
+    color:white;
+    border:none;
+    padding:10px;
+    border-radius:5px;
+    cursor:pointer;
 }
 
 table{
     width:100%;
     border-collapse:collapse;
+    margin-top:20px;
 }
 
 th{
@@ -98,27 +74,6 @@ td{
     font-weight:bold;
 }
 
-button{
-    border:none;
-    padding:6px 10px;
-    border-radius:4px;
-    cursor:pointer;
-    color:white;
-    margin:2px;
-}
-
-.btn-bayar{
-    background:#2e7d32;
-}
-
-.btn-cetak{
-    background:#1565c0;
-}
-
-.btn-hapus{
-    background:#c62828;
-}
-
 </style>
 </head>
 
@@ -126,50 +81,73 @@ button{
 
 <div class="container">
 
-<div class="header">
+<h2>TRANSAKSI</h2>
 
-<a href="dashboard.html" class="btn back">
-⬅ Dashboard
-</a>
+<div class="form-grid">
 
-<h2>Data Transaksi</h2>
+<input type="text" id="nota" readonly>
 
-<a href="tambah_transaksi.html" class="btn add">
-+ Tambah
-</a>
+<input type="date" id="tanggal" readonly>
+
+<select id="kendaraanSelect">
+<option value="">Pilih Kendaraan</option>
+</select>
+
+<input type="text" id="nama" placeholder="Nama Pelanggan" readonly>
+
+<input type="text" id="hp" placeholder="Nomor HP" readonly>
+
+<input type="text" id="plat" placeholder="Plat Nomor" readonly>
+
+<input type="text" id="merk" placeholder="Merk / Type" readonly>
+
+<select id="layanan">
+
+<option>Perpanjang STNK Tahunan</option>
+
+<option>Perpanjang STNK 5 Tahunan</option>
+
+<option>Balik Nama</option>
+
+<option>Mutasi Keluar</option>
+
+<option>Cabut Berkas</option>
+
+</select>
+
+<input
+type="number"
+id="biaya"
+placeholder="Biaya Jasa">
+
+<input
+type="number"
+id="dp"
+placeholder="DP">
 
 </div>
 
-<div class="info-box">
+<br>
 
-<div class="card">
-<h3>Total Omzet</h3>
-<p id="totalOmzet">Rp 0</p>
-</div>
-
-<div class="card">
-<h3>Total Piutang</h3>
-<p id="totalPiutang">Rp 0</p>
-</div>
-
-</div>
+<button onclick="simpanTransaksi()">
+Simpan Transaksi
+</button>
 
 <table>
 
 <thead>
+
 <tr>
 <th>Nota</th>
-<th>Tanggal</th>
 <th>Pelanggan</th>
-<th>No Polisi</th>
-<th>Kendaraan</th>
+<th>Plat</th>
 <th>Layanan</th>
 <th>Biaya</th>
 <th>DP</th>
 <th>Sisa</th>
-<th>Pembayaran</th>
-<th>Status Berkas</th>
+<th>Status</th>
 </tr>
+
 </thead>
 
 <tbody id="isiTabel"></tbody>
@@ -180,208 +158,201 @@ button{
 
 <script>
 
+let dataKendaraan =
+JSON.parse(
+localStorage.getItem("dataKendaraan")
+) || [];
+
+let dataTransaksi =
+JSON.parse(
+localStorage.getItem("dataTransaksi")
+) || [];
+
+function buatNota(){
+
+return "TRX-" +
+new Date().getFullYear() +
+"-" +
+String(dataTransaksi.length+1)
+.padStart(4,"0");
+
+}
+
+document.getElementById("nota").value =
+buatNota();
+
+document.getElementById("tanggal").value =
+new Date()
+.toISOString()
+.split("T")[0];
+
+function loadKendaraan(){
+
+let select =
+document.getElementById(
+"kendaraanSelect"
+);
+
+dataKendaraan.forEach((k,index)=>{
+
+select.innerHTML += `
+<option value="${index}">
+${k.plat} - ${k.namaStnk}
+</option>
+`;
+
+});
+
+}
+
+document
+.getElementById("kendaraanSelect")
+.addEventListener("change",function(){
+
+let k =
+dataKendaraan[this.value];
+
+document.getElementById("nama").value =
+k.namaPelanggan;
+
+document.getElementById("hp").value =
+k.hp;
+
+document.getElementById("plat").value =
+k.plat;
+
+document.getElementById("merk").value =
+k.merk;
+
+});
+
+function simpanTransaksi(){
+
+let biaya =
+Number(
+document.getElementById("biaya")
+.value
+);
+
+let dp =
+Number(
+document.getElementById("dp")
+.value
+);
+
+let sisa = biaya - dp;
+
+let transaksi = {
+
+nota:
+document.getElementById("nota")
+.value,
+
+tanggal:
+document.getElementById("tanggal")
+.value,
+
+nama:
+document.getElementById("nama")
+.value,
+
+hp:
+document.getElementById("hp")
+.value,
+
+plat:
+document.getElementById("plat")
+.value,
+
+merk:
+document.getElementById("merk")
+.value,
+
+layanan:
+document.getElementById("layanan")
+.value,
+
+biaya,
+
+dp,
+
+sisa,
+
+status:
+sisa <= 0
+? "Lunas"
+: "Belum Lunas"
+
+};
+
+dataTransaksi.push(transaksi);
+
+localStorage.setItem(
+"dataTransaksi",
+JSON.stringify(dataTransaksi)
+);
+
+alert(
+"Transaksi berhasil disimpan"
+);
+
+location.reload();
+
+}
+
 function renderTabel(){
 
-    let data =
-        JSON.parse(localStorage.getItem("dataTransaksi"))
-        || [];
+let tbody =
+document.getElementById(
+"isiTabel"
+);
 
-    let tbody =
-        document.getElementById("isiTabel");
+tbody.innerHTML = "";
 
-    tbody.innerHTML="";
+dataTransaksi.forEach(t=>{
 
-    let totalOmzet=0;
-    let totalPiutang=0;
+tbody.innerHTML += `
+<tr>
 
-    data.forEach((t,index)=>{
+<td>${t.nota}</td>
 
-        totalOmzet += Number(t.biayaJasa);
-        totalPiutang += Number(t.sisa);
+<td>${t.nama}</td>
 
-        tbody.innerHTML += `
-        <tr>
+<td>${t.plat}</td>
 
-        <td>${t.nota}</td>
+<td>${t.layanan}</td>
 
-        <td>${t.tanggal}</td>
+<td>
+Rp ${t.biaya.toLocaleString('id-ID')}
+</td>
 
-        <td>${t.pelanggan}</td>
+<td>
+Rp ${t.dp.toLocaleString('id-ID')}
+</td>
 
-        <td>${t.noPolisi}</td>
+<td>
+Rp ${t.sisa.toLocaleString('id-ID')}
+</td>
 
-        <td>${t.kendaraan}</td>
+<td class="${
+t.status==="Lunas"
+? "lunas"
+: "belum"
+}">
+${t.status}
+</td>
 
-        <td>${t.layanan}</td>
+</tr>
+`;
 
-        <td>
-        Rp ${Number(t.biayaJasa).toLocaleString('id-ID')}
-        </td>
+});
 
-        <td>
-        Rp ${Number(t.dp).toLocaleString('id-ID')}
-        </td>
-
-        <td>
-        Rp ${Number(t.sisa).toLocaleString('id-ID')}
-        </td>
-
-        <td class="${
-            t.pembayaran === 'Lunas'
-            ? 'lunas'
-            : 'belum'
-        }">
-
-        ${t.pembayaran}
-
-        </td>
-
-        <<th>Proses</th>
-
-        <td>
-
-        <button
-        class="btn-bayar"
-        onclick="bayar(${index})">
-        Bayar
-        </button>
-
-        <button
-        class="btn-cetak"
-        onclick="cetakNota(${index})">
-        Cetak
-        </button>
-
-        <button
-        class="btn-hapus"
-        onclick="hapus(${index})">
-        Hapus
-        </button>
-
-        </td>
-
-        </tr>
-        `;
-    });
-
-    document.getElementById("totalOmzet")
-    .innerText =
-    "Rp " +
-    totalOmzet.toLocaleString("id-ID");
-
-    document.getElementById("totalPiutang")
-    .innerText =
-    "Rp " +
-    totalPiutang.toLocaleString("id-ID");
 }
 
-function bayar(index){
-
-    let data =
-        JSON.parse(localStorage.getItem("dataTransaksi"));
-
-    let tambahan =
-        prompt("Masukkan pembayaran tambahan");
-
-    if(tambahan===null) return;
-
-    tambahan = Number(tambahan);
-
-    data[index].dp =
-        Number(data[index].dp)
-        + tambahan;
-
-    data[index].sisa =
-        Number(data[index].biayaJasa)
-        - Number(data[index].dp);
-
-    data[index].pembayaran =
-        data[index].sisa <= 0
-        ? "Lunas"
-        : "Belum Lunas";
-
-    localStorage.setItem(
-        "dataTransaksi",
-        JSON.stringify(data)
-    );
-
-    renderTabel();
-}
-
-function hapus(index){
-
-    if(confirm("Hapus transaksi ini?")){
-
-        let data =
-            JSON.parse(localStorage.getItem("dataTransaksi"));
-
-        data.splice(index,1);
-
-        localStorage.setItem(
-            "dataTransaksi",
-            JSON.stringify(data)
-        );
-
-        renderTabel();
-    }
-}
-
-function cetakNota(index){
-
-    let data =
-        JSON.parse(localStorage.getItem("dataTransaksi"));
-
-    let t = data[index];
-
-    let w =
-        window.open("","","width=700,height=700");
-
-    w.document.write(`
-    <html>
-    <head>
-    <title>Nota</title>
-    </head>
-    <body>
-
-    <h2>NOTA TRANSAKSI</h2>
-
-    <hr>
-
-    <p>No Nota : ${t.nota}</p>
-
-    <p>Tanggal : ${t.tanggal}</p>
-
-    <p>Pelanggan : ${t.pelanggan}</p>
-
-    <p>No Polisi : ${t.noPolisi}</p>
-
-    <p>Kendaraan : ${t.kendaraan}</p>
-
-    <p>Layanan : ${t.layanan}</p>
-
-    <hr>
-
-    <p>Total Biaya :
-    Rp ${Number(t.biayaJasa).toLocaleString('id-ID')}</p>
-
-    <p>DP :
-    Rp ${Number(t.dp).toLocaleString('id-ID')}</p>
-
-    <p>Sisa :
-    Rp ${Number(t.sisa).toLocaleString('id-ID')}</p>
-
-    <h3>${t.pembayaran}</h3>
-
-    </body>
-    </html>
-    `);
-
-    w.print();
-}
-
+loadKendaraan();
 renderTabel();
 
 </script>
 
 </body>
-</html> 
+</html>
