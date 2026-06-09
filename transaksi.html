@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="id">
 <head>
 <meta charset="UTF-8">
@@ -14,23 +13,23 @@ body{
 }
 
 .box{
-    background:white;
     max-width:500px;
     margin:auto;
+    background:#fff;
     padding:20px;
     border-radius:10px;
     box-shadow:0 2px 8px rgba(0,0,0,.1);
 }
 
 h2{
-    text-align:center;
     margin-bottom:15px;
+    text-align:center;
 }
 
 input,select{
     width:100%;
     padding:10px;
-    margin:5px 0;
+    margin-bottom:10px;
     border:1px solid #ddd;
     border-radius:5px;
 }
@@ -38,9 +37,9 @@ input,select{
 button{
     width:100%;
     padding:12px;
+    border:none;
     background:#0d47a1;
     color:white;
-    border:none;
     border-radius:5px;
     cursor:pointer;
     font-weight:bold;
@@ -52,77 +51,78 @@ button:hover{
 
 .back-link{
     display:block;
-    margin-bottom:10px;
+    margin-bottom:15px;
     text-decoration:none;
-    color:#546e7a;
+    color:#555;
 }
 
 .info{
-    background:#f1f5f9;
+    background:#f1f8ff;
     padding:10px;
     border-radius:5px;
-    margin:10px 0;
-    font-size:16px;
+    margin-bottom:10px;
 }
 </style>
-
 </head>
 
 <body>
 
 <div class="box">
 
-<a href="transaksi.html" class="back-link">
-⬅ Kembali ke Daftar
-</a>
+    <a href="transaksi.html" class="back-link">
+        ⬅ Kembali ke Daftar
+    </a>
 
-<h2>Input Data Baru</h2>
+    <h2>Input Transaksi Baru</h2>
 
-<input type="text"
-    id="nota"
-    readonly
-    style="background:#eee;">
+    <input type="text" id="nota" readonly>
 
-<input type="date" id="tanggal">
+    <input type="date" id="tanggal">
 
-<input type="text"
-    id="pelanggan"
-    placeholder="Nama Pelanggan">
+    <input type="text"
+           id="pelanggan"
+           placeholder="Nama Pelanggan">
 
-<input type="text"
-    id="noPolisi"
-    placeholder="Nomor Polisi">
+    <input type="text"
+           id="noPolisi"
+           placeholder="Nomor Polisi">
 
-<select id="kendaraan">
-    <option value="Motor">Motor</option>
-    <option value="Mobil">Mobil</option>
-</select>
+    <select id="kendaraan">
+        <option>Motor</option>
+        <option>Mobil</option>
+    </select>
 
-<select id="layanan">
-    <option>Perpanjang STNK Tahunan</option>
-    <option>Perpanjang STNK 5 Tahunan</option>
-    <option>Mutasi Keluar Daerah</option>
-    <option>Balik Nama Mobil</option>
-    <option>Cabut Berkas</option>
-</select>
+    <select id="layanan">
+        <option>Perpanjang STNK Tahunan</option>
+        <option>Perpanjang STNK 5 Tahunan</option>
+        <option>Mutasi Keluar Daerah</option>
+        <option>Balik Nama Mobil</option>
+        <option>Cabut Berkas</option>
+    </select>
 
-<input type="number"
-    id="biayaJasa"
-    placeholder="Biaya Jasa">
+    <input type="number"
+           id="biayaJasa"
+           placeholder="Biaya Jasa">
 
-<input type="number"
-    id="dp"
-    placeholder="DP"
-    value="0">
+    <input type="number"
+           id="dp"
+           placeholder="DP"
+           value="0">
 
-<div class="info">
-    Sisa Tagihan:
-    <strong id="sisaText">Rp 0</strong>
-</div>
+    <div class="info">
+        Sisa Tagihan :
+        <strong id="sisaTagihan">Rp 0</strong>
+    </div>
 
-<button onclick="simpan()">
-    Simpan Data
-</button>
+    <select id="status">
+        <option>Diproses</option>
+        <option>Menunggu Loket</option>
+        <option>Selesai</option>
+    </select>
+
+    <button onclick="simpan()">
+        Simpan Data
+    </button>
 
 </div>
 
@@ -131,17 +131,20 @@ button:hover{
 window.onload = function(){
 
     let data =
-    JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+        JSON.parse(localStorage.getItem("dataTransaksi"))
+        || [];
 
     document.getElementById("nota").value =
-    "#TRX-" +
-    (data.length + 1)
-    .toString()
-    .padStart(3,"0");
+        "#TRX-" +
+        (data.length + 1)
+        .toString()
+        .padStart(3,'0');
 
     document.getElementById("tanggal").value =
-    new Date().toISOString().split("T")[0];
-};
+        new Date().toISOString().split("T")[0];
+
+    hitungSisa();
+}
 
 document.getElementById("biayaJasa")
 .addEventListener("input", hitungSisa);
@@ -152,30 +155,32 @@ document.getElementById("dp")
 function hitungSisa(){
 
     let biaya =
-    Number(document.getElementById("biayaJasa").value) || 0;
+        Number(document.getElementById("biayaJasa").value);
 
     let dp =
-    Number(document.getElementById("dp").value) || 0;
+        Number(document.getElementById("dp").value);
 
     let sisa = biaya - dp;
 
-    document.getElementById("sisaText").innerText =
+    document.getElementById("sisaTagihan")
+    .innerText =
     "Rp " + sisa.toLocaleString("id-ID");
 }
 
 function simpan(){
 
-    let biayaJasa =
-    Number(document.getElementById("biayaJasa").value);
+    let biaya =
+        Number(document.getElementById("biayaJasa").value);
 
     let dp =
-    Number(document.getElementById("dp").value);
+        Number(document.getElementById("dp").value);
 
-    let sisa =
-    biayaJasa - dp;
+    let sisa = biaya - dp;
 
     let pembayaran =
-    sisa <= 0 ? "Lunas" : "Belum Lunas";
+        sisa <= 0
+        ? "Lunas"
+        : "Belum Lunas";
 
     let transaksi = {
 
@@ -197,21 +202,21 @@ function simpan(){
         layanan:
         document.getElementById("layanan").value,
 
-        biayaJasa:
-        biayaJasa,
+        biayaJasa: biaya,
 
-        dp:
-        dp,
+        dp: dp,
 
-        sisa:
-        sisa,
+        sisa: sisa,
 
-        pembayaran:
-        pembayaran
+        pembayaran: pembayaran,
+
+        statusBerkas:
+        document.getElementById("status").value
     };
 
     let data =
-    JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+        JSON.parse(localStorage.getItem("dataTransaksi"))
+        || [];
 
     data.push(transaksi);
 
@@ -222,9 +227,9 @@ function simpan(){
 
     alert("Data berhasil disimpan");
 
-    window.location.href = "transaksi.html";
+    window.location.href =
+        "transaksi.html";
 }
-
 </script>
 
 </body>
