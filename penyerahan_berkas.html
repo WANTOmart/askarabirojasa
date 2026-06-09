@@ -29,6 +29,7 @@
                 <th>Nama STNK</th>
                 <th>Plat</th>
                 <th>Layanan</th>
+                <th>Biaya</th>
                 <th class="no-print">Aksi</th>
             </tr>
         </thead>
@@ -42,23 +43,23 @@
     function render() {
         let html = "";
         dataTransaksi.forEach((t, index) => {
-            // Hanya tampilkan yang sudah SELESAI
             if (t.statusBerkas === "SELESAI") {
                 html += `<tr>
                     <td>${t.nota}</td>
                     <td>${t.stnk}</td>
                     <td>${t.plat}</td>
                     <td>${t.layanan}</td>
+                    <td>Rp ${Number(t.biaya).toLocaleString('id-ID')}</td>
                     <td class="no-print">
-                        <button class="btn-print" onclick="cetak('${t.nota}', '${t.stnk}', '${t.plat}', '${t.layanan}')">Cetak Bukti</button>
+                        <button class="btn-print" onclick="cetak('${t.nota}', '${t.stnk}', '${t.plat}', '${t.layanan}', '${t.biaya}')">Cetak Bukti</button>
                     </td>
                 </tr>`;
             }
         });
-        document.getElementById("isiTabel").innerHTML = html || "<tr><td colspan='5'>Tidak ada berkas yang selesai.</td></tr>";
+        document.getElementById("isiTabel").innerHTML = html || "<tr><td colspan='6'>Tidak ada berkas yang selesai.</td></tr>";
     }
 
-    function cetak(nota, nama, plat, layanan) {
+    function cetak(nota, nama, plat, layanan, biaya) {
         let printWindow = window.open('', '_blank');
         printWindow.document.write(`
             <html><head><title>Bukti Penyerahan</title></head>
@@ -69,9 +70,13 @@
                 <p><strong>Nama STNK:</strong> ${nama}</p>
                 <p><strong>Plat Nomor:</strong> ${plat}</p>
                 <p><strong>Jenis Layanan:</strong> ${layanan}</p>
-                <p><strong>Status:</strong> Berkas Telah Diserahkan & Selesai</p>
+                <p><strong>Total Pembayaran:</strong> Rp ${Number(biaya).toLocaleString('id-ID')}</p>
+                <p><strong>Status:</strong> LUNAS</p>
                 <br><br>
-                <p style="text-align:right;">Tanda Terima,<br><br><br>(..........................)</p>
+                <div style="text-align:right;">
+                    Tanda Terima,<br><br><br>
+                    (..........................)
+                </div>
             </body></html>
         `);
         printWindow.document.close();
