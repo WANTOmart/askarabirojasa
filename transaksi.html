@@ -117,10 +117,13 @@
         let t = dataTransaksi[index];
         let printWindow = window.open('', '_blank');
         printWindow.document.write(`
-            <html><body>
-                <h2 style="text-align:center;">BIRO JASA STNK ASKARA ZAYYAN</h2>
-                <p>Nota: ${t.nota} | Tgl: ${t.tanggal}</p>
+            <html><body style="font-family:sans-serif; padding:20px;">
+                <div style="text-align:center;">
+                    <img src="logo.jpg" style="width:120px; display:block; margin:0 auto 10px auto;">
+                    <h2 style="margin:5px 0;">BIRO JASA STNK ASKARA ZAYYAN</h2>
+                </div>
                 <hr>
+                <p>Nota: ${t.nota} | Tgl: ${t.tanggal}</p>
                 <p>Nama: ${t.stnk}</p>
                 <p>Plat: ${t.plat} (${t.merk})</p>
                 <p>Layanan: ${t.layanan}</p>
@@ -129,11 +132,11 @@
                 <p>DP: Rp ${Number(t.dp).toLocaleString('id-ID')}</p>
                 <p><strong>Sisa Kurang: Rp ${Number(t.sisa).toLocaleString('id-ID')}</strong></p>
                 <hr>
-                <p style="text-align:center;">Status: ${t.sisa <= 0 ? 'LUNAS' : 'BELUM LUNAS'}</p>
+                <p style="text-align:center;">Status: <b>${t.sisa <= 0 ? 'LUNAS' : 'BELUM LUNAS'}</b></p>
             </body></html>
         `);
         printWindow.document.close();
-        printWindow.print();
+        setTimeout(() => { printWindow.print(); }, 500);
     }
 
     function simpan(){
@@ -166,4 +169,5 @@
     render();
 </script>
 </body>
+</html>
 </html>
