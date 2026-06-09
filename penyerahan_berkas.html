@@ -1,57 +1,18 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Penyerahan Berkas</title>
-    <style>
-        body { font-family: Segoe UI, sans-serif; background: #f4f6f9; padding: 20px; }
-        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,.1); }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { background: #0d47a1; color: white; padding: 10px; }
-        td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
-        .btn-print { background: #1976d2; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
-        @media print { .no-print { display: none; } }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <div class="no-print">
-        <a href="dashboard.html">⬅ Kembali ke Dashboard</a>
-        <h2>Penyerahan Berkas Selesai</h2>
-    </div>
-    
-    <table>
-        <thead>
-            <tr>
-                <th>Nota</th>
-                <th>Nama STNK</th>
-                <th>Plat</th>
-                <th>Layanan</th>
-                <th>Biaya</th>
-                <th class="no-print">Aksi</th>
-            </tr>
-        </thead>
-        <tbody id="isiTabel"></tbody>
-    </table>
-</div>
-
-<script>
-    let dataTransaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-
-    function render() {
+function render() {
         let html = "";
         dataTransaksi.forEach((t, index) => {
             if (t.statusBerkas === "SELESAI") {
+                // Pastikan data t.biaya ada
+                let harga = t.biaya ? Number(t.biaya) : 0;
+                
                 html += `<tr>
                     <td>${t.nota}</td>
                     <td>${t.stnk}</td>
                     <td>${t.plat}</td>
                     <td>${t.layanan}</td>
-                    <td>Rp ${Number(t.biaya).toLocaleString('id-ID')}</td>
+                    <td>Rp ${harga.toLocaleString('id-ID')}</td>
                     <td class="no-print">
-                        <button class="btn-print" onclick="cetak('${t.nota}', '${t.stnk}', '${t.plat}', '${t.layanan}', '${t.biaya}')">Cetak Bukti</button>
+                        <button class="btn-print" onclick="cetak('${t.nota}', '${t.stnk}', '${t.plat}', '${t.layanan}', ${harga})">Cetak Bukti</button>
                     </td>
                 </tr>`;
             }
@@ -80,10 +41,8 @@
             </body></html>
         `);
         printWindow.document.close();
-        printWindow.print();
+        // Beri jeda sedikit agar konten sempat dimuat sebelum print muncul
+        setTimeout(() => {
+            printWindow.print();
+        }, 500);
     }
-
-    render();
-</script>
-</body>
-</html>
