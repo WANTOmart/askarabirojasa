@@ -1,178 +1,385 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Keuangan - Askara Zayyan</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background-color: #f4f6f9; }
-        .header { background-color: #0d47a1; color: white; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
-        .header .btn-back { color: white; text-decoration: none; font-size: 14px; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 6px; }
-        .header h1 { font-size: 18px; }
-        .container { padding: 20px; max-width: 900px; margin: 0 auto; }
-        
-        .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .card h3 { color: #333; margin-bottom: 15px; font-size: 16px; border-bottom: 2px solid #0d47a1; padding-bottom: 5px; display: inline-block; }
-        .info-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px; color: #555; }
-        .info-row strong.plus { color: #2e7d32; }
-        .info-row strong.minus { color: #c62828; }
-        
-        .form-section { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 25px; }
-        .form-grid { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 10px; margin-top: 10px; }
-        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
-        button { background-color: #0d47a1; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        button:hover { background-color: #0a3780; }
-        button.btn-hapus { background-color: #c62828; padding: 5px 10px; font-size: 12px; }
-        button.btn-hapus:hover { background-color: #a02020; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laporan Keuangan</title>
 
-        .table-section { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; margin-top: 10px; }
-        th { background-color: #f8f9fa; color: #333; padding: 12px; font-weight: 600; border-bottom: 2px solid #eee; }
-        td { padding: 12px; border-bottom: 1px solid #eee; color: #333; }
-        .txt-masuk { color: #2e7d32; font-weight: bold; }
-        .txt-keluar { color: #c62828; font-weight: bold; }
-        .badge-tipe { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
-        .bg-masuk { background-color: #e8f5e9; color: #2e7d32; }
-        .bg-keluar { background-color: #ffebee; color: #c62828; }
-    </style>
+<style>
+
+*{
+    box-sizing:border-box;
+    font-family:Segoe UI,sans-serif;
+}
+
+body{
+    background:#f4f6f9;
+    padding:20px;
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+}
+
+.header{
+    background:#0d47a1;
+    color:white;
+    padding:15px;
+    border-radius:10px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.back{
+    color:white;
+    text-decoration:none;
+    background:rgba(255,255,255,.2);
+    padding:8px 12px;
+    border-radius:5px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
+
+.card h3{
+    color:#666;
+    margin-bottom:10px;
+}
+
+.card p{
+    font-size:24px;
+    font-weight:bold;
+}
+
+.masuk{
+    color:green;
+}
+
+.keluar{
+    color:red;
+}
+
+.laba{
+    color:#0d47a1;
+}
+
+.form-box{
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    margin-bottom:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin-bottom:10px;
+    border:1px solid #ddd;
+    border-radius:5px;
+}
+
+button{
+    background:#0d47a1;
+    color:white;
+    border:none;
+    padding:10px 15px;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+}
+
+th{
+    background:#0d47a1;
+    color:white;
+    padding:10px;
+}
+
+td{
+    padding:10px;
+    border-bottom:1px solid #ddd;
+}
+
+.btn-hapus{
+    background:red;
+}
+
+</style>
 </head>
 <body>
 
+<div class="container">
+
 <div class="header">
-    <a href="dashboard.html" class="btn-back">⬅ Kembali</a>
-    <h1>Laporan Keuangan</h1>
-    <span>📊</span>
+<h2>Laporan Keuangan</h2>
+
+<a href="dashboard.html" class="back">
+⬅ Dashboard
+</a>
 </div>
 
-<div class="container">
-    <div class="report-grid">
-        <div class="card">
-            <h3>Total Kas Bulan Ini</h3>
-            <div class="info-row"><span>Total Pendapatan:</span><strong class="plus" id="total-masuk">+ Rp 0</strong></div>
-            <div class="info-row"><span>Total Pengeluaran:</span><strong class="minus" id="total-keluar">- Rp 0</strong></div>
-        </div>
-        <div class="card">
-            <h3>Sisa Saldo Bersih</h3>
-            <div class="info-row" style="margin-top: 15px;">
-                <span>Keuntungan Bersih:</span>
-                <span id="saldo-bersih" style="font-size: 20px; font-weight: bold; color: #0d47a1;">Rp 0</span>
-            </div>
-        </div>
-    </div>
+<div class="grid">
 
-    <div class="form-section">
-        <h3>Tambah Transaksi Baru</h3>
-        <div class="form-grid">
-            <input type="text" id="ket" placeholder="Keterangan (Contoh: Jasa STNK Budi)">
-            <input type="number" id="jumlah" placeholder="Jumlah (Rupiah)">
-            <select id="jenis">
-                <option value="masuk">Uang Masuk</option>
-                <option value="keluar">Uang Keluar</option>
-            </select>
-            <button onclick="tambahData()">Tambah</button>
-        </div>
-    </div>
+<div class="card">
+<h3>Total DP Masuk</h3>
+<p class="masuk" id="dpMasuk">
+Rp 0
+</p>
+</div>
 
-    <div class="table-section">
-        <h3>Rincian Kas Masuk & Keluar</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Keterangan / Deskripsi</th>
-                    <th>Jenis</th>
-                    <th>Jumlah (Rupiah)</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody id="isi-tabel"></tbody>
-        </table>
-    </div>
+<div class="card">
+<h3>Total Pelunasan</h3>
+<p class="masuk" id="pelunasanMasuk">
+Rp 0
+</p>
+</div>
+
+<div class="card">
+<h3>Total Pemasukan</h3>
+<p class="masuk" id="totalMasuk">
+Rp 0
+</p>
+</div>
+
+<div class="card">
+<h3>Pengeluaran</h3>
+<p class="keluar" id="totalKeluar">
+Rp 0
+</p>
+</div>
+
+<div class="card">
+<h3>Laba Bersih</h3>
+<p class="laba" id="laba">
+Rp 0
+</p>
+</div>
+
+</div>
+
+<div class="form-box">
+
+<h3>Input Pengeluaran Operasional</h3>
+
+<input
+type="text"
+id="keterangan"
+placeholder="Keterangan">
+
+<input
+type="number"
+id="jumlah"
+placeholder="Jumlah">
+
+<button onclick="tambahPengeluaran()">
+Tambah Pengeluaran
+</button>
+
+</div>
+
+<div class="form-box">
+
+<h3>Riwayat Pengeluaran</h3>
+
+<table>
+
+<thead>
+<tr>
+<th>Tanggal</th>
+<th>Keterangan</th>
+<th>Jumlah</th>
+<th>Aksi</th>
+</tr>
+</thead>
+
+<tbody id="isiTabel"></tbody>
+
+</table>
+
+</div>
+
 </div>
 
 <script>
-    let dataKas = [
-        { ket: "DP Perpanjang STNK 5 Tahunan - Budi Santoso", jumlah: 500000, jenis: "masuk" },
-        { ket: "Bayar Pajak Mobil Veloz ke SAMSAT", jumlah: 2800000, jenis: "keluar" },
-        { ket: "Pelunasan Balik Nama Mobil - Andi Setiawan", jumlah: 3500000, jenis: "masuk" }
-    ];
 
-    function formatRupiah(angka) {
-        return "Rp " + angka.toLocaleString('id-ID');
+function formatRp(nilai){
+
+    return "Rp " +
+    Number(nilai)
+    .toLocaleString("id-ID");
+}
+
+function render(){
+
+    let transaksi =
+    JSON.parse(localStorage.getItem("dataTransaksi"))
+    || [];
+
+    let pengeluaran =
+    JSON.parse(localStorage.getItem("pengeluaran"))
+    || [];
+
+    let totalDP = 0;
+    let totalPelunasan = 0;
+
+    transaksi.forEach(t=>{
+
+        totalDP += Number(t.dp);
+
+        totalPelunasan +=
+        Number(t.biayaJasa)
+        - Number(t.sisa)
+        - Number(t.dp)
+        + Number(t.dp);
+
+    });
+
+    let totalKeluar = 0;
+
+    pengeluaran.forEach(p=>{
+        totalKeluar += Number(p.jumlah);
+    });
+
+    let totalMasuk =
+    totalDP + totalPelunasan;
+
+    let laba =
+    totalMasuk - totalKeluar;
+
+    document.getElementById("dpMasuk")
+    .innerText = formatRp(totalDP);
+
+    document.getElementById("pelunasanMasuk")
+    .innerText = formatRp(totalPelunasan);
+
+    document.getElementById("totalMasuk")
+    .innerText = formatRp(totalMasuk);
+
+    document.getElementById("totalKeluar")
+    .innerText = formatRp(totalKeluar);
+
+    document.getElementById("laba")
+    .innerText = formatRp(laba);
+
+    renderPengeluaran();
+}
+
+function tambahPengeluaran(){
+
+    let ket =
+    document.getElementById("keterangan").value;
+
+    let jumlah =
+    document.getElementById("jumlah").value;
+
+    if(ket==="" || jumlah===""){
+        alert("Lengkapi data");
+        return;
     }
 
-    function hitungDanTampilkan() {
-        let tbody = document.getElementById("isi-tabel");
-        tbody.innerHTML = "";
-        let totalMasuk = 0;
-        let totalKeluar = 0;
+    let data =
+    JSON.parse(localStorage.getItem("pengeluaran"))
+    || [];
 
-        dataKas.forEach((item, index) => {
-            let tr = document.createElement("tr");
-            
-            let tdKet = document.createElement("td");
-            tdKet.innerText = item.ket;
-            
-            let tdJenis = document.createElement("td");
-            if(item.jenis === "masuk") {
-                tdJenis.innerHTML = '<span class="badge-tipe bg-masuk">Masuk</span>';
-                totalMasuk += item.jumlah;
-            } else {
-                tdJenis.innerHTML = '<span class="badge-tipe bg-keluar">Keluar</span>';
-                totalKeluar += item.jumlah;
-            }
+    data.push({
 
-            let tdJumlah = document.createElement("td");
-            tdJumlah.className = item.jenis === "masuk" ? "txt-masuk" : "txt-keluar";
-            tdJumlah.innerText = (item.jenis === "masuk" ? "+ " : "- ") + formatRupiah(item.jumlah);
+        tanggal:
+        new Date()
+        .toLocaleDateString("id-ID"),
 
-            let tdAksi = document.createElement("td");
-            tdAksi.innerHTML = `<button class="btn-hapus" onclick="hapusData(${index})">Hapus</button>`;
+        keterangan:ket,
 
-            tr.appendChild(tdKet);
-            tr.appendChild(tdJenis);
-            tr.appendChild(tdJumlah);
-            tr.appendChild(tdAksi);
-            tbody.appendChild(tr);
-        });
+        jumlah:Number(jumlah)
 
-        document.getElementById("total-masuk").innerText = "+ " + formatRupiah(totalMasuk);
-        document.getElementById("total-keluar").innerText = "- " + formatRupiah(totalKeluar);
-        document.getElementById("saldo-bersih").innerText = formatRupiah(totalMasuk - totalKeluar);
-    }
+    });
 
-    function tambahData() {
-        let inputKet = document.getElementById("ket");
-        let inputJumlah = document.getElementById("jumlah");
-        let inputJenis = document.getElementById("jenis");
+    localStorage.setItem(
+    "pengeluaran",
+    JSON.stringify(data));
 
-        if(inputKet.value === "" || inputJumlah.value === "") {
-            alert("Harap isi keterangan dan jumlah uangnya ya!");
-            return;
-        }
+    document.getElementById("keterangan").value="";
+    document.getElementById("jumlah").value="";
 
-        dataKas.push({
-            ket: inputKet.value,
-            jumlah: parseInt(inputJumlah.value),
-            jenis: inputJenis.value
-        });
+    render();
+}
 
-        inputKet.value = "";
-        inputJumlah.value = "";
-        hitungDanTampilkan();
-    }
+function renderPengeluaran(){
 
-    function hapusData(index) {
-        if(confirm("Yakin ingin menghapus transaksi ini?")) {
-            dataKas.splice(index, 1);
-            hitungDanTampilkan();
-        }
-    }
+    let data =
+    JSON.parse(localStorage.getItem("pengeluaran"))
+    || [];
 
-    hitungDanTampilkan();
+    let tbody =
+    document.getElementById("isiTabel");
+
+    tbody.innerHTML="";
+
+    data.forEach((p,index)=>{
+
+        tbody.innerHTML += `
+        <tr>
+
+        <td>${p.tanggal}</td>
+
+        <td>${p.keterangan}</td>
+
+        <td>
+        ${formatRp(p.jumlah)}
+        </td>
+
+        <td>
+
+        <button
+        class="btn-hapus"
+        onclick="hapus(${index})">
+        Hapus
+        </button>
+
+        </td>
+
+        </tr>
+        `;
+    });
+
+}
+
+function hapus(index){
+
+    let data =
+    JSON.parse(localStorage.getItem("pengeluaran"))
+    || [];
+
+    data.splice(index,1);
+
+    localStorage.setItem(
+    "pengeluaran",
+    JSON.stringify(data));
+
+    render();
+}
+
+render();
+
 </script>
 
 </body>
-</html>
 </html>
