@@ -3,82 +3,93 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Penyerahan Berkas</title>
+<title>Pelunasan</title>
 
 <style>
 
 *{
-    box-sizing:border-box;
-    font-family:Segoe UI,sans-serif;
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,sans-serif;
 }
 
 body{
-    background:#f4f6f9;
-    padding:20px;
-}
-
-.container{
-    max-width:1200px;
-    margin:auto;
-    background:white;
-    padding:20px;
-    border-radius:10px;
-    box-shadow:0 2px 10px rgba(0,0,0,.1);
+background:#f4f6f9;
 }
 
 .header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:20px;
+background:#2e7d32;
+color:white;
+padding:15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
 }
 
-.btn{
-    padding:10px 15px;
-    border:none;
-    border-radius:5px;
-    cursor:pointer;
-    color:white;
-    font-weight:bold;
+.container{
+max-width:1200px;
+margin:auto;
+padding:20px;
 }
 
-.back{
-    background:#546e7a;
-    text-decoration:none;
-}
-
-.serah{
-    background:#2e7d32;
-}
-
-.cetak{
-    background:#1565c0;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-}
-
-th{
-    background:#0d47a1;
-    color:white;
-    padding:10px;
-}
-
-td{
-    padding:10px;
-    border-bottom:1px solid #ddd;
+.card{
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 2px 10px rgba(0,0,0,.1);
+margin-bottom:20px;
 }
 
 input{
-    padding:8px;
-    width:180px;
+width:100%;
+padding:10px;
+margin-top:5px;
+margin-bottom:15px;
+border:1px solid #ccc;
+border-radius:5px;
 }
 
-.selesai{
-    color:green;
-    font-weight:bold;
+button{
+padding:10px 15px;
+border:none;
+border-radius:5px;
+cursor:pointer;
+color:white;
+}
+
+.btn-save{
+background:#2e7d32;
+}
+
+.btn-next{
+background:#1565c0;
+}
+
+.btn-delete{
+background:#c62828;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+background:white;
+}
+
+table th{
+background:#2e7d32;
+color:white;
+padding:10px;
+}
+
+table td{
+padding:10px;
+border:1px solid #ddd;
+}
+
+a{
+text-decoration:none;
+color:white;
 }
 
 </style>
@@ -86,15 +97,41 @@ input{
 </head>
 <body>
 
+<div class="header">
+<h2>PELUNASAN</h2>
+
+<div>
+<a href="tracking.html">⬅ Kembali</a>
+</div>
+</div>
+
 <div class="container">
 
-<div class="header">
+<div class="card">
 
-<a href="dashboard.html" class="btn back">
-⬅ Dashboard
-</a>
+<h3>Pembayaran Pelunasan</h3>
 
-<h2>Penyerahan Berkas</h2>
+<label>Nomor Polisi</label>
+<input type="text" id="nopol" readonly>
+
+<label>Nama Pelanggan</label>
+<input type="text" id="nama" readonly>
+
+<label>Total Biaya</label>
+<input type="number" id="total" readonly>
+
+<label>DP</label>
+<input type="number" id="dp" readonly>
+
+<label>Sisa Tagihan</label>
+<input type="number" id="sisa" readonly>
+
+<label>Jumlah Pelunasan</label>
+<input type="number" id="bayar">
+
+<button class="btn-save" onclick="simpanPelunasan()">
+Simpan Pelunasan
+</button>
 
 </div>
 
@@ -102,17 +139,18 @@ input{
 
 <thead>
 <tr>
-<th>Nota</th>
-<th>Pelanggan</th>
+<th>No</th>
 <th>No Polisi</th>
-<th>Layanan</th>
-<th>Status Bayar</th>
-<th>Penerima</th>
+<th>Nama</th>
+<th>Total</th>
+<th>DP</th>
+<th>Pelunasan</th>
+<th>Status</th>
 <th>Aksi</th>
 </tr>
 </thead>
 
-<tbody id="isiTabel"></tbody>
+<tbody id="dataPelunasan"></tbody>
 
 </table>
 
@@ -120,241 +158,177 @@ input{
 
 <script>
 
-function render(){
+let transaksi =
+JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+
+let pelunasan =
+JSON.parse(localStorage.getItem("dataPelunasan")) || [];
+
+let nopolCari =
+localStorage.getItem("nopolPelunasan");
+
+function loadData(){
 
 let data =
-JSON.parse(localStorage.getItem("dataTransaksi"))
-|| [];
+transaksi.find(x=>x.nopol===nopolCari);
+
+if(data){
+
+document.getElementById("nopol").value =
+data.nopol;
+
+document.getElementById("nama").value =
+data.nama;
+
+document.getElementById("total").value =
+data.biayaJasa;
+
+document.getElementById("dp").value =
+data.dp;
+
+document.getElementById("sisa").value =
+data.sisa;
+
+}
+
+}
+
+function simpanPelunasan(){
+
+let nopol =
+document.getElementById("nopol").value;
+
+let nama =
+document.getElementById("nama").value;
+
+let total =
+Number(document.getElementById("total").value);
+
+let dp =
+Number(document.getElementById("dp").value);
+
+let bayar =
+Number(document.getElementById("bayar").value);
+
+let sisa =
+total - dp;
+
+if(bayar < sisa){
+
+alert("Pelunasan kurang dari sisa tagihan");
+return;
+
+}
+
+let obj = {
+
+nopol:nopol,
+nama:nama,
+total:total,
+dp:dp,
+pelunasan:bayar,
+status:"LUNAS"
+
+};
+
+let cek =
+pelunasan.findIndex(x=>x.nopol===nopol);
+
+if(cek>=0){
+
+pelunasan[cek]=obj;
+
+}else{
+
+pelunasan.push(obj);
+
+}
+
+localStorage.setItem(
+"dataPelunasan",
+JSON.stringify(pelunasan)
+);
+
+alert("Pelunasan berhasil disimpan");
+
+tampilData();
+
+}
+
+function tampilData(){
 
 let tbody =
-document.getElementById("isiTabel");
+document.getElementById("dataPelunasan");
 
 tbody.innerHTML="";
 
-data.forEach((t,index)=>{
-
-if(t.pembayaran==="Lunas"){
+pelunasan.forEach((p,i)=>{
 
 tbody.innerHTML += `
-
 <tr>
 
-<td>${t.nota}</td>
-
-<td>${t.pelanggan}</td>
-
-<td>${t.noPolisi}</td>
-
-<td>${t.layanan}</td>
-
-<td>${t.pembayaran}</td>
-
-<td>
-
-<input
-type="text"
-id="penerima${index}"
-placeholder="Nama Penerima">
-
-</td>
+<td>${i+1}</td>
+<td>${p.nopol}</td>
+<td>${p.nama}</td>
+<td>Rp ${Number(p.total).toLocaleString('id-ID')}</td>
+<td>Rp ${Number(p.dp).toLocaleString('id-ID')}</td>
+<td>Rp ${Number(p.pelunasan).toLocaleString('id-ID')}</td>
+<td>${p.status}</td>
 
 <td>
 
 <button
-class="btn serah"
-onclick="serahkan(${index})">
-
-Serahkan
-
+class="btn-next"
+onclick="lanjutBerkas('${p.nopol}')">
+Penyerahan
 </button>
 
 <button
-class="btn cetak"
-onclick="cetak(${index})">
-
-Cetak
-
+class="btn-delete"
+onclick="hapus(${i})">
+Hapus
 </button>
 
 </td>
 
 </tr>
-
 `;
-
-}
 
 });
 
 }
 
-function serahkan(index){
-
-let data =
-JSON.parse(localStorage.getItem("dataTransaksi"));
-
-let penerima =
-document.getElementById(
-"penerima"+index
-).value;
-
-if(penerima===""){
-
-alert("Masukkan nama penerima");
-
-return;
-
-}
-
-data[index].statusBerkas =
-"SELESAI";
-
-data[index].penerima =
-penerima;
-
-data[index].tanggalSerah =
-new Date().toLocaleDateString("id-ID");
+function lanjutBerkas(nopol){
 
 localStorage.setItem(
-"dataTransaksi",
-JSON.stringify(data)
+"nopolBerkas",
+nopol
 );
 
-alert("Berkas berhasil diserahkan");
-
-render();
-
-}
-
-function cetak(index){
-
-let data =
-JSON.parse(localStorage.getItem("dataTransaksi"));
-
-let t = data[index];
-
-let w =
-window.open("","","width=800,height=700");
-
-w.document.write(`
-
-<html>
-
-<head>
-
-<title>Bukti Penyerahan Berkas</title>
-
-<style>
-
-body{
-font-family:Arial;
-padding:30px;
-}
-
-h2{
-text-align:center;
-}
-
-table{
-width:100%;
-}
-
-td{
-padding:8px;
-}
-
-</style>
-
-</head>
-
-<body>
-
-<h2>
-BUKTI PENYERAHAN BERKAS
-</h2>
-
-<hr>
-
-<table>
-
-<tr>
-<td>No Nota</td>
-<td>: ${t.nota}</td>
-</tr>
-
-<tr>
-<td>Nama Pelanggan</td>
-<td>: ${t.pelanggan}</td>
-</tr>
-
-<tr>
-<td>No Polisi</td>
-<td>: ${t.noPolisi}</td>
-</tr>
-
-<tr>
-<td>Layanan</td>
-<td>: ${t.layanan}</td>
-</tr>
-
-<tr>
-<td>Status Pembayaran</td>
-<td>: ${t.pembayaran}</td>
-</tr>
-
-<tr>
-<td>Penerima</td>
-<td>: ${t.penerima || "-"}</td>
-</tr>
-
-<tr>
-<td>Tanggal Serah</td>
-<td>: ${t.tanggalSerah || "-"}</td>
-</tr>
-
-</table>
-
-<br><br><br>
-
-<table width="100%">
-
-<tr>
-
-<td align="center">
-
-Petugas
-
-<br><br><br><br>
-
-(_______________)
-
-</td>
-
-<td align="center">
-
-Penerima
-
-<br><br><br><br>
-
-(${t.penerima || "_______________"})
-
-</td>
-
-</tr>
-
-</table>
-
-</body>
-
-</html>
-
-`);
-
-w.print();
+window.location =
+"penyerahan_berkas.html";
 
 }
 
-render();
+function hapus(i){
+
+if(confirm("Hapus data?")){
+
+pelunasan.splice(i,1);
+
+localStorage.setItem(
+"dataPelunasan",
+JSON.stringify(pelunasan)
+);
+
+tampilData();
+
+}
+
+}
+
+loadData();
+tampilData();
 
 </script>
 
