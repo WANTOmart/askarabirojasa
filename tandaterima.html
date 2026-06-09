@@ -3,56 +3,56 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pelunasan Transaksi</title>
+<title>Penyerahan Berkas</title>
 
 <style>
+
 *{
-    margin:0;
-    padding:0;
     box-sizing:border-box;
     font-family:Segoe UI,sans-serif;
 }
 
 body{
     background:#f4f6f9;
-}
-
-.header{
-    background:#0d47a1;
-    color:white;
-    padding:15px 20px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-
-.back{
-    color:white;
-    text-decoration:none;
-    background:rgba(255,255,255,.2);
-    padding:8px 12px;
-    border-radius:6px;
+    padding:20px;
 }
 
 .container{
     max-width:1200px;
-    margin:20px auto;
-    padding:20px;
-}
-
-.card{
+    margin:auto;
     background:white;
     padding:20px;
     border-radius:10px;
     box-shadow:0 2px 10px rgba(0,0,0,.1);
 }
 
-.search{
-    width:100%;
-    padding:12px;
-    border:1px solid #ddd;
-    border-radius:6px;
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
     margin-bottom:20px;
+}
+
+.btn{
+    padding:10px 15px;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    color:white;
+    font-weight:bold;
+}
+
+.back{
+    background:#546e7a;
+    text-decoration:none;
+}
+
+.serah{
+    background:#2e7d32;
+}
+
+.cetak{
+    background:#1565c0;
 }
 
 table{
@@ -63,7 +63,7 @@ table{
 th{
     background:#0d47a1;
     color:white;
-    padding:12px;
+    padding:10px;
 }
 
 td{
@@ -71,52 +71,32 @@ td{
     border-bottom:1px solid #ddd;
 }
 
-.lunas{
+input{
+    padding:8px;
+    width:180px;
+}
+
+.selesai{
     color:green;
     font-weight:bold;
 }
 
-.belum{
-    color:red;
-    font-weight:bold;
-}
-
-.btn{
-    border:none;
-    padding:8px 12px;
-    border-radius:5px;
-    cursor:pointer;
-    color:white;
-    font-weight:bold;
-}
-
-.btn-bayar{
-    background:#2e7d32;
-}
-
-.btn-bayar:hover{
-    background:#1b5e20;
-}
 </style>
 
 </head>
 <body>
 
-<div class="header">
-    <a href="dashboard.html" class="back">⬅ Dashboard</a>
-    <h2>PELUNASAN TRANSAKSI</h2>
-</div>
-
 <div class="container">
 
-<div class="card">
+<div class="header">
 
-<input
-type="text"
-id="cari"
-class="search"
-placeholder="Cari Nota atau Nama Pelanggan..."
-onkeyup="renderData()">
+<a href="dashboard.html" class="btn back">
+⬅ Dashboard
+</a>
+
+<h2>Penyerahan Berkas</h2>
+
+</div>
 
 <table>
 
@@ -125,10 +105,9 @@ onkeyup="renderData()">
 <th>Nota</th>
 <th>Pelanggan</th>
 <th>No Polisi</th>
-<th>Total Biaya</th>
-<th>Sudah Dibayar</th>
-<th>Sisa</th>
-<th>Status</th>
+<th>Layanan</th>
+<th>Status Bayar</th>
+<th>Penerima</th>
 <th>Aksi</th>
 </tr>
 </thead>
@@ -139,130 +118,243 @@ onkeyup="renderData()">
 
 </div>
 
-</div>
-
 <script>
 
-function formatRupiah(nilai){
-    return "Rp " +
-    Number(nilai).toLocaleString("id-ID");
+function render(){
+
+let data =
+JSON.parse(localStorage.getItem("dataTransaksi"))
+|| [];
+
+let tbody =
+document.getElementById("isiTabel");
+
+tbody.innerHTML="";
+
+data.forEach((t,index)=>{
+
+if(t.pembayaran==="Lunas"){
+
+tbody.innerHTML += `
+
+<tr>
+
+<td>${t.nota}</td>
+
+<td>${t.pelanggan}</td>
+
+<td>${t.noPolisi}</td>
+
+<td>${t.layanan}</td>
+
+<td>${t.pembayaran}</td>
+
+<td>
+
+<input
+type="text"
+id="penerima${index}"
+placeholder="Nama Penerima">
+
+</td>
+
+<td>
+
+<button
+class="btn serah"
+onclick="serahkan(${index})">
+
+Serahkan
+
+</button>
+
+<button
+class="btn cetak"
+onclick="cetak(${index})">
+
+Cetak
+
+</button>
+
+</td>
+
+</tr>
+
+`;
+
 }
 
-function renderData(){
+});
 
-    let data =
-    JSON.parse(localStorage.getItem("dataTransaksi"))
-    || [];
-
-    let keyword =
-    document.getElementById("cari")
-    .value
-    .toLowerCase();
-
-    let tbody =
-    document.getElementById("isiTabel");
-
-    tbody.innerHTML="";
-
-    data.forEach((t,index)=>{
-
-        if(
-            !t.nota.toLowerCase().includes(keyword)
-            &&
-            !t.pelanggan.toLowerCase().includes(keyword)
-        ){
-            return;
-        }
-
-        tbody.innerHTML += `
-        <tr>
-
-        <td>${t.nota}</td>
-
-        <td>${t.pelanggan}</td>
-
-        <td>${t.noPolisi}</td>
-
-        <td>${formatRupiah(t.biayaJasa)}</td>
-
-        <td>${formatRupiah(t.dp)}</td>
-
-        <td>${formatRupiah(t.sisa)}</td>
-
-        <td class="${
-            t.pembayaran==="Lunas"
-            ? "lunas"
-            : "belum"
-        }">
-            ${t.pembayaran}
-        </td>
-
-        <td>
-
-        ${
-            t.pembayaran==="Lunas"
-            ?
-            "✓ Selesai"
-            :
-            `<button
-            class="btn btn-bayar"
-            onclick="pelunasan(${index})">
-            Pelunasan
-            </button>`
-        }
-
-        </td>
-
-        </tr>
-        `;
-    });
 }
 
-function pelunasan(index){
+function serahkan(index){
 
-    let data =
-    JSON.parse(localStorage.getItem("dataTransaksi"));
+let data =
+JSON.parse(localStorage.getItem("dataTransaksi"));
 
-    let nominal =
-    prompt("Masukkan nominal pelunasan");
+let penerima =
+document.getElementById(
+"penerima"+index
+).value;
 
-    if(
-        nominal===null ||
-        nominal===""
-    ){
-        return;
-    }
+if(penerima===""){
 
-    nominal = Number(nominal);
+alert("Masukkan nama penerima");
 
-    data[index].dp =
-    Number(data[index].dp)
-    + nominal;
+return;
 
-    data[index].sisa =
-    Number(data[index].biayaJasa)
-    - Number(data[index].dp);
-
-    if(data[index].sisa <= 0){
-
-        data[index].sisa = 0;
-        data[index].pembayaran = "Lunas";
-
-        alert(
-        "Pembayaran LUNAS.\nBerkas siap diserahkan."
-        );
-
-    }
-
-    localStorage.setItem(
-        "dataTransaksi",
-        JSON.stringify(data)
-    );
-
-    renderData();
 }
 
-renderData();
+data[index].statusBerkas =
+"SELESAI";
+
+data[index].penerima =
+penerima;
+
+data[index].tanggalSerah =
+new Date().toLocaleDateString("id-ID");
+
+localStorage.setItem(
+"dataTransaksi",
+JSON.stringify(data)
+);
+
+alert("Berkas berhasil diserahkan");
+
+render();
+
+}
+
+function cetak(index){
+
+let data =
+JSON.parse(localStorage.getItem("dataTransaksi"));
+
+let t = data[index];
+
+let w =
+window.open("","","width=800,height=700");
+
+w.document.write(`
+
+<html>
+
+<head>
+
+<title>Bukti Penyerahan Berkas</title>
+
+<style>
+
+body{
+font-family:Arial;
+padding:30px;
+}
+
+h2{
+text-align:center;
+}
+
+table{
+width:100%;
+}
+
+td{
+padding:8px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>
+BUKTI PENYERAHAN BERKAS
+</h2>
+
+<hr>
+
+<table>
+
+<tr>
+<td>No Nota</td>
+<td>: ${t.nota}</td>
+</tr>
+
+<tr>
+<td>Nama Pelanggan</td>
+<td>: ${t.pelanggan}</td>
+</tr>
+
+<tr>
+<td>No Polisi</td>
+<td>: ${t.noPolisi}</td>
+</tr>
+
+<tr>
+<td>Layanan</td>
+<td>: ${t.layanan}</td>
+</tr>
+
+<tr>
+<td>Status Pembayaran</td>
+<td>: ${t.pembayaran}</td>
+</tr>
+
+<tr>
+<td>Penerima</td>
+<td>: ${t.penerima || "-"}</td>
+</tr>
+
+<tr>
+<td>Tanggal Serah</td>
+<td>: ${t.tanggalSerah || "-"}</td>
+</tr>
+
+</table>
+
+<br><br><br>
+
+<table width="100%">
+
+<tr>
+
+<td align="center">
+
+Petugas
+
+<br><br><br><br>
+
+(_______________)
+
+</td>
+
+<td align="center">
+
+Penerima
+
+<br><br><br><br>
+
+(${t.penerima || "_______________"})
+
+</td>
+
+</tr>
+
+</table>
+
+</body>
+
+</html>
+
+`);
+
+w.print();
+
+}
+
+render();
 
 </script>
 
