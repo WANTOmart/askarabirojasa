@@ -1,117 +1,345 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Kendaraan - Askara Zayyan</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background-color: #f4f6f9; padding: 20px; }
-        .header { background-color: #0d47a1; color: white; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; border-radius: 8px; margin-bottom: 20px; }
-        .btn-back { color: white; text-decoration: none; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 6px; font-size: 14px; }
-        .container { max-width: 1100px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
-        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
-        button { padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .btn-tambah { background: #0d47a1; color: white; }
-        .btn-hapus { background: #c62828; color: white; font-size: 11px; padding: 5px 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background: #0d47a1; color: white; padding: 12px; text-align: left; }
-        td { padding: 12px; border-bottom: 1px solid #eee; }
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; }
-        .badge-mobil { background: #e3f2fd; color: #0d47a1; }
-        .badge-motor { background: #e8f5e9; color: #2e7d32; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Kendaraan</title>
+
+<style>
+
+body{
+    font-family:Segoe UI,sans-serif;
+    background:#f4f6f9;
+    padding:20px;
+}
+
+.container{
+    max-width:1000px;
+    margin:auto;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
+
+h2{
+    margin-bottom:20px;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+}
+
+input,select{
+    padding:10px;
+    border:1px solid #ddd;
+    border-radius:5px;
+}
+
+button{
+    background:#0d47a1;
+    color:white;
+    border:none;
+    padding:10px;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#1565c0;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+th{
+    background:#0d47a1;
+    color:white;
+    padding:10px;
+}
+
+td{
+    padding:10px;
+    border-bottom:1px solid #ddd;
+}
+
+.btn-hapus{
+    background:#c62828;
+}
+
+</style>
+
 </head>
 <body>
 
-<div class="header">
-    <a href="#" onclick="window.history.back();" class="btn-back">⬅ Kembali</a>
-    <h1>Data Kendaraan</h1>
+<div class="container">
+
+<h2>DATA KENDARAAN</h2>
+
+<div class="form-grid">
+
+<select id="pelangganSelect">
+<option value="">Pilih Nama STNK</option>
+</select>
+
+<input
+type="text"
+id="pemilik"
+placeholder="Nama Pemilik STNK"
+readonly>
+
+<input
+type="text"
+id="plat"
+placeholder="Plat Nomor">
+
+<input
+type="text"
+id="merk"
+placeholder="Merk / Type">
+
+<input
+type="text"
+id="rangka"
+placeholder="Nomor Rangka">
+
+<input
+type="text"
+id="mesin"
+placeholder="Nomor Mesin">
+
+<select id="jenis">
+<option value="Motor">Motor</option>
+<option value="Mobil">Mobil</option>
+</select>
+
+<button onclick="simpanKendaraan()">
+Simpan Kendaraan
+</button>
+
 </div>
 
-<div class="container">
-    <h2>Tambah Data Baru</h2>
-    <div class="form-grid" style="margin-top:15px;">
-        <input type="text" id="plat" placeholder="Plat Nomor">
-        <input type="text" id="pemilik" placeholder="Nama Pemilik">
-        <input type="text" id="merk" placeholder="Merk / Tipe">
-        <select id="jenis">
-            <option value="Mobil">Mobil</option>
-            <option value="Motor">Motor</option>
-        </select>
-        <input type="text" id="rangka" placeholder="No. Rangka">
-        <input type="text" id="mesin" placeholder="No. Mesin">
-        <button class="btn-tambah" onclick="tambahData()">Tambah Data (+)</button>
-    </div>
+<table>
 
-    <table id="tabelKendaraan">
-        <thead>
-            <tr>
-                <th>Plat Nomor</th>
-                <th>Pemilik</th>
-                <th>Merk / Tipe</th>
-                <th>Jenis</th>
-                <th>No. Rangka</th>
-                <th>No. Mesin</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody id="isiTabel"></tbody>
-    </table>
+<thead>
+<tr>
+<th>Pemilik STNK</th>
+<th>Plat</th>
+<th>Merk</th>
+<th>Jenis</th>
+<th>Rangka</th>
+<th>Mesin</th>
+<th>Aksi</th>
+</tr>
+</thead>
+
+<tbody id="isiTabel"></tbody>
+
+</table>
+
 </div>
 
 <script>
-    let dataKendaraan = JSON.parse(localStorage.getItem("dataK")) || [];
 
-    function renderTabel() {
-        let tbody = document.getElementById("isiTabel");
-        tbody.innerHTML = "";
-        dataKendaraan.forEach((item, index) => {
-            let badge = item.jenis === "Mobil" ? "badge-mobil" : "badge-motor";
-            tbody.innerHTML += `
-                <tr>
-                    <td><strong>${item.plat}</strong></td>
-                    <td>${item.pemilik}</td>
-                    <td>${item.merk}</td>
-                    <td><span class="badge ${badge}">${item.jenis}</span></td>
-                    <td>${item.rangka}</td>
-                    <td>${item.mesin}</td>
-                    <td><button class="btn-hapus" onclick="hapusData(${index})">Hapus</button></td>
-                </tr>
-            `;
-        });
-    }
+// ambil pelanggan
+let dataPelanggan =
+JSON.parse(
+localStorage.getItem("dataPelanggan")
+) || [];
 
-    function tambahData() {
-        let obj = {
-            plat: document.getElementById("plat").value,
-            pemilik: document.getElementById("pemilik").value,
-            merk: document.getElementById("merk").value,
-            jenis: document.getElementById("jenis").value,
-            rangka: document.getElementById("rangka").value,
-            mesin: document.getElementById("mesin").value
-        };
+let dataKendaraan =
+JSON.parse(
+localStorage.getItem("dataKendaraan")
+) || [];
 
-        if(!obj.plat || !obj.pemilik) { alert("Isi Plat dan Pemilik!"); return; }
+// isi dropdown pelanggan
+function loadPelanggan(){
 
-        dataKendaraan.push(obj);
-        localStorage.setItem("dataK", JSON.stringify(dataKendaraan));
-        renderTabel();
-        
-        // Reset form
-        document.querySelectorAll("input").forEach(i => i.value = "");
-    }
+let select =
+document.getElementById(
+"pelangganSelect"
+);
 
-    function hapusData(index) {
-        if(confirm("Yakin ingin menghapus data ini?")) {
-            dataKendaraan.splice(index, 1);
-            localStorage.setItem("dataK", JSON.stringify(dataKendaraan));
-            renderTabel();
-        }
-    }
+select.innerHTML =
+'<option value="">Pilih Nama STNK</option>';
 
-    renderTabel();
+dataPelanggan.forEach((p,index)=>{
+
+select.innerHTML += `
+<option value="${index}">
+${p.namaStnk}
+</option>
+`;
+
+});
+
+}
+
+document
+.getElementById("pelangganSelect")
+.addEventListener("change",function(){
+
+let index = this.value;
+
+if(index===""){
+
+document
+.getElementById("pemilik")
+.value = "";
+
+return;
+
+}
+
+document
+.getElementById("pemilik")
+.value =
+dataPelanggan[index].namaStnk;
+
+});
+
+function simpanKendaraan(){
+
+let index =
+document.getElementById(
+"pelangganSelect"
+).value;
+
+if(index===""){
+alert("Pilih pelanggan");
+return;
+}
+
+let kendaraan = {
+
+id:
+"KDR-" +
+Date.now(),
+
+pelangganId:
+dataPelanggan[index].id,
+
+namaPelanggan:
+dataPelanggan[index].nama,
+
+namaStnk:
+dataPelanggan[index].namaStnk,
+
+hp:
+dataPelanggan[index].hp,
+
+plat:
+document.getElementById(
+"plat"
+).value,
+
+merk:
+document.getElementById(
+"merk"
+).value,
+
+rangka:
+document.getElementById(
+"rangka"
+).value,
+
+mesin:
+document.getElementById(
+"mesin"
+).value,
+
+jenis:
+document.getElementById(
+"jenis"
+).value
+
+};
+
+dataKendaraan.push(kendaraan);
+
+localStorage.setItem(
+"dataKendaraan",
+JSON.stringify(dataKendaraan)
+);
+
+renderTabel();
+
+alert("Data kendaraan berhasil disimpan");
+
+document.getElementById("plat").value="";
+document.getElementById("merk").value="";
+document.getElementById("rangka").value="";
+document.getElementById("mesin").value="";
+}
+
+function renderTabel(){
+
+let tbody =
+document.getElementById(
+"isiTabel"
+);
+
+tbody.innerHTML="";
+
+dataKendaraan.forEach((k,index)=>{
+
+tbody.innerHTML += `
+<tr>
+
+<td>${k.namaStnk}</td>
+
+<td>${k.plat}</td>
+
+<td>${k.merk}</td>
+
+<td>${k.jenis}</td>
+
+<td>${k.rangka}</td>
+
+<td>${k.mesin}</td>
+
+<td>
+<button
+class="btn-hapus"
+onclick="hapus(${index})">
+Hapus
+</button>
+</td>
+
+</tr>
+`;
+
+});
+
+}
+
+function hapus(index){
+
+if(confirm(
+"Hapus data kendaraan?"
+)){
+
+dataKendaraan.splice(index,1);
+
+localStorage.setItem(
+"dataKendaraan",
+JSON.stringify(dataKendaraan)
+);
+
+renderTabel();
+
+}
+
+}
+
+loadPelanggan();
+renderTabel();
+
 </script>
 
 </body>
