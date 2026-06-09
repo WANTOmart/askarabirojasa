@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="id">
 <head>
 <meta charset="UTF-8">
@@ -7,69 +8,88 @@
 
 <style>
 
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,sans-serif;
+}
+
 body{
-    font-family:Segoe UI,sans-serif;
-    background:#f4f6f9;
-    padding:20px;
+background:#f4f6f9;
+padding:20px;
 }
 
 .container{
-    max-width:1000px;
-    margin:auto;
-    background:white;
-    padding:20px;
-    border-radius:10px;
-    box-shadow:0 2px 10px rgba(0,0,0,.1);
+max-width:1200px;
+margin:auto;
+background:white;
+padding:20px;
+border-radius:12px;
+box-shadow:0 2px 10px rgba(0,0,0,.1);
 }
 
-h2{
-    margin-bottom:20px;
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+}
+
+.btn{
+padding:10px 15px;
+border-radius:6px;
+text-decoration:none;
+color:white;
+font-weight:bold;
+}
+
+.back{
+background:#546e7a;
+}
+
+.save{
+background:#0d47a1;
+border:none;
+cursor:pointer;
 }
 
 .form-grid{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:10px;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:10px;
+margin-bottom:20px;
 }
 
 input,select{
-    padding:10px;
-    border:1px solid #ddd;
-    border-radius:5px;
-}
-
-button{
-    background:#0d47a1;
-    color:white;
-    border:none;
-    padding:10px;
-    border-radius:5px;
-    cursor:pointer;
-}
-
-button:hover{
-    background:#1565c0;
+padding:12px;
+border:1px solid #ddd;
+border-radius:6px;
 }
 
 table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:20px;
+width:100%;
+border-collapse:collapse;
 }
 
 th{
-    background:#0d47a1;
-    color:white;
-    padding:10px;
+background:#0d47a1;
+color:white;
+padding:10px;
 }
 
 td{
-    padding:10px;
-    border-bottom:1px solid #ddd;
+padding:10px;
+border-bottom:1px solid #ddd;
 }
 
-.btn-hapus{
-    background:#c62828;
+.hapus{
+background:#c62828;
+color:white;
+border:none;
+padding:6px 10px;
+border-radius:4px;
+cursor:pointer;
 }
 
 </style>
@@ -79,47 +99,44 @@ td{
 
 <div class="container">
 
-<h2>DATA KENDARAAN</h2>
+<div class="header">
+
+<a href="dashboard-admin.html" class="btn back">
+⬅ Dashboard
+</a>
+
+<h2>Data Kendaraan</h2>
+
+</div>
 
 <div class="form-grid">
 
-<select id="pelangganSelect">
+<select id="pelanggan">
 <option value="">Pilih Nama STNK</option>
 </select>
 
-<input
-type="text"
-id="pemilik"
-placeholder="Nama Pemilik STNK"
-readonly>
-
-<input
-type="text"
+<input type="text"
 id="plat"
 placeholder="Plat Nomor">
 
-<input
-type="text"
+<input type="text"
 id="merk"
 placeholder="Merk / Type">
 
-<input
-type="text"
+<input type="text"
 id="rangka"
 placeholder="Nomor Rangka">
 
-<input
-type="text"
+<input type="text"
 id="mesin"
 placeholder="Nomor Mesin">
 
-<select id="jenis">
-<option value="Motor">Motor</option>
-<option value="Mobil">Mobil</option>
-</select>
+<button
+class="save"
+onclick="simpan()">
 
-<button onclick="simpanKendaraan()">
 Simpan Kendaraan
+
 </button>
 
 </div>
@@ -127,18 +144,23 @@ Simpan Kendaraan
 <table>
 
 <thead>
+
 <tr>
-<th>Pemilik STNK</th>
-<th>Plat</th>
-<th>Merk</th>
-<th>Jenis</th>
-<th>Rangka</th>
-<th>Mesin</th>
+
+<th>Nama STNK</th>
+<th>Plat Nomor</th>
+<th>Merk/Type</th>
+<th>No Rangka</th>
+<th>No Mesin</th>
 <th>Aksi</th>
+
 </tr>
+
 </thead>
 
-<tbody id="isiTabel"></tbody>
+<tbody id="isiTabel">
+
+</tbody>
 
 </table>
 
@@ -146,8 +168,7 @@ Simpan Kendaraan
 
 <script>
 
-// ambil pelanggan
-let dataPelanggan =
+let pelanggan =
 JSON.parse(
 localStorage.getItem("dataPelanggan")
 ) || [];
@@ -157,22 +178,16 @@ JSON.parse(
 localStorage.getItem("dataKendaraan")
 ) || [];
 
-// isi dropdown pelanggan
 function loadPelanggan(){
 
-let select =
-document.getElementById(
-"pelangganSelect"
-);
+let opsi =
+document.getElementById("pelanggan");
 
-select.innerHTML =
-'<option value="">Pilih Nama STNK</option>';
+pelanggan.forEach(p=>{
 
-dataPelanggan.forEach((p,index)=>{
-
-select.innerHTML += `
-<option value="${index}">
-${p.namaStnk}
+opsi.innerHTML += `
+<option value="${p.stnk}">
+${p.stnk}
 </option>
 `;
 
@@ -180,165 +195,120 @@ ${p.namaStnk}
 
 }
 
-document
-.getElementById("pelangganSelect")
-.addEventListener("change",function(){
+function render(){
 
-let index = this.value;
-
-if(index===""){
-
-document
-.getElementById("pemilik")
-.value = "";
-
-return;
-
-}
-
-document
-.getElementById("pemilik")
-.value =
-dataPelanggan[index].namaStnk;
-
-});
-
-function simpanKendaraan(){
-
-let index =
-document.getElementById(
-"pelangganSelect"
-).value;
-
-if(index===""){
-alert("Pilih pelanggan");
-return;
-}
-
-let kendaraan = {
-
-id:
-"KDR-" +
-Date.now(),
-
-pelangganId:
-dataPelanggan[index].id,
-
-namaPelanggan:
-dataPelanggan[index].nama,
-
-namaStnk:
-dataPelanggan[index].namaStnk,
-
-hp:
-dataPelanggan[index].hp,
-
-plat:
-document.getElementById(
-"plat"
-).value,
-
-merk:
-document.getElementById(
-"merk"
-).value,
-
-rangka:
-document.getElementById(
-"rangka"
-).value,
-
-mesin:
-document.getElementById(
-"mesin"
-).value,
-
-jenis:
-document.getElementById(
-"jenis"
-).value
-
-};
-
-dataKendaraan.push(kendaraan);
-
-localStorage.setItem(
-"dataKendaraan",
-JSON.stringify(dataKendaraan)
-);
-
-renderTabel();
-
-alert("Data kendaraan berhasil disimpan");
-
-document.getElementById("plat").value="";
-document.getElementById("merk").value="";
-document.getElementById("rangka").value="";
-document.getElementById("mesin").value="";
-}
-
-function renderTabel(){
-
-let tbody =
-document.getElementById(
-"isiTabel"
-);
-
-tbody.innerHTML="";
+let html="";
 
 dataKendaraan.forEach((k,index)=>{
 
-tbody.innerHTML += `
+html += `
+
 <tr>
 
-<td>${k.namaStnk}</td>
+<td>${k.stnk}</td>
 
 <td>${k.plat}</td>
 
 <td>${k.merk}</td>
-
-<td>${k.jenis}</td>
 
 <td>${k.rangka}</td>
 
 <td>${k.mesin}</td>
 
 <td>
+
 <button
-class="btn-hapus"
+class="hapus"
 onclick="hapus(${index})">
+
 Hapus
+
 </button>
+
 </td>
 
 </tr>
+
 `;
 
 });
 
-}
-
-function hapus(index){
-
-if(confirm(
-"Hapus data kendaraan?"
-)){
-
-dataKendaraan.splice(index,1);
+document.getElementById("isiTabel")
+.innerHTML = html;
 
 localStorage.setItem(
 "dataKendaraan",
 JSON.stringify(dataKendaraan)
 );
 
-renderTabel();
+}
+
+function simpan(){
+
+let stnk =
+document.getElementById("pelanggan").value;
+
+let plat =
+document.getElementById("plat").value;
+
+let merk =
+document.getElementById("merk").value;
+
+let rangka =
+document.getElementById("rangka").value;
+
+let mesin =
+document.getElementById("mesin").value;
+
+if(
+stnk==="" ||
+plat==="" ||
+merk==="")
+{
+alert("Lengkapi data");
+return;
+}
+
+dataKendaraan.push({
+
+id:Date.now(),
+
+stnk:stnk,
+
+plat:plat,
+
+merk:merk,
+
+rangka:rangka,
+
+mesin:mesin
+
+});
+
+render();
+
+document.getElementById("plat").value="";
+document.getElementById("merk").value="";
+document.getElementById("rangka").value="";
+document.getElementById("mesin").value="";
+
+}
+
+function hapus(index){
+
+if(confirm("Hapus kendaraan?")){
+
+dataKendaraan.splice(index,1);
+
+render();
 
 }
 
 }
 
 loadPelanggan();
-renderTabel();
+
+render();
 
 </script>
 
