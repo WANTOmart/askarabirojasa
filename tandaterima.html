@@ -1,63 +1,270 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tanda Terima - Askara Zayyan</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background-color: #f4f6f9; }
-        .header { background-color: #0d47a1; color: white; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
-        .header .btn-back { color: white; text-decoration: none; font-size: 14px; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 6px; }
-        .header h1 { font-size: 18px; }
-        .container { padding: 20px; max-width: 600px; margin: 0 auto; }
-        .nota-box { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 8px solid #0d47a1; }
-        .nota-header { display: flex; align-items: center; gap: 25px; border-bottom: 2px solid #0d47a1; padding-bottom: 20px; margin-bottom: 25px; }
-        .img-logo { width: 120px; height: 120px; object-fit: contain; }
-        .nota-title { text-align: left; }
-        .nota-title h2 { color: #0d47a1; font-size: 24px; letter-spacing: 0.5px; }
-        .nota-title p { font-size: 13px; color: #555; margin-top: 5px; line-height: 1.5; }
-        .nota-details { margin-bottom: 20px; font-size: 14px; line-height: 2.2; border-bottom: 1px dashed #ccc; padding-bottom: 15px; }
-        .nota-details .row { display: flex; justify-content: space-between; }
-        .nota-details span.label { color: #666; width: 150px; display: inline-block; }
-        .nota-details span.value { color: #333; flex: 1; text-align: left; }
-        .btn-print { width: 100%; background: #2e7d32; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 15px; }
-        .btn-print:hover { background: #236327; }
-        @media print {
-            body { background: white; }
-            .header, .btn-print { display: none; }
-            .container { padding: 0; }
-            .nota-box { border: none; box-shadow: none; padding: 10px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pelunasan Transaksi</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Segoe UI,sans-serif;
+}
+
+body{
+    background:#f4f6f9;
+}
+
+.header{
+    background:#0d47a1;
+    color:white;
+    padding:15px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.back{
+    color:white;
+    text-decoration:none;
+    background:rgba(255,255,255,.2);
+    padding:8px 12px;
+    border-radius:6px;
+}
+
+.container{
+    max-width:1200px;
+    margin:20px auto;
+    padding:20px;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
+
+.search{
+    width:100%;
+    padding:12px;
+    border:1px solid #ddd;
+    border-radius:6px;
+    margin-bottom:20px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    background:#0d47a1;
+    color:white;
+    padding:12px;
+}
+
+td{
+    padding:10px;
+    border-bottom:1px solid #ddd;
+}
+
+.lunas{
+    color:green;
+    font-weight:bold;
+}
+
+.belum{
+    color:red;
+    font-weight:bold;
+}
+
+.btn{
+    border:none;
+    padding:8px 12px;
+    border-radius:5px;
+    cursor:pointer;
+    color:white;
+    font-weight:bold;
+}
+
+.btn-bayar{
+    background:#2e7d32;
+}
+
+.btn-bayar:hover{
+    background:#1b5e20;
+}
+</style>
+
 </head>
 <body>
+
 <div class="header">
-    <a href="dashboard.html" class="btn-back">⬅ Kembali</a>
-    <h1>Cetak Tanda Terima</h1>
-    <span>🧾</span>
+    <a href="dashboard.html" class="back">⬅ Dashboard</a>
+    <h2>PELUNASAN TRANSAKSI</h2>
 </div>
+
 <div class="container">
-    <div class="nota-box">
-        <div class="nota-header">
-            <img src="GAMBAR/logo-az.jpeg" alt="Logo Askara Zayyan" class="img-logo">
-            <div class="nota-title">
-                <h2>ASKARA ZAYYAN</h2>
-                <p><strong>Biro Jasa STNK Bermotor</strong><br>Cepat • Aman • Terpercaya<br>Telp: 081358197419</p>
-            </div>
-        </div>
-        <div class="nota-details">
-            <div class="row"><span class="label">No. Tanda Terima:</span><span class="value"><strong>#TT-2026-0045</strong></span></div>
-            <div class="row"><span class="label">Tanggal Berkas:</span><span class="value">08 Juni 2026</span></div>
-            <div class="row"><span class="label">Nama Pelanggan:</span><span class="value">Budi Santoso</span></div>
-            <div class="row"><span class="label">Kendaraan / Plat:</span><span class="value">Honda Vario 160 / L 1234 AB</span></div>
-            <div class="row"><span class="label">Jenis Layanan:</span><span class="value">Perpanjang STNK 5 Tahunan</span></div>
-            <div class="row"><span class="label">Total Biaya Jasa:</span><span class="value">Rp 1.250.000</span></div>
-            <div class="row"><span class="label">Status Pembayaran:</span><span class="value" style="color: #2e7d32; font-weight: bold;">DP Masuk Rp 500.000</span></div>
-            <div class="row"><span class="label">Sisa Pelunasan:</span><span class="value" style="color: #c62828; font-weight: bold;">Rp 750.000</span></div>
-        </div>
-        <button class="btn-print" onclick="window.print()">🖨️ Cetak Nota Resmi</button>
-    </div>
+
+<div class="card">
+
+<input
+type="text"
+id="cari"
+class="search"
+placeholder="Cari Nota atau Nama Pelanggan..."
+onkeyup="renderData()">
+
+<table>
+
+<thead>
+<tr>
+<th>Nota</th>
+<th>Pelanggan</th>
+<th>No Polisi</th>
+<th>Total Biaya</th>
+<th>Sudah Dibayar</th>
+<th>Sisa</th>
+<th>Status</th>
+<th>Aksi</th>
+</tr>
+</thead>
+
+<tbody id="isiTabel"></tbody>
+
+</table>
+
 </div>
+
+</div>
+
+<script>
+
+function formatRupiah(nilai){
+    return "Rp " +
+    Number(nilai).toLocaleString("id-ID");
+}
+
+function renderData(){
+
+    let data =
+    JSON.parse(localStorage.getItem("dataTransaksi"))
+    || [];
+
+    let keyword =
+    document.getElementById("cari")
+    .value
+    .toLowerCase();
+
+    let tbody =
+    document.getElementById("isiTabel");
+
+    tbody.innerHTML="";
+
+    data.forEach((t,index)=>{
+
+        if(
+            !t.nota.toLowerCase().includes(keyword)
+            &&
+            !t.pelanggan.toLowerCase().includes(keyword)
+        ){
+            return;
+        }
+
+        tbody.innerHTML += `
+        <tr>
+
+        <td>${t.nota}</td>
+
+        <td>${t.pelanggan}</td>
+
+        <td>${t.noPolisi}</td>
+
+        <td>${formatRupiah(t.biayaJasa)}</td>
+
+        <td>${formatRupiah(t.dp)}</td>
+
+        <td>${formatRupiah(t.sisa)}</td>
+
+        <td class="${
+            t.pembayaran==="Lunas"
+            ? "lunas"
+            : "belum"
+        }">
+            ${t.pembayaran}
+        </td>
+
+        <td>
+
+        ${
+            t.pembayaran==="Lunas"
+            ?
+            "✓ Selesai"
+            :
+            `<button
+            class="btn btn-bayar"
+            onclick="pelunasan(${index})">
+            Pelunasan
+            </button>`
+        }
+
+        </td>
+
+        </tr>
+        `;
+    });
+}
+
+function pelunasan(index){
+
+    let data =
+    JSON.parse(localStorage.getItem("dataTransaksi"));
+
+    let nominal =
+    prompt("Masukkan nominal pelunasan");
+
+    if(
+        nominal===null ||
+        nominal===""
+    ){
+        return;
+    }
+
+    nominal = Number(nominal);
+
+    data[index].dp =
+    Number(data[index].dp)
+    + nominal;
+
+    data[index].sisa =
+    Number(data[index].biayaJasa)
+    - Number(data[index].dp);
+
+    if(data[index].sisa <= 0){
+
+        data[index].sisa = 0;
+        data[index].pembayaran = "Lunas";
+
+        alert(
+        "Pembayaran LUNAS.\nBerkas siap diserahkan."
+        );
+
+    }
+
+    localStorage.setItem(
+        "dataTransaksi",
+        JSON.stringify(data)
+    );
+
+    renderData();
+}
+
+renderData();
+
+</script>
+
 </body>
 </html>
