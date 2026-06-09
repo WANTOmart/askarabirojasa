@@ -7,158 +7,170 @@
 
 <style>
 
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,sans-serif;
+}
+
 body{
-    font-family:Segoe UI,sans-serif;
-    background:#f4f6f9;
-    padding:20px;
+background:#f4f6f9;
+}
+
+.header{
+background:#fb8c00;
+color:white;
+padding:15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
 }
 
 .container{
-    max-width:900px;
-    margin:auto;
-    background:white;
-    padding:20px;
-    border-radius:10px;
-    box-shadow:0 2px 10px rgba(0,0,0,.1);
+max-width:1200px;
+margin:auto;
+padding:20px;
 }
 
-h2{
-    margin-bottom:20px;
+.card{
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 2px 10px rgba(0,0,0,.1);
 }
 
-select,input{
-    width:100%;
-    padding:10px;
-    margin-bottom:10px;
-    border:1px solid #ddd;
-    border-radius:5px;
+input,select{
+width:100%;
+padding:10px;
+margin-top:5px;
+margin-bottom:15px;
+border:1px solid #ccc;
+border-radius:5px;
 }
 
 button{
-    background:#0d47a1;
-    color:white;
-    border:none;
-    padding:10px 15px;
-    border-radius:5px;
-    cursor:pointer;
+padding:10px 15px;
+border:none;
+border-radius:5px;
+cursor:pointer;
+color:white;
 }
 
-button:hover{
-    background:#1565c0;
+.btn-save{
+background:#2e7d32;
 }
 
-.info{
-    background:#f5f5f5;
-    padding:15px;
-    border-radius:5px;
-    margin-top:10px;
+.btn-next{
+background:#1565c0;
 }
 
-.timeline{
-    margin-top:20px;
+.btn-edit{
+background:#ff9800;
 }
 
-.item{
-    border-left:4px solid #0d47a1;
-    padding:10px 15px;
-    margin-bottom:10px;
-    background:#fafafa;
+.btn-delete{
+background:#c62828;
 }
 
-.item h4{
-    margin:0;
-    color:#0d47a1;
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+background:white;
 }
 
-.item small{
-    color:#666;
+table th{
+background:#fb8c00;
+color:white;
+padding:10px;
+}
+
+table td{
+padding:10px;
+border:1px solid #ddd;
+}
+
+a{
+text-decoration:none;
+color:white;
 }
 
 </style>
+
 </head>
 <body>
 
-<div class="container">
-
+<div class="header">
 <h2>TRACKING BERKAS</h2>
 
-<select id="notaSelect">
-<option value="">Pilih Nomor Nota</option>
-</select>
-
-<div class="info">
-
-<p>
-<b>Nama :</b>
-<span id="nama">-</span>
-</p>
-
-<p>
-<b>Plat :</b>
-<span id="plat">-</span>
-</p>
-
-<p>
-<b>Layanan :</b>
-<span id="layanan">-</span>
-</p>
-
+<div>
+<a href="transaksi.html">⬅ Kembali</a>
+</div>
 </div>
 
-<br>
+<div class="container">
 
+<div class="card">
+
+<h3>Update Status Berkas</h3>
+
+<label>Nomor Polisi</label>
+<select id="nopol"></select>
+
+<label>Status Berkas</label>
 <select id="status">
-
-<option>Berkas Diterima</option>
-
-<option>Cek Fisik Kendaraan</option>
-
+<option>Proses Cek Fisik</option>
 <option>Proses Samsat</option>
-
-<option>Pencetakan STNK</option>
-
-<option>STNK Selesai</option>
-
-<option>Siap Diambil</option>
-
-<option>Selesai / Diserahkan</option>
-
+<option>Proses BPKB</option>
+<option>Proses STNK</option>
+<option>SELESAI</option>
 </select>
 
-<button onclick="simpanTracking()">
-Update Tracking
+<button class="btn-save" onclick="simpanTracking()">
+Simpan Tracking
 </button>
 
-<div class="timeline" id="timeline">
-
 </div>
+
+<table>
+
+<thead>
+<tr>
+<th>No</th>
+<th>No Polisi</th>
+<th>Nama</th>
+<th>Status</th>
+<th>Aksi</th>
+</tr>
+</thead>
+
+<tbody id="dataTracking"></tbody>
+
+</table>
 
 </div>
 
 <script>
 
 let transaksi =
-JSON.parse(
-localStorage.getItem("dataTransaksi")
-) || [];
+JSON.parse(localStorage.getItem("dataTransaksi")) || [];
 
 let tracking =
-JSON.parse(
-localStorage.getItem("dataTracking")
-) || [];
+JSON.parse(localStorage.getItem("dataTracking")) || [];
 
-function loadNota(){
+function loadNopol(){
 
 let select =
-document.getElementById(
-"notaSelect"
-);
+document.getElementById("nopol");
+
+select.innerHTML="";
 
 transaksi.forEach((t,index)=>{
 
 select.innerHTML += `
-<option value="${t.nota}">
-${t.nota}
+<option value="${index}">
+${t.nopol} - ${t.nama}
 </option>
 `;
 
@@ -166,110 +178,117 @@ ${t.nota}
 
 }
 
-document
-.getElementById("notaSelect")
-.addEventListener("change",function(){
-
-let nota = this.value;
-
-let trx =
-transaksi.find(
-x=>x.nota===nota
-);
-
-if(!trx) return;
-
-document.getElementById("nama")
-.innerText = trx.nama;
-
-document.getElementById("plat")
-.innerText = trx.plat;
-
-document.getElementById("layanan")
-.innerText = trx.layanan;
-
-renderTimeline(nota);
-
-});
-
 function simpanTracking(){
 
-let nota =
-document.getElementById(
-"notaSelect"
-).value;
+let index =
+document.getElementById("nopol").value;
 
-if(nota===""){
+let status =
+document.getElementById("status").value;
 
-alert("Pilih nota dahulu");
+let data = transaksi[index];
 
-return;
+let obj = {
+nama:data.nama,
+nopol:data.nopol,
+status:status
+};
+
+let cek =
+tracking.findIndex(x=>x.nopol===data.nopol);
+
+if(cek>=0){
+
+tracking[cek]=obj;
+
+}else{
+
+tracking.push(obj);
 
 }
-
-tracking.push({
-
-nota:nota,
-
-status:
-document.getElementById(
-"status"
-).value,
-
-tanggal:
-new Date()
-.toLocaleString("id-ID")
-
-});
 
 localStorage.setItem(
 "dataTracking",
 JSON.stringify(tracking)
 );
 
-renderTimeline(nota);
+tampilTracking();
 
-alert("Tracking berhasil diupdate");
+alert("Tracking berhasil disimpan");
 
 }
 
-function renderTimeline(nota){
+function tampilTracking(){
 
-let area =
-document.getElementById(
-"timeline"
-);
+let tbody =
+document.getElementById("dataTracking");
 
-area.innerHTML="";
+tbody.innerHTML="";
 
-let data =
-tracking.filter(
-x=>x.nota===nota
-);
+tracking.forEach((t,i)=>{
 
-data.forEach(item=>{
+tbody.innerHTML += `
+<tr>
 
-area.innerHTML += `
+<td>${i+1}</td>
+<td>${t.nopol}</td>
+<td>${t.nama}</td>
+<td>${t.status}</td>
 
-<div class="item">
+<td>
 
-<h4>
-${item.status}
-</h4>
+<button
+class="btn-next"
+onclick="lanjutPelunasan('${t.nopol}')">
+Pelunasan
+</button>
 
-<small>
-${item.tanggal}
-</small>
+<button
+class="btn-delete"
+onclick="hapus(${i})">
+Hapus
+</button>
 
-</div>
+</td>
 
+</tr>
 `;
 
 });
 
 }
 
-loadNota();
+function lanjutPelunasan(nopol){
+
+localStorage.setItem(
+"nopolPelunasan",
+nopol
+);
+
+window.location =
+"pelunasan.html";
+
+}
+
+function hapus(i){
+
+if(confirm("Hapus data?")){
+
+tracking.splice(i,1);
+
+localStorage.setItem(
+"dataTracking",
+JSON.stringify(tracking)
+);
+
+tampilTracking();
+
+}
+
+}
+
+loadNopol();
+tampilTracking();
 
 </script>
 
