@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pelunasan Pembayaran</title>
+    <style>
+        body { font-family: Segoe UI, sans-serif; background: #f4f6f9; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #2e7d32; color: white; padding: 10px; }
+        td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
+        .btn-lunas { background: #2e7d32; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="dashboard.html">⬅ Kembali ke Dashboard</a>
+    <h2>Data Transaksi Belum Lunas</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Nota</th>
+                <th>Nama STNK</th>
+                <th>Total Biaya</th>
+                <th>Sisa Tagihan</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody id="isiTabel"></tbody>
+    </table>
+</div>
+
+<script>
+    let dataTransaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+
+    function render() {
+        let html = "";
+        dataTransaksi.forEach((t, index) => {
+            // Hanya tampilkan jika sisa masih di atas 0
+            if (Number(t.sisa) > 0) {
+                html += `<tr>
+                    <td>${t.nota}</td>
+                    <td>${t.stnk}</td>
+                    <td>Rp ${Number(t.biaya).toLocaleString('id-ID')}</td>
+                    <td>Rp ${Number(t.sisa).toLocaleString('id-ID')}</td>
+                    <td>
+                        <button class="btn-lunas" onclick="lunasi(${index})">Lunasi</button>
+                    </td>
+                </tr>`;
+            }
+        });
+        document.getElementById("isiTabel").innerHTML = html || "<tr><td colspan='5'>Semua transaksi sudah lunas!</td></tr>";
+    }
+
+    function lunasi(index) {
+        if(confirm("Apakah pelanggan sudah membayar sisa tagihan?")) {
+            // Update sisa menjadi 0
+            dataTransaksi[index].sisa = 0;
+            dataTransaksi[index].dp = dataTransaksi[index].biaya;
+            
+            localStorage.setItem("dataTransaksi", JSON.stringify(dataTransaksi));
+            render();
+            alert("Transaksi berhasil dilunasi!");
+        }
+    }
+
+    render();
+</script>
+</body>
+</html>
