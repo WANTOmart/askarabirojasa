@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pelunasan</title>
+<title>Penyerahan Berkas</title>
 
 <style>
 
@@ -19,7 +19,7 @@ background:#f4f6f9;
 }
 
 .header{
-background:#2e7d32;
+background:#6a1b9a;
 color:white;
 padding:15px;
 display:flex;
@@ -62,12 +62,12 @@ color:white;
 background:#2e7d32;
 }
 
-.btn-next{
-background:#1565c0;
-}
-
 .btn-delete{
 background:#c62828;
+}
+
+.btn-finish{
+background:#1565c0;
 }
 
 table{
@@ -77,7 +77,7 @@ background:white;
 }
 
 table th{
-background:#2e7d32;
+background:#6a1b9a;
 color:white;
 padding:10px;
 }
@@ -98,10 +98,10 @@ color:white;
 <body>
 
 <div class="header">
-<h2>PELUNASAN</h2>
+<h2>PENYERAHAN BERKAS</h2>
 
 <div>
-<a href="tracking.html">⬅ Kembali</a>
+<a href="pelunasan.html">⬅ Kembali</a>
 </div>
 </div>
 
@@ -109,28 +109,19 @@ color:white;
 
 <div class="card">
 
-<h3>Pembayaran Pelunasan</h3>
+<h3>Data Penyerahan Berkas</h3>
 
-<label>Nomor Polisi</label>
+<label>No Polisi</label>
 <input type="text" id="nopol" readonly>
 
 <label>Nama Pelanggan</label>
 <input type="text" id="nama" readonly>
 
-<label>Total Biaya</label>
-<input type="number" id="total" readonly>
+<label>Tanggal Penyerahan</label>
+<input type="date" id="tanggal">
 
-<label>DP</label>
-<input type="number" id="dp" readonly>
-
-<label>Sisa Tagihan</label>
-<input type="number" id="sisa" readonly>
-
-<label>Jumlah Pelunasan</label>
-<input type="number" id="bayar">
-
-<button class="btn-save" onclick="simpanPelunasan()">
-Simpan Pelunasan
+<button class="btn-save" onclick="simpanBerkas()">
+Simpan Penyerahan
 </button>
 
 </div>
@@ -142,15 +133,13 @@ Simpan Pelunasan
 <th>No</th>
 <th>No Polisi</th>
 <th>Nama</th>
-<th>Total</th>
-<th>DP</th>
-<th>Pelunasan</th>
+<th>Tanggal</th>
 <th>Status</th>
 <th>Aksi</th>
 </tr>
 </thead>
 
-<tbody id="dataPelunasan"></tbody>
+<tbody id="dataBerkas"></tbody>
 
 </table>
 
@@ -158,19 +147,19 @@ Simpan Pelunasan
 
 <script>
 
-let transaksi =
-JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-
 let pelunasan =
 JSON.parse(localStorage.getItem("dataPelunasan")) || [];
 
+let berkas =
+JSON.parse(localStorage.getItem("dataBerkas")) || [];
+
 let nopolCari =
-localStorage.getItem("nopolPelunasan");
+localStorage.getItem("nopolBerkas");
 
 function loadData(){
 
 let data =
-transaksi.find(x=>x.nopol===nopolCari);
+pelunasan.find(x=>x.nopol===nopolCari);
 
 if(data){
 
@@ -180,20 +169,11 @@ data.nopol;
 document.getElementById("nama").value =
 data.nama;
 
-document.getElementById("total").value =
-data.biayaJasa;
-
-document.getElementById("dp").value =
-data.dp;
-
-document.getElementById("sisa").value =
-data.sisa;
-
 }
 
 }
 
-function simpanPelunasan(){
+function simpanBerkas(){
 
 let nopol =
 document.getElementById("nopol").value;
@@ -201,21 +181,12 @@ document.getElementById("nopol").value;
 let nama =
 document.getElementById("nama").value;
 
-let total =
-Number(document.getElementById("total").value);
+let tanggal =
+document.getElementById("tanggal").value;
 
-let dp =
-Number(document.getElementById("dp").value);
+if(tanggal==""){
 
-let bayar =
-Number(document.getElementById("bayar").value);
-
-let sisa =
-total - dp;
-
-if(bayar < sisa){
-
-alert("Pelunasan kurang dari sisa tagihan");
+alert("Tanggal wajib diisi");
 return;
 
 }
@@ -224,63 +195,83 @@ let obj = {
 
 nopol:nopol,
 nama:nama,
-total:total,
-dp:dp,
-pelunasan:bayar,
-status:"LUNAS"
+tanggal:tanggal,
+status:"SELESAI"
 
 };
 
 let cek =
-pelunasan.findIndex(x=>x.nopol===nopol);
+berkas.findIndex(x=>x.nopol===nopol);
 
 if(cek>=0){
 
-pelunasan[cek]=obj;
+berkas[cek]=obj;
 
 }else{
 
-pelunasan.push(obj);
+berkas.push(obj);
 
 }
 
 localStorage.setItem(
-"dataPelunasan",
-JSON.stringify(pelunasan)
+"dataBerkas",
+JSON.stringify(berkas)
 );
 
-alert("Pelunasan berhasil disimpan");
+updateDashboard();
+
+alert("Penyerahan berkas berhasil disimpan");
 
 tampilData();
+
+}
+
+function updateDashboard(){
+
+let transaksi =
+JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+
+transaksi.forEach(t=>{
+
+if(t.nopol===document.getElementById("nopol").value){
+
+t.statusBerkas="SELESAI";
+
+}
+
+});
+
+localStorage.setItem(
+"dataTransaksi",
+JSON.stringify(transaksi)
+);
 
 }
 
 function tampilData(){
 
 let tbody =
-document.getElementById("dataPelunasan");
+document.getElementById("dataBerkas");
 
 tbody.innerHTML="";
 
-pelunasan.forEach((p,i)=>{
+berkas.forEach((b,i)=>{
 
 tbody.innerHTML += `
 <tr>
 
 <td>${i+1}</td>
-<td>${p.nopol}</td>
-<td>${p.nama}</td>
-<td>Rp ${Number(p.total).toLocaleString('id-ID')}</td>
-<td>Rp ${Number(p.dp).toLocaleString('id-ID')}</td>
-<td>Rp ${Number(p.pelunasan).toLocaleString('id-ID')}</td>
-<td>${p.status}</td>
+<td>${b.nopol}</td>
+<td>${b.nama}</td>
+<td>${b.tanggal}</td>
+<td>${b.status}</td>
 
 <td>
 
 <button
-class="btn-next"
-onclick="lanjutBerkas('${p.nopol}')">
-Penyerahan
+class="btn-finish"
+onclick="cetak('${b.nopol}')">
+Selesai
 </button>
 
 <button
@@ -298,15 +289,13 @@ Hapus
 
 }
 
-function lanjutBerkas(nopol){
+function cetak(nopol){
 
-localStorage.setItem(
-"nopolBerkas",
-nopol
+alert(
+"Berkas " + nopol + " telah selesai dan diserahkan kepada pelanggan."
 );
 
-window.location =
-"penyerahan_berkas.html";
+window.location="dashboard.html";
 
 }
 
@@ -314,11 +303,11 @@ function hapus(i){
 
 if(confirm("Hapus data?")){
 
-pelunasan.splice(i,1);
+berkas.splice(i,1);
 
 localStorage.setItem(
-"dataPelunasan",
-JSON.stringify(pelunasan)
+"dataBerkas",
+JSON.stringify(berkas)
 );
 
 tampilData();
