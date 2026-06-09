@@ -3,199 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Pelanggan - Askara Zayyan</title>
+    <title>Data Pelanggan</title>
+
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Arial, sans-serif;
+        body{
+            font-family: Arial, sans-serif;
+            background:#f4f4f4;
+            margin:0;
+            padding:20px;
         }
-        body {
-            background-color: #f4f6f9;
+
+        .container{
+            max-width:700px;
+            margin:auto;
+            background:white;
+            padding:20px;
+            border-radius:10px;
+            box-shadow:0 0 10px rgba(0,0,0,0.1);
         }
-        .header {
-            background-color: #0d47a1;
-            color: white;
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+
+        h2{
+            text-align:center;
         }
-        .header .btn-back {
-            color: white;
-            text-decoration: none;
-            font-size: 14px;
-            background: rgba(255,255,255,0.2);
-            padding: 5px 12px;
-            border-radius: 6px;
+
+        .form-group{
+            margin-bottom:15px;
         }
-        .header h1 {
-            font-size: 18px;
+
+        label{
+            display:block;
+            margin-bottom:5px;
+            font-weight:bold;
         }
-        .container {
-            padding: 20px;
-            max-width: 800px;
-            margin: 0 auto;
+
+        input, textarea{
+            width:100%;
+            padding:10px;
+            border:1px solid #ccc;
+            border-radius:5px;
+            box-sizing:border-box;
         }
-        .search-box {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
+
+        button{
+            background:#007bff;
+            color:white;
+            border:none;
+            padding:10px 20px;
+            border-radius:5px;
+            cursor:pointer;
         }
-        .search-box input {
-            width: 100%;
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-        }
-        .customer-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .customer-card {
-            background: white;
-            padding: 15px 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .customer-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .avatar {
-            width: 45px;
-            height: 45px;
-            background-color: #0d47a1;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: bold;
-            font-size: 16px;
-        }
-        .avatar.green { background-color: #2e7d32; }
-        .avatar.orange { background-color: #ef6c00; }
-        .avatar.purple { background-color: #6a1b9a; }
-        .avatar.teal { background-color: #00695c; }
-        
-        .details h4 {
-            color: #333;
-            font-size: 16px;
-            margin-bottom: 3px;
-        }
-        .details .phone {
-            color: #0d47a1;
-            font-size: 13px;
-            font-weight: 500;
-            margin-bottom: 3px;
-        }
-        .details .address {
-            color: #777;
-            font-size: 13px;
-        }
-        .arrow-icon {
-            color: #aaa;
-            font-size: 18px;
-        }
-        .total-count {
-            margin-top: 15px;
-            font-size: 13px;
-            color: #666;
-            font-weight: 500;
+
+        button:hover{
+            background:#0056b3;
         }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <a href="dashboard.html" class="btn-back">⬅ Kembali</a>
-    <h1>Data Pelanggan</h1>
-    <span style="font-size: 18px;">➕</span>
-</div>
-
 <div class="container">
-    <!-- Kolom Pencarian -->
-    <div class="search-box">
-        <input type="text" placeholder="🔍 Cari nama atau nomor HP...">
-    </div>
+    <h2>FORM DATA PELANGGAN</h2>
 
-    <!-- Daftar Pelanggan Sesuai Gambar Mockup -->
-    <div class="customer-list">
-        
-        <div class="customer-card">
-            <div class="customer-info">
-                <div class="avatar">BS</div>
-                <div class="details">
-                    <h4>Budi Santoso</h4>
-                    <div class="phone">081234567890</div>
-                    <div class="address">Jl. Raya Sukolilo No. 45, Surabaya</div>
-                </div>
-            </div>
-            <div class="arrow-icon">▶</div>
+    <form action="#" method="post">
+
+        <div class="form-group">
+            <label>ID Pelanggan</label>
+            <input type="text" name="id_pelanggan" required>
         </div>
 
-        <div class="customer-card">
-            <div class="customer-info">
-                <div class="avatar green">AS</div>
-                <div class="details">
-                    <h4>Andi Setiawan</h4>
-                    <div class="phone">081298765432</div>
-                    <div class="address">Jl. Merr No. 12, Sidoarjo</div>
-                </div>
-            </div>
-            <div class="arrow-icon">▶</div>
+        <div class="form-group">
+            <label>Nama Pelanggan</label>
+            <input type="text" name="nama_pelanggan" required>
         </div>
 
-        <div class="customer-card">
-            <div class="customer-info">
-                <div class="avatar orange">RH</div>
-                <div class="details">
-                    <h4>Rina Handayani</h4>
-                    <div class="phone">082112223333</div>
-                    <div class="address">Jl. Gubeng Kertajaya No. 89, Surabaya</div>
-                </div>
-            </div>
-            <div class="arrow-icon">▶</div>
+        <div class="form-group">
+            <label>Alamat</label>
+            <textarea name="alamat" rows="3"></textarea>
         </div>
 
-        <div class="customer-card">
-            <div class="customer-info">
-                <div class="avatar purple">MH</div>
-                <div class="details">
-                    <h4>Mohammad Hasan</h4>
-                    <div class="phone">081355566677</div>
-                    <div class="address">Perum Griya Asri Blok C-12, Surabaya</div>
-                </div>
-            </div>
-            <div class="arrow-icon">▶</div>
+        <div class="form-group">
+            <label>No. HP</label>
+            <input type="text" name="no_hp">
         </div>
 
-        <div class="customer-card">
-            <div class="customer-info">
-                <div class="avatar teal">SN</div>
-                <div class="details">
-                    <h4>Siti Nurhaliza</h4>
-                    <div class="phone">082244455566</div>
-                    <div class="address">Jl. Raya Menganti No. 77, Gresik</div>
-                </div>
-            </div>
-            <div class="arrow-icon">▶</div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" name="email">
         </div>
 
-    </div>
+        <button type="submit">Simpan</button>
 
-    <div class="total-count">Total 128 Pelanggan</div>
+    </form>
 </div>
 
 </body>
