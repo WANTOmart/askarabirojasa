@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="id">
 <head>
 <meta charset="UTF-8">
@@ -61,8 +62,10 @@ button:hover{
     padding:10px;
     border-radius:5px;
     margin:10px 0;
+    font-size:16px;
 }
 </style>
+
 </head>
 
 <body>
@@ -76,19 +79,19 @@ button:hover{
 <h2>Input Data Baru</h2>
 
 <input type="text"
-       id="nota"
-       readonly
-       style="background:#eee;">
+    id="nota"
+    readonly
+    style="background:#eee;">
 
 <input type="date" id="tanggal">
 
 <input type="text"
-       id="pelanggan"
-       placeholder="Nama Pelanggan">
+    id="pelanggan"
+    placeholder="Nama Pelanggan">
 
 <input type="text"
-       id="noPolisi"
-       placeholder="Nomor Polisi">
+    id="noPolisi"
+    placeholder="Nomor Polisi">
 
 <select id="kendaraan">
     <option value="Motor">Motor</option>
@@ -104,27 +107,21 @@ button:hover{
 </select>
 
 <input type="number"
-       id="biayaJasa"
-       placeholder="Biaya Jasa">
+    id="biayaJasa"
+    placeholder="Biaya Jasa">
 
 <input type="number"
-       id="dp"
-       placeholder="DP"
-       value="0">
+    id="dp"
+    placeholder="DP"
+    value="0">
 
 <div class="info">
     Sisa Tagihan:
     <strong id="sisaText">Rp 0</strong>
 </div>
 
-<select id="status">
-    <option>Diproses</option>
-    <option>Menunggu Loket</option>
-    <option>Selesai</option>
-</select>
-
 <button onclick="simpan()">
-Simpan Data
+    Simpan Data
 </button>
 
 </div>
@@ -134,9 +131,7 @@ Simpan Data
 window.onload = function(){
 
     let data =
-    JSON.parse(
-        localStorage.getItem("dataTransaksi")
-    ) || [];
+    JSON.parse(localStorage.getItem("dataTransaksi")) || [];
 
     document.getElementById("nota").value =
     "#TRX-" +
@@ -157,42 +152,30 @@ document.getElementById("dp")
 function hitungSisa(){
 
     let biaya =
-    Number(
-        document.getElementById("biayaJasa").value
-    ) || 0;
+    Number(document.getElementById("biayaJasa").value) || 0;
 
     let dp =
-    Number(
-        document.getElementById("dp").value
-    ) || 0;
+    Number(document.getElementById("dp").value) || 0;
 
     let sisa = biaya - dp;
 
-    document.getElementById("sisaText")
-    .innerText =
-    "Rp " +
-    sisa.toLocaleString("id-ID");
+    document.getElementById("sisaText").innerText =
+    "Rp " + sisa.toLocaleString("id-ID");
 }
 
 function simpan(){
 
     let biayaJasa =
-    Number(
-        document.getElementById("biayaJasa").value
-    );
+    Number(document.getElementById("biayaJasa").value);
 
     let dp =
-    Number(
-        document.getElementById("dp").value
-    );
+    Number(document.getElementById("dp").value);
 
     let sisa =
     biayaJasa - dp;
 
     let pembayaran =
-    sisa <= 0
-    ? "Lunas"
-    : "Belum Lunas";
+    sisa <= 0 ? "Lunas" : "Belum Lunas";
 
     let transaksi = {
 
@@ -224,16 +207,11 @@ function simpan(){
         sisa,
 
         pembayaran:
-        pembayaran,
-
-        statusBerkas:
-        document.getElementById("status").value
+        pembayaran
     };
 
     let data =
-    JSON.parse(
-        localStorage.getItem("dataTransaksi")
-    ) || [];
+    JSON.parse(localStorage.getItem("dataTransaksi")) || [];
 
     data.push(transaksi);
 
@@ -244,8 +222,7 @@ function simpan(){
 
     alert("Data berhasil disimpan");
 
-    window.location.href =
-    "transaksi.html";
+    window.location.href = "transaksi.html";
 }
 
 </script>
