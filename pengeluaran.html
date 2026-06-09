@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Pengeluaran</title>
+    <style>
+        body { font-family: Segoe UI, sans-serif; background: #f4f6f9; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,.1); }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-bottom: 20px; }
+        input { padding: 12px; border: 1px solid #ddd; border-radius: 6px; }
+        button { padding: 10px 15px; background: #c62828; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="dashboard.html">⬅ Kembali ke Dashboard</a>
+    <h2>Data Pengeluaran</h2>
+    <div class="form-grid">
+        <input type="text" id="keterangan" placeholder="Keterangan (Contoh: Bensin)">
+        <input type="number" id="jumlah" placeholder="Jumlah Biaya">
+        <button onclick="simpan()">Simpan</button>
+    </div>
+    <table>
+        <thead><tr><th>Keterangan</th><th>Jumlah</th><th>Aksi</th></tr></thead>
+        <tbody id="isiTabel"></tbody>
+    </table>
+</div>
+
+<script>
+    let dataPengeluaran = JSON.parse(localStorage.getItem("dataPengeluaran")) || [];
+
+    function render() {
+        let html = "";
+        dataPengeluaran.forEach((p, index) => {
+            html += `<tr><td>${p.keterangan}</td><td>Rp ${Number(p.jumlah).toLocaleString('id-ID')}</td>
+                     <td><button onclick="hapus(${index})">Hapus</button></td></tr>`;
+        });
+        document.getElementById("isiTabel").innerHTML = html;
+        localStorage.setItem("dataPengeluaran", JSON.stringify(dataPengeluaran));
+    }
+
+    function simpan() {
+        let ket = document.getElementById("keterangan").value;
+        let jml = document.getElementById("jumlah").value;
+        if(ket && jml) {
+            dataPengeluaran.push({keterangan: ket, jumlah: jml});
+            render();
+            document.getElementById("keterangan").value = "";
+            document.getElementById("jumlah").value = "";
+        }
+    }
+
+    function hapus(index) {
+        dataPengeluaran.splice(index, 1);
+        render();
+    }
+
+    render();
+</script>
+</body>
+</html>
