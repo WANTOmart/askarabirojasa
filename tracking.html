@@ -1,294 +1,70 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tracking Berkas</title>
-
-<style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Segoe UI,sans-serif;
-}
-
-body{
-background:#f4f6f9;
-}
-
-.header{
-background:#fb8c00;
-color:white;
-padding:15px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
-
-.container{
-max-width:1200px;
-margin:auto;
-padding:20px;
-}
-
-.card{
-background:white;
-padding:20px;
-border-radius:10px;
-box-shadow:0 2px 10px rgba(0,0,0,.1);
-}
-
-input,select{
-width:100%;
-padding:10px;
-margin-top:5px;
-margin-bottom:15px;
-border:1px solid #ccc;
-border-radius:5px;
-}
-
-button{
-padding:10px 15px;
-border:none;
-border-radius:5px;
-cursor:pointer;
-color:white;
-}
-
-.btn-save{
-background:#2e7d32;
-}
-
-.btn-next{
-background:#1565c0;
-}
-
-.btn-edit{
-background:#ff9800;
-}
-
-.btn-delete{
-background:#c62828;
-}
-
-table{
-width:100%;
-border-collapse:collapse;
-margin-top:20px;
-background:white;
-}
-
-table th{
-background:#fb8c00;
-color:white;
-padding:10px;
-}
-
-table td{
-padding:10px;
-border:1px solid #ddd;
-}
-
-a{
-text-decoration:none;
-color:white;
-}
-
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracking Berkas</title>
+    <style>
+        body { font-family: Segoe UI, sans-serif; background: #f4f6f9; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #0d47a1; color: white; padding: 10px; }
+        td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
+        select { padding: 5px; border-radius: 4px; }
+        .status-btn { padding: 5px 10px; border-radius: 5px; border: none; cursor: pointer; }
+    </style>
 </head>
 <body>
 
-<div class="header">
-<h2>TRACKING BERKAS</h2>
-
-<div>
-<a href="transaksi.html">⬅ Kembali</a>
-</div>
-</div>
-
 <div class="container">
-
-<div class="card">
-
-<h3>Update Status Berkas</h3>
-
-<label>Nomor Polisi</label>
-<select id="nopol"></select>
-
-<label>Status Berkas</label>
-<select id="status">
-<option>Proses Cek Fisik</option>
-<option>Proses Samsat</option>
-<option>Proses BPKB</option>
-<option>Proses STNK</option>
-<option>SELESAI</option>
-</select>
-
-<button class="btn-save" onclick="simpanTracking()">
-Simpan Tracking
-</button>
-
-</div>
-
-<table>
-
-<thead>
-<tr>
-<th>No</th>
-<th>No Polisi</th>
-<th>Nama</th>
-<th>Status</th>
-<th>Aksi</th>
-</tr>
-</thead>
-
-<tbody id="dataTracking"></tbody>
-
-</table>
-
+    <a href="dashboard.html">⬅ Kembali ke Dashboard</a>
+    <h2>Tracking Status Berkas</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Nota</th>
+                <th>Nama STNK</th>
+                <th>Plat</th>
+                <th>Status Berkas</th>
+                <th>Update</th>
+            </tr>
+        </thead>
+        <tbody id="isiTabel"></tbody>
+    </table>
 </div>
 
 <script>
+    let dataTransaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
 
-let transaksi =
-JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+    function render() {
+        let html = "";
+        dataTransaksi.forEach((t, index) => {
+            html += `<tr>
+                <td>${t.nota}</td>
+                <td>${t.stnk}</td>
+                <td>${t.plat}</td>
+                <td>
+                    <select onchange="updateStatus(${index}, this.value)">
+                        <option value="BERKAS DITERIMA" ${t.statusBerkas === 'BERKAS DITERIMA' ? 'selected' : ''}>Diterima</option>
+                        <option value="DIPROSES" ${t.statusBerkas === 'DIPROSES' ? 'selected' : ''}>Diproses</option>
+                        <option value="SELESAI" ${t.statusBerkas === 'SELESAI' ? 'selected' : ''}>Selesai</option>
+                        <option value="DIAMBIL" ${t.statusBerkas === 'DIAMBIL' ? 'selected' : ''}>Diambil</option>
+                    </select>
+                </td>
+                <td>${t.statusBerkas}</td>
+            </tr>`;
+        });
+        document.getElementById("isiTabel").innerHTML = html;
+    }
 
-let tracking =
-JSON.parse(localStorage.getItem("dataTracking")) || [];
+    function updateStatus(index, status) {
+        dataTransaksi[index].statusBerkas = status;
+        localStorage.setItem("dataTransaksi", JSON.stringify(dataTransaksi));
+        render(); // Refresh tabel
+    }
 
-function loadNopol(){
-
-let select =
-document.getElementById("nopol");
-
-select.innerHTML="";
-
-transaksi.forEach((t,index)=>{
-
-select.innerHTML += `
-<option value="${index}">
-${t.nopol} - ${t.nama}
-</option>
-`;
-
-});
-
-}
-
-function simpanTracking(){
-
-let index =
-document.getElementById("nopol").value;
-
-let status =
-document.getElementById("status").value;
-
-let data = transaksi[index];
-
-let obj = {
-nama:data.nama,
-nopol:data.nopol,
-status:status
-};
-
-let cek =
-tracking.findIndex(x=>x.nopol===data.nopol);
-
-if(cek>=0){
-
-tracking[cek]=obj;
-
-}else{
-
-tracking.push(obj);
-
-}
-
-localStorage.setItem(
-"dataTracking",
-JSON.stringify(tracking)
-);
-
-tampilTracking();
-
-alert("Tracking berhasil disimpan");
-
-}
-
-function tampilTracking(){
-
-let tbody =
-document.getElementById("dataTracking");
-
-tbody.innerHTML="";
-
-tracking.forEach((t,i)=>{
-
-tbody.innerHTML += `
-<tr>
-
-<td>${i+1}</td>
-<td>${t.nopol}</td>
-<td>${t.nama}</td>
-<td>${t.status}</td>
-
-<td>
-
-<button
-class="btn-next"
-onclick="lanjutPelunasan('${t.nopol}')">
-Pelunasan
-</button>
-
-<button
-class="btn-delete"
-onclick="hapus(${i})">
-Hapus
-</button>
-
-</td>
-
-</tr>
-`;
-
-});
-
-}
-
-function lanjutPelunasan(nopol){
-
-localStorage.setItem(
-"nopolPelunasan",
-nopol
-);
-
-window.location = "pages/pelunasan.html";
-}
-
-function hapus(i){
-
-if(confirm("Hapus data?")){
-
-tracking.splice(i,1);
-
-localStorage.setItem(
-"dataTracking",
-JSON.stringify(tracking)
-);
-
-tampilTracking();
-
-}
-
-}
-
-loadNopol();
-tampilTracking();
-
+    render();
 </script>
-
 </body>
 </html>
