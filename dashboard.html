@@ -10,7 +10,8 @@
         .header{ background:#0d47a1; color:white; padding:15px 20px; display:flex; justify-content:space-between; align-items:center; }
         .logout{ background:#c62828; color:white; text-decoration:none; padding:8px 15px; border-radius:5px; }
         .container{ max-width:1200px; margin:auto; padding:20px; }
-        .welcome{ background:white; padding:20px; border-radius:10px; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,.1); }
+        .welcome{ background:white; padding:20px; border-radius:10px; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,.1); text-align: center; }
+        .welcome img { width: 150px; height: auto; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto; }
         .grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:15px; margin-bottom:20px; }
         .card{ background:white; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.1); }
         .card h4{ color:#666; margin-bottom:10px; }
@@ -30,7 +31,7 @@
 
 <div class="container">
     <div class="welcome">
-        <h2>Selamat Datang</h2>
+        <img src="logo.jpeg" alt="Logo Biro Jasa">
         <p>BIRO JASA STNK ASKARA ZAYYAN</p>
     </div>
 
@@ -54,46 +55,43 @@
             <a href="tracking.html">🔍 Tracking</a>
             <a href="pelunasan.html">💰 Pelunasan</a>
             <a href="penyerahan_berkas.html">📂 Penyerahan</a>
-            <a href="laporan.html">📊 Keuangan</a>
+            <a href="pengeluaran.html">📊 Keuangan</a>
         </div>
     </div>
 </div>
 
 <script>
-function rupiah(angka){ return "Rp " + Number(angka).toLocaleString("id-ID"); }
+    function rupiah(angka){ return "Rp " + Number(angka).toLocaleString("id-ID"); }
 
-function loadDashboard(){
-    let pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
-    let kendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
-    let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-    let pengeluaran = JSON.parse(localStorage.getItem("dataPengeluaran")) || [];
+    function loadDashboard(){
+        let pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
+        let kendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
+        let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+        let pengeluaran = JSON.parse(localStorage.getItem("dataPengeluaran")) || [];
 
-    let omzet = 0;
-    let dp = 0;
-    let piutang = 0;
-    let selesai = 0;
+        let omzet = 0, dp = 0, piutang = 0, selesai = 0;
 
-    transaksi.forEach(t=>{
-        omzet += Number(t.biaya); // Sesuaikan dengan key di transaksi.html
-        dp += Number(t.dp);
-        piutang += Number(t.sisa);
-        if(t.statusBerkas === "SELESAI") { selesai++; }
-    });
+        transaksi.forEach(t=>{
+            omzet += Number(t.biaya);
+            dp += Number(t.dp);
+            piutang += Number(t.sisa);
+            if(t.statusBerkas === "SELESAI") { selesai++; }
+        });
 
-    let totalKeluar = 0;
-    pengeluaran.forEach(p => { totalKeluar += Number(p.jumlah); });
+        let totalKeluar = 0;
+        pengeluaran.forEach(p => { totalKeluar += Number(p.jumlah); });
 
-    document.getElementById("pelanggan").innerText = pelanggan.length;
-    document.getElementById("kendaraan").innerText = kendaraan.length;
-    document.getElementById("transaksi").innerText = transaksi.length;
-    document.getElementById("omzet").innerText = rupiah(omzet);
-    document.getElementById("dp").innerText = rupiah(dp);
-    document.getElementById("piutang").innerText = rupiah(piutang);
-    document.getElementById("laba").innerText = rupiah(omzet - totalKeluar);
-    document.getElementById("selesai").innerText = selesai;
-}
+        document.getElementById("pelanggan").innerText = pelanggan.length;
+        document.getElementById("kendaraan").innerText = kendaraan.length;
+        document.getElementById("transaksi").innerText = transaksi.length;
+        document.getElementById("omzet").innerText = rupiah(omzet);
+        document.getElementById("dp").innerText = rupiah(dp);
+        document.getElementById("piutang").innerText = rupiah(piutang);
+        document.getElementById("laba").innerText = rupiah(omzet - totalKeluar);
+        document.getElementById("selesai").innerText = selesai;
+    }
 
-loadDashboard();
+    loadDashboard();
 </script>
 
 </body>
