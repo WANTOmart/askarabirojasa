@@ -1,302 +1,99 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Admin</title>
-
-<style>
-
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-    font-family:Segoe UI,sans-serif;
-}
-
-body{
-    background:#f4f6f9;
-}
-
-.header{
-    background:#0d47a1;
-    color:white;
-    padding:15px 20px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-
-.logout{
-    background:#c62828;
-    color:white;
-    text-decoration:none;
-    padding:8px 15px;
-    border-radius:5px;
-}
-
-.container{
-    max-width:1200px;
-    margin:auto;
-    padding:20px;
-}
-
-.welcome{
-    background:white;
-    padding:20px;
-    border-radius:10px;
-    margin-bottom:20px;
-    box-shadow:0 2px 8px rgba(0,0,0,.1);
-}
-
-.grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:15px;
-    margin-bottom:20px;
-}
-
-.card{
-    background:white;
-    padding:20px;
-    border-radius:10px;
-    box-shadow:0 2px 8px rgba(0,0,0,.1);
-}
-
-.card h4{
-    color:#666;
-    margin-bottom:10px;
-}
-
-.card p{
-    font-size:24px;
-    font-weight:bold;
-}
-
-.menu{
-    background:white;
-    padding:20px;
-    border-radius:10px;
-    box-shadow:0 2px 8px rgba(0,0,0,.1);
-}
-
-.menu-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-    gap:15px;
-}
-
-.menu a{
-    text-decoration:none;
-    text-align:center;
-    padding:20px;
-    background:#f5f5f5;
-    border-radius:10px;
-    color:#333;
-    font-weight:bold;
-}
-
-.menu a:hover{
-    background:#0d47a1;
-    color:white;
-}
-
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Owner</title>
+    <style>
+        *{ box-sizing:border-box; margin:0; padding:0; font-family:Segoe UI,sans-serif; }
+        body{ background:#f4f6f9; }
+        .header{ background:#0d47a1; color:white; padding:15px 20px; display:flex; justify-content:space-between; align-items:center; }
+        .logout{ background:#c62828; color:white; text-decoration:none; padding:8px 15px; border-radius:5px; }
+        .container{ max-width:1200px; margin:auto; padding:20px; }
+        .welcome{ background:white; padding:20px; border-radius:10px; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,.1); }
+        .grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:15px; margin-bottom:20px; }
+        .card{ background:white; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.1); }
+        .card h4{ color:#666; margin-bottom:10px; }
+        .card p{ font-size:20px; font-weight:bold; }
+        .menu{ background:white; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.1); }
+        .menu-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:15px; }
+        .menu a{ text-decoration:none; text-align:center; padding:20px; background:#f5f5f5; border-radius:10px; color:#333; font-weight:bold; }
+        .menu a:hover{ background:#0d47a1; color:white; }
+    </style>
 </head>
 <body>
 
 <div class="header">
-
-<h2>Dashboard Owner</h2>
-
-<a href="index.html" class="logout">
-Keluar
-</a>
-
+    <h2>Dashboard Owner</h2>
+    <a href="index.html" class="logout">Keluar</a>
 </div>
 
 <div class="container">
+    <div class="welcome">
+        <h2>Selamat Datang</h2>
+        <p>BIRO JASA STNK ASKARA ZAYYAN</p>
+    </div>
 
-<div class="welcome">
+    <div class="grid">
+        <div class="card"><h4>Total Pelanggan</h4><p id="pelanggan">0</p></div>
+        <div class="card"><h4>Total Kendaraan</h4><p id="kendaraan">0</p></div>
+        <div class="card"><h4>Total Transaksi</h4><p id="transaksi">0</p></div>
+        <div class="card"><h4>Total Omzet</h4><p id="omzet">Rp 0</p></div>
+        <div class="card"><h4>Total DP</h4><p id="dp">Rp 0</p></div>
+        <div class="card"><h4>Total Piutang</h4><p id="piutang">Rp 0</p></div>
+        <div class="card"><h4>Laba Bersih</h4><p id="laba">Rp 0</p></div>
+        <div class="card"><h4>Berkas Selesai</h4><p id="selesai">0</p></div>
+    </div>
 
-<h2>Selamat Datang</h2>
-
-<p>BIRO JASA STNK ASKARA ZAYYAN</p>
-
-</div>
-
-<div class="grid">
-
-<div class="card">
-<h4>Total Pelanggan</h4>
-<p id="pelanggan">0</p>
-</div>
-
-<div class="card">
-<h4>Total Kendaraan</h4>
-<p id="kendaraan">0</p>
-</div>
-
-<div class="card">
-<h4>Total Transaksi</h4>
-<p id="transaksi">0</p>
-</div>
-
-<div class="card">
-<h4>Total Omzet</h4>
-<p id="omzet">Rp 0</p>
-</div>
-
-<div class="card">
-<h4>Total DP</h4>
-<p id="dp">Rp 0</p>
-</div>
-
-<div class="card">
-<h4>Total Piutang</h4>
-<p id="piutang">Rp 0</p>
-</div>
-
-<div class="card">
-<h4>Laba Bersih</h4>
-<p id="laba">Rp 0</p>
-</div>
-
-<div class="card">
-<h4>Berkas Selesai</h4>
-<p id="selesai">0</p>
-</div>
-
-</div>
-
-<div class="menu">
-
-<h3>Menu Utama</h3>
-
-<br>
-
-<div class="menu-grid">
-
-<a href="pelanggan.html">
-👤 Pelanggan
-</a>
-
-<a href="kendaraan.html">
-🚗 Kendaraan
-</a>
-
-<a href="transaksi.html">
-📝 Transaksi
-</a>
-
-<a href="tracking.html">
-🔍 Tracking
-</a>
-
-<a href="pelunasan.html">
-💰 Pelunasan
-</a>
-
-<a href="penyerahan_berkas.html">
-📂 Penyerahan
-</a>
-
-<a href="laporan.html">
-📊 Keuangan
-</a>
-
-</div>
-
-</div>
-
+    <div class="menu">
+        <h3>Menu Utama</h3><br>
+        <div class="menu-grid">
+            <a href="pelanggan.html">👤 Pelanggan</a>
+            <a href="kendaraan.html">🚗 Kendaraan</a>
+            <a href="transaksi.html">📝 Transaksi</a>
+            <a href="tracking.html">🔍 Tracking</a>
+            <a href="pelunasan.html">💰 Pelunasan</a>
+            <a href="penyerahan_berkas.html">📂 Penyerahan</a>
+            <a href="laporan.html">📊 Keuangan</a>
+        </div>
+    </div>
 </div>
 
 <script>
-
-function rupiah(angka){
-
-return "Rp " +
-Number(angka)
-.toLocaleString("id-ID");
-
-}
+function rupiah(angka){ return "Rp " + Number(angka).toLocaleString("id-ID"); }
 
 function loadDashboard(){
+    let pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
+    let kendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
+    let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+    let pengeluaran = JSON.parse(localStorage.getItem("dataPengeluaran")) || [];
 
-let pelanggan =
-JSON.parse(localStorage.getItem("dataPelanggan"))
-|| [];
+    let omzet = 0;
+    let dp = 0;
+    let piutang = 0;
+    let selesai = 0;
 
-let kendaraan =
-JSON.parse(localStorage.getItem("dataK"))
-|| [];
+    transaksi.forEach(t=>{
+        omzet += Number(t.biaya); // Sesuaikan dengan key di transaksi.html
+        dp += Number(t.dp);
+        piutang += Number(t.sisa);
+        if(t.statusBerkas === "SELESAI") { selesai++; }
+    });
 
-let transaksi =
-JSON.parse(localStorage.getItem("dataTransaksi"))
-|| [];
+    let totalKeluar = 0;
+    pengeluaran.forEach(p => { totalKeluar += Number(p.jumlah); });
 
-let pengeluaran =
-JSON.parse(localStorage.getItem("pengeluaran"))
-|| [];
-
-let omzet = 0;
-let dp = 0;
-let piutang = 0;
-let selesai = 0;
-
-transaksi.forEach(t=>{
-
-omzet += Number(t.biayaJasa);
-
-dp += Number(t.dp);
-
-piutang += Number(t.sisa);
-
-if(t.statusBerkas==="SELESAI"){
-selesai++;
-}
-
-});
-
-let keluar = 0;
-
-pengeluaran.forEach(p=>{
-
-keluar += Number(p.jumlah);
-
-});
-
-let laba = omzet - keluar;
-
-document.getElementById("pelanggan")
-.innerText = pelanggan.length;
-
-document.getElementById("kendaraan")
-.innerText = kendaraan.length;
-
-document.getElementById("transaksi")
-.innerText = transaksi.length;
-
-document.getElementById("omzet")
-.innerText = rupiah(omzet);
-
-document.getElementById("dp")
-.innerText = rupiah(dp);
-
-document.getElementById("piutang")
-.innerText = rupiah(piutang);
-
-document.getElementById("laba")
-.innerText = rupiah(laba);
-
-document.getElementById("selesai")
-.innerText = selesai;
-
+    document.getElementById("pelanggan").innerText = pelanggan.length;
+    document.getElementById("kendaraan").innerText = kendaraan.length;
+    document.getElementById("transaksi").innerText = transaksi.length;
+    document.getElementById("omzet").innerText = rupiah(omzet);
+    document.getElementById("dp").innerText = rupiah(dp);
+    document.getElementById("piutang").innerText = rupiah(piutang);
+    document.getElementById("laba").innerText = rupiah(omzet - totalKeluar);
+    document.getElementById("selesai").innerText = selesai;
 }
 
 loadDashboard();
-
 </script>
 
 </body>
