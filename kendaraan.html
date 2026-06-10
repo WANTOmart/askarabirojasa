@@ -7,17 +7,18 @@
     <style>
         *{ margin:0; padding:0; box-sizing:border-box; font-family:Segoe UI,sans-serif; }
         body{ background:#f4f6f9; padding:20px; }
-        .container{ max-width:1100px; margin:auto; background:white; padding:20px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,.1); }
+        .container{ max-width:1200px; margin:auto; background:white; padding:20px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,.1); }
         .header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
         .btn{ padding:10px 15px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; text-decoration:none; color:white; }
         .back{ background:#546e7a; }
         .save{ background:#2e7d32; }
         .form-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin-bottom:20px; }
         input, select { padding:12px; border:1px solid #ddd; border-radius:6px; font-size: 14px; }
-        table{ width:100%; border-collapse:collapse; }
-        th{ background:#2e7d32; color:white; padding:10px; }
-        td{ padding:10px; border-bottom:1px solid #ddd; text-align: center; }
+        table{ width:100%; border-collapse:collapse; margin-top: 15px; }
+        th{ background:#2e7d32; color:white; padding:10px; font-size: 14px; }
+        td{ padding:10px; border-bottom:1px solid #ddd; text-align: center; font-size: 14px; }
         th { text-align: center; }
+        .suggest-info { font-size: 11px; color: #2e7d32; font-weight: bold; margin-top: 2px; }
     </style>
 </head>
 <body>
@@ -29,17 +30,24 @@
     </div>
 
     <div class="form-grid">
-        <input type="text" id="namaPelanggan" placeholder="Ketik Nama Pelanggan" oninput="cariPelangganOtomatis()">
+        <div>
+            <input type="text" id="namaPelanggan" placeholder="Ketik Nama Pelanggan" oninput="cariPelangganOtomatis()" style="width: 100%;">
+            <div id="infoPencarian" class="suggest-info"></div>
+        </div>
         
-        <input type="text" id="stnk" placeholder="Nama Asli STNK" readonly style="background: #eee;">
+        <input type="text" id="stnk" placeholder="Nama Asli STNK" readonly style="background: #eee; font-weight: bold;">
         
         <input type="text" id="noPlat" placeholder="Nomor Polisi (No. Plat)">
+        <input type="text" id="noRangka" placeholder="Nomor Rangka">
+        <input type="text" id="noMesin" placeholder="Nomor Mesin">
         <input type="text" id="merk" placeholder="Merk / Tipe (Contoh: Honda Vario)">
+        
         <select id="jenis">
             <option value="">-- Pilih Jenis --</option>
             <option value="Motor">Motor</option>
             <option value="Mobil">Mobil</option>
         </select>
+        
         <button class="btn save" onclick="simpan()">Simpan Kendaraan</button>
     </div>
 
@@ -49,6 +57,8 @@
                 <th>Pemilik (Pelanggan)</th>
                 <th>Nama Asli STNK</th>
                 <th>No. Plat / Nopol</th>
+                <th>No. Rangka</th>
+                <th>No. Mesin</th>
                 <th>Merk & Tipe</th>
                 <th>Jenis Kendaraan</th>
             </tr>
@@ -60,20 +70,33 @@
 <script>
     let dataPelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
     let dataKendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
+    let namaPelangganAsli = ""; // Menyimpan nama asli dengan case-sensitive yang benar
 
-    // FUNGSI CARI DATA PELANGGAN OTOMATIS SAAT KETIK NAMA
+    // FUNGSI PENCARIAN OTOMATIS DAN PINTAR
     function cariPelangganOtomatis() {
         let inputNama = document.getElementById("namaPelanggan").value.trim().toUpperCase();
+        let infoBox = document.getElementById("infoPencarian");
         
-        // Cari di database pelanggan yang namanya cocok
-        let pelangganDitemukan = dataPelanggan.find(p => p.nama.trim().toUpperCase() === inputNama);
+        if (inputNama === "") {
+            document.getElementById("stnk").value = "";
+            infoBox.innerText = "";
+            namaPelangganAsli = "";
+            return;
+        }
+        
+        // Mencari pelanggan yang namanya mengandung unsur huruf yang diketik (tidak harus sama persis di awal)
+        let pelangganDitemukan = dataPelanggan.find(p => p.nama.trim().toUpperCase().includes(inputNama));
 
         if (pelangganDitemukan) {
-            // Jika nama pelanggan ditemukan, isi field Nama STNK secara otomatis
+            // Isi field STNK otomatis
             document.getElementById("stnk").value = pelangganDitemukan.stnk || "";
+            infoBox.innerText = "✓ Ditemukan: " + pelangganDitemukan.nama;
+            namaPelangganAsli = pelangganDitemukan.nama; // Kunci nama aslinya untuk disimpan ke database
         } else {
-            // Jika belum cocok, kosongkan field Nama STNK
+            // Jika ketikan tidak ada yang cocok di database
             document.getElementById("stnk").value = "";
+            infoBox.innerText = "⚠ Pelanggan Tidak Ditemukan";
+            namaPelangganAsli = "";
         }
     }
 
@@ -85,6 +108,8 @@
                 <td>${k.namaPelanggan}</td>
                 <td><strong>${k.stnk}</strong></td>
                 <td><strong>${k.noPlat.toUpperCase()}</strong></td>
+                <td>${k.noRangka || "-"}</td>
+                <td>${k.noMesin || "-"}</td>
                 <td>${k.merk}</td>
                 <td>${k.jenis}</td>
             </tr>
@@ -96,43 +121,50 @@
     }
 
     function simpan(){
-        let namaPelanggan = document.getElementById("namaPelanggan").value.trim();
         let stnk = document.getElementById("stnk").value;
         let noPlat = document.getElementById("noPlat").value.trim().toUpperCase();
+        let noRangka = document.getElementById("noRangka").value.trim().toUpperCase();
+        let noMesin = document.getElementById("noMesin").value.trim().toUpperCase();
         let merk = document.getElementById("merk").value.trim();
         let jenis = document.getElementById("jenis").value;
 
-        // Validasi agar harus mengetik nama pelanggan yang sudah terdaftar di database pelanggan
-        if(stnk === "") {
-            alert("Nama Pelanggan tidak ditemukan di database! Harap daftarkan dulu di halaman Data Pelanggan.");
+        // Validasi database pelanggan mengunci
+        if(stnk === "" || namaPelangganAsli === "") {
+            alert("Nama Pelanggan harus terdaftar di database sistem! Mohon periksa kembali ketikan Anda.");
             return;
         }
 
-        if(noPlat === "" || merk === "" || jenis === "") {
-            alert("Lengkapi nomor plat, merk, dan jenis kendaraan!");
+        if(noPlat === "" || noRangka === "" || noMesin === "" || merk === "" || jenis === "") {
+            alert("Harap lengkapi No. Plat, No. Rangka, No. Mesin, Merk, dan Jenis Kendaraan!");
             return;
         }
 
         dataKendaraan.push({
             id: Date.now(),
-            namaPelanggan: namaPelanggan,
+            namaPelanggan: namaPelangganAsli,
             stnk: stnk,
             noPlat: noPlat,
+            noRangka: noRangka,
+            noMesin: noMesin,
             merk: merk,
             jenis: jenis
         });
 
         render();
 
-        // Reset Form setelah data tersimpan
+        // Reset semua field form inputan setelah data tersimpan
         document.getElementById("namaPelanggan").value = "";
         document.getElementById("stnk").value = "";
         document.getElementById("noPlat").value = "";
+        document.getElementById("noRangka").value = "";
+        document.getElementById("noMesin").value = "";
         document.getElementById("merk").value = "";
         document.getElementById("jenis").value = "";
+        document.getElementById("infoPencarian").innerText = "";
+        namaPelangganAsli = "";
     }
 
-    // Jalankan render tabel saat halaman dibuka pertama kali
+    // Jalankan render tabel saat halaman pertama kali dibuka
     render();
 </script>
 
