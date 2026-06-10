@@ -1,5 +1,5 @@
 
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -12,7 +12,6 @@
         .logout{ background:#c62828; color:white; text-decoration:none; padding:8px 15px; border-radius:5px; }
         .container{ max-width:1200px; margin:auto; padding:20px; }
         .welcome{ background:white; padding:20px; border-radius:10px; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,.1); text-align: center; }
-        .welcome img { width: 120px; height: auto; margin-bottom: 10px; }
         .grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:15px; margin-bottom:20px; }
         .card{ background:white; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.1); text-align: center; }
         .card h4{ color:#666; margin-bottom:10px; font-size: 14px; }
@@ -32,9 +31,8 @@
 
 <div class="container">
     <div class="welcome">
-        <img src="logo.jpg" alt="Logo">
         <h2>Biro Jasa STNK Askara Zayyan</h2>
-        <p>Selamat Bekerja</p>
+        <p>Dashboard Operasional</p>
     </div>
 
     <div class="grid">
@@ -45,7 +43,7 @@
     </div>
 
     <div class="menu">
-        <h3>Menu Operasional</h3><br>
+        <h3>Menu Utama</h3><br>
         <div class="menu-grid">
             <a href="pelanggan.html">👤 Pelanggan</a>
             <a href="kendaraan.html">🚗 Kendaraan</a>
@@ -73,7 +71,6 @@
         document.getElementById("transaksi").innerText = transaksi.length;
         document.getElementById("selesai").innerText = selesai;
     }
-
     loadDashboard();
 </script>
 
