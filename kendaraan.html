@@ -11,8 +11,8 @@
         .header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
         .btn{ padding:10px 15px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; text-decoration:none; color:white; }
         .back{ background:#546e7a; }
-        .save{ background:#2e7d32; } /* Warna hijau khas operasional */
-        .form-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; margin-bottom:20px; }
+        .save{ background:#2e7d32; }
+        .form-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin-bottom:20px; }
         input, select { padding:12px; border:1px solid #ddd; border-radius:6px; font-size: 14px; }
         table{ width:100%; border-collapse:collapse; }
         th{ background:#2e7d32; color:white; padding:10px; }
@@ -29,6 +29,10 @@
     </div>
 
     <div class="form-grid">
+        <input type="text" id="namaPelanggan" placeholder="Ketik Nama Pelanggan" oninput="cariPelangganOtomatis()">
+        
+        <input type="text" id="stnk" placeholder="Nama Asli STNK" readonly style="background: #eee;">
+        
         <input type="text" id="noPlat" placeholder="Nomor Polisi (No. Plat)">
         <input type="text" id="merk" placeholder="Merk / Tipe (Contoh: Honda Vario)">
         <select id="jenis">
@@ -42,27 +46,48 @@
     <table>
         <thead>
             <tr>
+                <th>Pemilik (Pelanggan)</th>
+                <th>Nama Asli STNK</th>
                 <th>No. Plat / Nopol</th>
                 <th>Merk & Tipe</th>
                 <th>Jenis Kendaraan</th>
-                </tr>
+            </tr>
         </thead>
         <tbody id="isiTabel"></tbody>
     </table>
 </div>
 
 <script>
+    let dataPelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
     let dataKendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
+
+    // FUNGSI CARI DATA PELANGGAN OTOMATIS SAAT KETIK NAMA
+    function cariPelangganOtomatis() {
+        let inputNama = document.getElementById("namaPelanggan").value.trim().toUpperCase();
+        
+        // Cari di database pelanggan yang namanya cocok
+        let pelangganDitemukan = dataPelanggan.find(p => p.nama.trim().toUpperCase() === inputNama);
+
+        if (pelangganDitemukan) {
+            // Jika nama pelanggan ditemukan, isi field Nama STNK secara otomatis
+            document.getElementById("stnk").value = pelangganDitemukan.stnk || "";
+        } else {
+            // Jika belum cocok, kosongkan field Nama STNK
+            document.getElementById("stnk").value = "";
+        }
+    }
 
     function render(){
         let html = "";
         dataKendaraan.forEach((k)=>{
             html += `
             <tr>
+                <td>${k.namaPelanggan}</td>
+                <td><strong>${k.stnk}</strong></td>
                 <td><strong>${k.noPlat.toUpperCase()}</strong></td>
                 <td>${k.merk}</td>
                 <td>${k.jenis}</td>
-                </tr>
+            </tr>
             `;
         });
 
@@ -71,17 +96,27 @@
     }
 
     function simpan(){
-        let noPlat = document.getElementById("noPlat").value;
-        let merk = document.getElementById("merk").value;
+        let namaPelanggan = document.getElementById("namaPelanggan").value.trim();
+        let stnk = document.getElementById("stnk").value;
+        let noPlat = document.getElementById("noPlat").value.trim().toUpperCase();
+        let merk = document.getElementById("merk").value.trim();
         let jenis = document.getElementById("jenis").value;
 
-        if(noPlat==="" || merk==="" || jenis==="") {
-            alert("Lengkapi data kendaraan terlebih dahulu");
+        // Validasi agar harus mengetik nama pelanggan yang sudah terdaftar di database pelanggan
+        if(stnk === "") {
+            alert("Nama Pelanggan tidak ditemukan di database! Harap daftarkan dulu di halaman Data Pelanggan.");
+            return;
+        }
+
+        if(noPlat === "" || merk === "" || jenis === "") {
+            alert("Lengkapi nomor plat, merk, dan jenis kendaraan!");
             return;
         }
 
         dataKendaraan.push({
             id: Date.now(),
+            namaPelanggan: namaPelanggan,
+            stnk: stnk,
             noPlat: noPlat,
             merk: merk,
             jenis: jenis
@@ -89,14 +124,15 @@
 
         render();
 
-        // Reset Form
+        // Reset Form setelah data tersimpan
+        document.getElementById("namaPelanggan").value = "";
+        document.getElementById("stnk").value = "";
         document.getElementById("noPlat").value = "";
         document.getElementById("merk").value = "";
         document.getElementById("jenis").value = "";
     }
 
-    // Fungsi hapus data dibuang demi keamanan hak akses pegawai
-
+    // Jalankan render tabel saat halaman dibuka pertama kali
     render();
 </script>
 
