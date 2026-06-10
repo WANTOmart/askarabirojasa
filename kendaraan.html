@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Transaksi</title>
+    <title>Data Kendaraan</title>
     <style>
         *{ margin:0; padding:0; box-sizing:border-box; font-family:Segoe UI,sans-serif; }
         body{ background:#f4f6f9; padding:20px; }
@@ -11,14 +11,13 @@
         .header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
         .btn{ padding:10px 15px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; text-decoration:none; color:white; }
         .back{ background:#546e7a; }
-        .save{ background:#0d47a1; }
+        .save{ background:#2e7d32; }
         .form-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin-bottom:20px; }
         input, select { padding:12px; border:1px solid #ddd; border-radius:6px; font-size: 14px; }
         table{ width:100%; border-collapse:collapse; }
-        th{ background:#0d47a1; color:white; padding:10px; }
+        th{ background:#2e7d32; color:white; padding:10px; }
         td{ padding:10px; border-bottom:1px solid #ddd; text-align: center; }
         th { text-align: center; }
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; color: white; background: #e65100; }
     </style>
 </head>
 <body>
@@ -26,38 +25,34 @@
 <div class="container">
     <div class="header">
         <a href="dashboard.html" class="btn back">⬅ Dashboard</a>
-        <h2>Data Transaksi</h2>
+        <h2>Data Kendaraan</h2>
     </div>
 
     <div class="form-grid">
-        <input type="text" id="idTransaksi" placeholder="No. Invoice" readonly style="background: #eee;">
-        
-        <select id="pilihKendaraan" onchange="isiDataOtomatis()">
-            <option value="">-- Pilih No. Plat --</option>
+        <select id="pilihPelanggan" onchange="isiNamaStnkOtomatis()">
+            <option value="">-- Pilih Pelanggan --</option>
         </select>
-
-        <input type="text" id="namaPelanggan" placeholder="Nama Pelanggan" readonly style="background: #eee;">
+        
         <input type="text" id="stnk" placeholder="Nama Asli STNK" readonly style="background: #eee;">
         
-        <select id="layanan">
-            <option value="">-- Pilih Layanan --</option>
-            <option value="Perpanjang STNK 1 Tahunan">Perpanjang STNK 1 Tahunan</option>
-            <option value="Pajak 5 Tahunan (Ganti Plat)">Pajak 5 Tahunan (Ganti Plat)</option>
-            <option value="Balik Nama (BBN-KB)">Balik Nama (BBN-KB)</option>
-            <option value="Mutasi Keluar/Masuk">Mutasi Keluar/Masuk</option>
+        <input type="text" id="noPlat" placeholder="Nomor Polisi (No. Plat)">
+        <input type="text" id="merk" placeholder="Merk / Tipe">
+        <select id="jenis">
+            <option value="">-- Jenis --</option>
+            <option value="Motor">Motor</option>
+            <option value="Mobil">Mobil</option>
         </select>
-        <button class="btn save" onclick="simpan()">Buat Transaksi</button>
+        <button class="btn save" onclick="simpan()">Simpan</button>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th>No. Transaksi</th>
+                <th>Pemilik (Pelanggan)</th>
+                <th>Nama Asli STNK</th>
                 <th>No. Plat</th>
-                <th>Pelanggan</th>
-                <th>Nama STNK</th>
-                <th>Layanan</th>
-                <th>Status</th>
+                <th>Merk & Tipe</th>
+                <th>Jenis</th>
             </tr>
         </thead>
         <tbody id="isiTabel"></tbody>
@@ -65,89 +60,81 @@
 </div>
 
 <script>
+    let dataPelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
     let dataKendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
-    let dataTransaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
 
-    function generateInvoice() {
-        document.getElementById("idTransaksi").value = "TRX-" + Math.floor(100000 + Math.random() * 900000);
-    }
-
-    // Memasukkan list kendaraan ke dropdown nopol
-    function muatPilihanKendaraan() {
-        let select = document.getElementById("pilihKendaraan");
-        dataKendaraan.forEach((k, index) => {
+    // Fungsi menampilkan daftar pelanggan di pilihan dropdown
+    function muatPilihanPelanggan() {
+        let select = document.getElementById("pilihPelanggan");
+        dataPelanggan.forEach((p, index) => {
             let option = document.createElement("option");
-            option.value = index;
-            option.text = k.noPlat.toUpperCase();
+            option.value = index; // Menyimpan index array pelanggan
+            option.text = p.nama;
             select.add(option);
         });
     }
 
-    // Otomatis tarik data pelanggan & STNK berdasarkan kendaraan terpilih
-    function isiDataOtomatis() {
-        let indexTerpilih = document.getElementById("pilihKendaraan").value;
+    // Fungsi otomatis mengisi Nama STNK saat nama pelanggan dipilih
+    function isiNamaStnkOtomatis() {
+        let indexTerpilih = document.getElementById("pilihPelanggan").value;
         if(indexTerpilih !== "") {
-            let kendaraan = dataKendaraan[indexTerpilih];
-            document.getElementById("namaPelanggan").value = kendaraan.namaPelanggan;
-            document.getElementById("stnk").value = kendaraan.stnk;
+            document.getElementById("stnk").value = dataPelanggan[indexTerpilled].stnk;
         } else {
-            document.getElementById("namaPelanggan").value = "";
             document.getElementById("stnk").value = "";
         }
     }
 
     function render(){
         let html = "";
-        dataTransaksi.forEach((t)=>{
+        dataKendaraan.forEach((k)=>{
             html += `
             <tr>
-                <td><strong>${t.idTransaksi}</strong></td>
-                <td><strong>${t.noPlat.toUpperCase()}</strong></td>
-                <td>${t.namaPelanggan}</td>
-                <td>${t.stnk}</td>
-                <td>${t.layanan}</td>
-                <td><span class="badge">${t.statusBerkas}</span></td>
+                <td>${k.namaPelanggan}</td>
+                <td><strong>${k.stnk}</strong></td>
+                <td><strong>${k.noPlat.toUpperCase()}</strong></td>
+                <td>${k.merk}</td>
+                <td>${k.jenis}</td>
             </tr>
             `;
         });
-
         document.getElementById("isiTabel").innerHTML = html;
-        localStorage.setItem("dataTransaksi", JSON.stringify(dataTransaksi));
-        generateInvoice();
+        localStorage.setItem("dataKendaraan", JSON.stringify(dataKendaraan));
     }
 
     function simpan(){
-        let idTransaksi = document.getElementById("idTransaksi").value;
-        let indexKendaraan = document.getElementById("pilihKendaraan").value;
-        let layanan = document.getElementById("layanan").value;
+        let indexPelanggan = document.getElementById("pilihPelanggan").value;
+        let noPlat = document.getElementById("noPlat").value;
+        let merk = document.getElementById("merk").value;
+        let jenis = document.getElementById("jenis").value;
 
-        if(indexKendaraan==="" || layanan==="") {
-            alert("Harap pilih kendaraan dan layanan!");
+        if(indexPelanggan === "" || noPlat==="" || merk==="" || jenis==="") {
+            alert("Lengkapi semua data!");
             return;
         }
 
-        let k = dataKendaraan[indexKendaraan];
+        let pelangganTerpilih = dataPelanggan[indexPelanggan];
 
-        dataTransaksi.push({
+        dataKendaraan.push({
             id: Date.now(),
-            idTransaksi: idTransaksi,
-            noPlat: k.noPlat,
-            namaPelanggan: k.namaPelanggan,
-            stnk: k.stnk,
-            layanan: layanan,
-            statusBerkas: "PROSES"
+            namaPelanggan: pelangganTerpilih.nama,
+            stnk: pelangganTerpilih.stnk,
+            noPlat: noPlat,
+            merk: merk,
+            jenis: jenis
         });
 
         render();
 
-        // Reset
-        document.getElementById("pilihKendaraan").value = "";
-        document.getElementById("namaPelanggan").value = "";
+        // Reset form
+        document.getElementById("pilihPelanggan").value = "";
         document.getElementById("stnk").value = "";
-        document.getElementById("layanan").value = "";
+        document.getElementById("noPlat").value = "";
+        document.getElementById("merk").value = "";
+        document.getElementById("jenis").value = "";
     }
 
-    muatPilihanKendaraan();
+    // Jalankan fungsi awal
+    muatPilihanPelanggan();
     render();
 </script>
 </body>
