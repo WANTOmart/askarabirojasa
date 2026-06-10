@@ -30,17 +30,14 @@
     </div>
 
     <div class="form-grid">
-        <!-- Input Ketik Nama dengan Fitur Datalist (Rekomendasi Otomatis) -->
         <div>
             <input type="text" id="namaPelanggan" list="listPelanggan" placeholder="Ketik Nama Pelanggan" oninput="cariPelangganOtomatis()" style="width: 100%;">
             <datalist id="listPelanggan"></datalist>
             <div id="infoPencarian" class="suggest-info"></div>
         </div>
         
-        <!-- Field yang Terisi Otomatis -->
         <input type="text" id="stnk" placeholder="Nama Asli STNK" readonly style="background: #eee; font-weight: bold;">
         
-        <!-- Field Input Manual -->
         <input type="text" id="noPlat" placeholder="Nomor Polisi (No. Plat)">
         <input type="text" id="noRangka" placeholder="Nomor Rangka">
         <input type="text" id="noMesin" placeholder="Nomor Mesin">
@@ -72,15 +69,11 @@
 </div>
 
 <script>
-    // Ambil database dari localStorage
+    // Load database dari localStorage browser
     let dataPelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
     let dataKendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
-    
-    // Variabel bantuan untuk mengunci data yang valid
-    let namaTerpilihValid = "";
-    let stnkTerpilihValid = "";
 
-    // Memasukkan database pelanggan ke daftar rekomendasi (Datalist) bawah inputan
+    // Memasukkan list database pelanggan ke rekomendasi pilihan bawan inputan
     function inisialisasiDatalist() {
         let datalist = document.getElementById("listPelanggan");
         datalist.innerHTML = "";
@@ -91,7 +84,7 @@
         });
     }
 
-    // FUNGSI PENCARIAN OTOMATIS (Tidak Sensitif Huruf Besar/Kecil)
+    // FUNGSI PENCARIAN OTOMATIS (Mencari teks yang mengandung unsur ketikan petugas)
     function cariPelangganOtomatis() {
         let inputNama = document.getElementById("namaPelanggan").value.trim().toUpperCase();
         let infoBox = document.getElementById("infoPencarian");
@@ -99,32 +92,24 @@
         if (inputNama === "") {
             document.getElementById("stnk").value = "";
             infoBox.innerText = "";
-            namaTerpilihValid = "";
-            stnkTerpilihValid = "";
             return;
         }
         
-        // Cari pelanggan yang namanya mengandung unsur tulisan yang diketik petugas
+        // Cari pelanggan di database yang mirip
         let pelangganDitemukan = dataPelanggan.find(p => p.nama.trim().toUpperCase().includes(inputNama));
 
         if (pelangganDitemukan) {
             document.getElementById("stnk").value = pelangganDitemukan.stnk || "";
             infoBox.style.color = "#2e7d32";
-            infoBox.innerText = "✓ Cocok: " + pelangganDitemukan.nama;
-            
-            // Kunci data yang benar ke dalam sistem
-            namaTerpilihValid = pelangganDitemukan.nama;
-            stnkTerpilihValid = pelangganDitemukan.stnk || "";
+            infoBox.innerText = "✓ Ditemukan: " + pelangganDitemukan.nama;
         } else {
             document.getElementById("stnk").value = "";
             infoBox.style.color = "#c62828";
-            infoBox.innerText = "⚠ Pelanggan Tidak Ditemukan di Database";
-            namaTerpilihValid = "";
-            stnkTerpilihValid = "";
+            infoBox.innerText = "⚠ Nama belum terdaftar di Data Pelanggan";
         }
     }
 
-    // Menampilkan data ke dalam tabel bawah
+    // Menampilkan isi database kendaraan ke dalam tabel bawah secara real-time
     function render(){
         let html = "";
         dataKendaraan.forEach((k)=>{
@@ -133,8 +118,8 @@
                 <td>${k.namaPelanggan}</td>
                 <td><strong>${k.stnk}</strong></td>
                 <td><strong>${k.noPlat.toUpperCase()}</strong></td>
-                <td>${k.noRangka || "-"}</td>
-                <td>${k.noMesin || "-"}</td>
+                <td>${k.noRangka}</td>
+                <td>${k.noMesin}</td>
                 <td>${k.merk}</td>
                 <td>${k.jenis}</td>
             </tr>
@@ -142,35 +127,36 @@
         });
 
         document.getElementById("isiTabel").innerHTML = html;
-        // Simpan ke penyimpanan browser
         localStorage.setItem("dataKendaraan", JSON.stringify(dataKendaraan));
     }
 
-    // FUNGSI TOMBOL SIMPAN
+    // FUNGSI UTAMA TOMBOL SIMPAN DATA KENDARAAN
     function simpan(){
+        let namaPelanggan = document.getElementById("namaPelanggan").value.trim();
+        let stnk = document.getElementById("stnk").value.trim();
         let noPlat = document.getElementById("noPlat").value.trim().toUpperCase();
         let noRangka = document.getElementById("noRangka").value.trim().toUpperCase();
         let noMesin = document.getElementById("noMesin").value.trim().toUpperCase();
         let merk = document.getElementById("merk").value.trim();
         let jenis = document.getElementById("jenis").value;
 
-        // Validasi: Jika nama pelanggan tidak ketemu di database, tolak penambahan data kendaraan
-        if(namaTerpilihValid === "" || stnkTerpilihValid === "") {
-            alert("Nama Pelanggan salah atau tidak terdaftar! Silakan ketik nama pelanggan yang ada di database.");
+        // JIKA NAMA STNK BLANK (KOSONG), BERARTI PETUGAS BELUM INPUT PELANGGAN TERSEBUT DI HALAMAN PELANGGAN
+        if(stnk === "" || namaPelanggan === "") {
+            alert("Nama Pelanggan wajib terdaftar dulu! Periksa kolom pencarian atau daftarkan dulu di halaman Data Pelanggan.");
             return;
         }
 
-        // Validasi kelengkapan data input manual
+        // Validasi kelengkapan semua kolom isian
         if(noPlat === "" || noRangka === "" || noMesin === "" || merk === "" || jenis === "") {
-            alert("Harap lengkapi semua data: No. Plat, No. Rangka, No. Mesin, Merk, dan Jenis Kendaraan!");
+            alert("Harap isi semua kolom: No. Plat, No. Rangka, No. Mesin, Merk, dan Jenis Kendaraan!");
             return;
         }
 
-        // Memasukkan data baru ke dalam array database kendaraan
+        // Push langsung data ke dalam array database kendaraan
         dataKendaraan.push({
             id: Date.now(),
-            namaPelanggan: namaTerpilihValid,
-            stnk: stnkTerpilihValid,
+            namaPelanggan: namaPelanggan,
+            stnk: stnk,
             noPlat: noPlat,
             noRangka: noRangka,
             noMesin: noMesin,
@@ -178,10 +164,10 @@
             jenis: jenis
         });
 
-        // Perbarui tabel bawah secara langsung
+        // Jalankan perintah tulis data ke tabel bawah
         render();
 
-        // Reset/Kosongkan semua kolom input agar bisa dipakai ketik data baru lagi
+        // Bersihkan seluruh form inputan agar siap diisi data kendaraan baru selanjutnya
         document.getElementById("namaPelanggan").value = "";
         document.getElementById("stnk").value = "";
         document.getElementById("noPlat").value = "";
@@ -190,13 +176,9 @@
         document.getElementById("merk").value = "";
         document.getElementById("jenis").value = "";
         document.getElementById("infoPencarian").innerText = "";
-        
-        // Reset pengunci data
-        namaTerpilihValid = "";
-        stnkTerpilihValid = "";
     }
 
-    // Jalankan pertama kali saat halaman dibuka
+    // Eksekusi fungsi saat pertama kali halaman diakses
     inisialisasiDatalist();
     render();
 </script>
