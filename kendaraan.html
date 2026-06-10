@@ -1,19 +1,104 @@
-<script>
-    function renderKendaraan() {
-        let kendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
-        let tbody = document.getElementById("listKendaraan");
-        tbody.innerHTML = "";
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Kendaraan</title>
+    <style>
+        *{ margin:0; padding:0; box-sizing:border-box; font-family:Segoe UI,sans-serif; }
+        body{ background:#f4f6f9; padding:20px; }
+        .container{ max-width:1100px; margin:auto; background:white; padding:20px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,.1); }
+        .header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+        .btn{ padding:10px 15px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; text-decoration:none; color:white; }
+        .back{ background:#546e7a; }
+        .save{ background:#2e7d32; } /* Warna hijau khas operasional */
+        .form-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; margin-bottom:20px; }
+        input, select { padding:12px; border:1px solid #ddd; border-radius:6px; font-size: 14px; }
+        table{ width:100%; border-collapse:collapse; }
+        th{ background:#2e7d32; color:white; padding:10px; }
+        td{ padding:10px; border-bottom:1px solid #ddd; text-align: center; }
+        th { text-align: center; }
+    </style>
+</head>
+<body>
 
-        kendaraan.forEach((k, index) => {
-            let row = `<tr>
-                <td>${k.noPlat}</td>
+<div class="container">
+    <div class="header">
+        <a href="dashboard.html" class="btn back">⬅ Dashboard</a>
+        <h2>Data Kendaraan</h2>
+    </div>
+
+    <div class="form-grid">
+        <input type="text" id="noPlat" placeholder="Nomor Polisi (No. Plat)">
+        <input type="text" id="merk" placeholder="Merk / Tipe (Contoh: Honda Vario)">
+        <select id="jenis">
+            <option value="">-- Pilih Jenis --</option>
+            <option value="Motor">Motor</option>
+            <option value="Mobil">Mobil</option>
+        </select>
+        <button class="btn save" onclick="simpan()">Simpan Kendaraan</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>No. Plat / Nopol</th>
+                <th>Merk & Tipe</th>
+                <th>Jenis Kendaraan</th>
+                </tr>
+        </thead>
+        <tbody id="isiTabel"></tbody>
+    </table>
+</div>
+
+<script>
+    let dataKendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
+
+    function render(){
+        let html = "";
+        dataKendaraan.forEach((k)=>{
+            html += `
+            <tr>
+                <td><strong>${k.noPlat.toUpperCase()}</strong></td>
                 <td>${k.merk}</td>
-                <td>
-                    <a href="edit_kendaraan.html?id=${index}" style="color: blue;">Edit</a>
-                </td>
-            </tr>`;
-            tbody.innerHTML += row;
+                <td>${k.jenis}</td>
+                </tr>
+            `;
         });
+
+        document.getElementById("isiTabel").innerHTML = html;
+        localStorage.setItem("dataKendaraan", JSON.stringify(dataKendaraan));
     }
-    renderKendaraan();
+
+    function simpan(){
+        let noPlat = document.getElementById("noPlat").value;
+        let merk = document.getElementById("merk").value;
+        let jenis = document.getElementById("jenis").value;
+
+        if(noPlat==="" || merk==="" || jenis==="") {
+            alert("Lengkapi data kendaraan terlebih dahulu");
+            return;
+        }
+
+        dataKendaraan.push({
+            id: Date.now(),
+            noPlat: noPlat,
+            merk: merk,
+            jenis: jenis
+        });
+
+        render();
+
+        // Reset Form
+        document.getElementById("noPlat").value = "";
+        document.getElementById("merk").value = "";
+        document.getElementById("jenis").value = "";
+    }
+
+    // Fungsi hapus data dibuang demi keamanan hak akses pegawai
+
+    render();
 </script>
+
+</body>
+</html>
