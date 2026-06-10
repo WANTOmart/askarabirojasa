@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Transaksi Biro Jasa</title>
+    <title>Data Transaksi</title>
     <style>
         *{ margin:0; padding:0; box-sizing:border-box; font-family:Segoe UI,sans-serif; }
         body{ background:#f4f6f9; padding:20px; }
@@ -12,7 +12,7 @@
         .btn{ padding:10px 15px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; text-decoration:none; color:white; }
         .back{ background:#546e7a; }
         .save{ background:#0d47a1; }
-        .form-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; margin-bottom:20px; }
+        .form-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin-bottom:20px; }
         input, select { padding:12px; border:1px solid #ddd; border-radius:6px; font-size: 14px; }
         table{ width:100%; border-collapse:collapse; }
         th{ background:#0d47a1; color:white; padding:10px; }
@@ -30,9 +30,15 @@
     </div>
 
     <div class="form-grid">
-        <input type="text" id="idTransaksi" placeholder="No. Invoice / Transaksi" readonly>
-        <input type="text" id="namaPelanggan" placeholder="Nama Pelanggan">
-        <input type="text" id="noPlat" placeholder="No. Plat Kendaraan">
+        <input type="text" id="idTransaksi" placeholder="No. Invoice" readonly style="background: #eee;">
+        
+        <select id="pilihKendaraan" onchange="isiDataOtomatis()">
+            <option value="">-- Pilih No. Plat --</option>
+        </select>
+
+        <input type="text" id="namaPelanggan" placeholder="Nama Pelanggan" readonly style="background: #eee;">
+        <input type="text" id="stnk" placeholder="Nama Asli STNK" readonly style="background: #eee;">
+        
         <select id="layanan">
             <option value="">-- Pilih Layanan --</option>
             <option value="Perpanjang STNK 1 Tahunan">Perpanjang STNK 1 Tahunan</option>
@@ -47,22 +53,47 @@
         <thead>
             <tr>
                 <th>No. Transaksi</th>
-                <th>Pelanggan</th>
                 <th>No. Plat</th>
-                <th>Jenis Layanan</th>
-                <th>Status Berkas</th>
-                </tr>
+                <th>Pelanggan</th>
+                <th>Nama STNK</th>
+                <th>Layanan</th>
+                <th>Status</th>
+            </tr>
         </thead>
         <tbody id="isiTabel"></tbody>
     </table>
 </div>
 
 <script>
+    let dataKendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
     let dataTransaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
 
-    // Fungsi generate ID otomatis agar rapi
     function generateInvoice() {
         document.getElementById("idTransaksi").value = "TRX-" + Math.floor(100000 + Math.random() * 900000);
+    }
+
+    // Memasukkan list kendaraan ke dropdown nopol
+    function muatPilihanKendaraan() {
+        let select = document.getElementById("pilihKendaraan");
+        dataKendaraan.forEach((k, index) => {
+            let option = document.createElement("option");
+            option.value = index;
+            option.text = k.noPlat.toUpperCase();
+            select.add(option);
+        });
+    }
+
+    // Otomatis tarik data pelanggan & STNK berdasarkan kendaraan terpilih
+    function isiDataOtomatis() {
+        let indexTerpilih = document.getElementById("pilihKendaraan").value;
+        if(indexTerpilih !== "") {
+            let kendaraan = dataKendaraan[indexTerpilih];
+            document.getElementById("namaPelanggan").value = kendaraan.namaPelanggan;
+            document.getElementById("stnk").value = kendaraan.stnk;
+        } else {
+            document.getElementById("namaPelanggan").value = "";
+            document.getElementById("stnk").value = "";
+        }
     }
 
     function render(){
@@ -71,11 +102,12 @@
             html += `
             <tr>
                 <td><strong>${t.idTransaksi}</strong></td>
+                <td><strong>${t.noPlat.toUpperCase()}</strong></td>
                 <td>${t.namaPelanggan}</td>
-                <td>${t.noPlat.toUpperCase()}</td>
+                <td>${t.stnk}</td>
                 <td>${t.layanan}</td>
                 <td><span class="badge">${t.statusBerkas}</span></td>
-                </tr>
+            </tr>
             `;
         });
 
@@ -86,36 +118,37 @@
 
     function simpan(){
         let idTransaksi = document.getElementById("idTransaksi").value;
-        let namaPelanggan = document.getElementById("namaPelanggan").value;
-        let noPlat = document.getElementById("noPlat").value;
+        let indexKendaraan = document.getElementById("pilihKendaraan").value;
         let layanan = document.getElementById("layanan").value;
 
-        if(namaPelanggan==="" || noPlat==="" || layanan==="") {
-            alert("Harap lengkapi detail data transaksi");
+        if(indexKendaraan==="" || layanan==="") {
+            alert("Harap pilih kendaraan dan layanan!");
             return;
         }
+
+        let k = dataKendaraan[indexKendaraan];
 
         dataTransaksi.push({
             id: Date.now(),
             idTransaksi: idTransaksi,
-            namaPelanggan: namaPelanggan,
-            noPlat: noPlat,
+            noPlat: k.noPlat,
+            namaPelanggan: k.namaPelanggan,
+            stnk: k.stnk,
             layanan: layanan,
-            statusBerkas: "PROSES" // Default status awal berkas masuk
+            statusBerkas: "PROSES"
         });
 
         render();
 
-        // Reset Form lapangan inputan kecuali id otomatis
+        // Reset
+        document.getElementById("pilihKendaraan").value = "";
         document.getElementById("namaPelanggan").value = "";
-        document.getElementById("noPlat").value = "";
+        document.getElementById("stnk").value = "";
         document.getElementById("layanan").value = "";
     }
 
-    // Seluruh baris fungsi hapus (.splice) dibuang agar pegawai tidak bisa memanipulasi riwayat berkas
-
+    muatPilihanKendaraan();
     render();
 </script>
-
 </body>
 </html>
