@@ -131,52 +131,52 @@
     }
 
     // FUNGSI UTAMA TOMBOL SIMPAN DATA KENDARAAN
-    function simpan(){
-        let namaPelanggan = document.getElementById("namaPelanggan").value.trim();
-        let stnk = document.getElementById("stnk").value.trim();
-        let noPlat = document.getElementById("noPlat").value.trim().toUpperCase();
-        let noRangka = document.getElementById("noRangka").value.trim().toUpperCase();
-        let noMesin = document.getElementById("noMesin").value.trim().toUpperCase();
-        let merk = document.getElementById("merk").value.trim();
-        let jenis = document.getElementById("jenis").value;
+   function simpan(){
 
-        // JIKA NAMA STNK BLANK (KOSONG), BERARTI PETUGAS BELUM INPUT PELANGGAN TERSEBUT DI HALAMAN PELANGGAN
-        if(stnk === "" || namaPelanggan === "") {
-            alert("Nama Pelanggan wajib terdaftar dulu! Periksa kolom pencarian atau daftarkan dulu di halaman Data Pelanggan.");
-            return;
-        }
+    let namaPelanggan = document.getElementById("namaPelanggan").value.trim();
+    let stnk = document.getElementById("stnk").value.trim();
+    let noPlat = document.getElementById("noPlat").value.trim().toUpperCase();
+    let noRangka = document.getElementById("noRangka").value.trim().toUpperCase();
+    let noMesin = document.getElementById("noMesin").value.trim().toUpperCase();
+    let merk = document.getElementById("merk").value.trim();
+    let jenis = document.getElementById("jenis").value;
 
-        // Validasi kelengkapan semua kolom isian
-        if(noPlat === "" || noRangka === "" || noMesin === "" || merk === "" || jenis === "") {
-            alert("Harap isi semua kolom: No. Plat, No. Rangka, No. Mesin, Merk, dan Jenis Kendaraan!");
-            return;
-        }
-
-        // Push langsung data ke dalam array database kendaraan
-        dataKendaraan.push({
-            id: Date.now(),
-            namaPelanggan: namaPelanggan,
-            stnk: stnk,
-            noPlat: noPlat,
-            noRangka: noRangka,
-            noMesin: noMesin,
-            merk: merk,
-            jenis: jenis
-        });
-
-        // Jalankan perintah tulis data ke tabel bawah
-        render();
-
-        // Bersihkan seluruh form inputan agar siap diisi data kendaraan baru selanjutnya
-        document.getElementById("namaPelanggan").value = "";
-        document.getElementById("stnk").value = "";
-        document.getElementById("noPlat").value = "";
-        document.getElementById("noRangka").value = "";
-        document.getElementById("noMesin").value = "";
-        document.getElementById("merk").value = "";
-        document.getElementById("jenis").value = "";
-        document.getElementById("infoPencarian").innerText = "";
+    if(namaPelanggan === ""){
+        alert("Nama pelanggan harus diisi");
+        return;
     }
+
+    if(stnk === ""){
+        alert("Pelanggan belum ditemukan di Data Pelanggan");
+        return;
+    }
+
+    dataKendaraan.push({
+        id: Date.now(),
+        namaPelanggan: namaPelanggan,
+        stnk: stnk,
+        noPlat: noPlat,
+        noRangka: noRangka,
+        noMesin: noMesin,
+        merk: merk,
+        jenis: jenis
+    });
+
+    localStorage.setItem("dataKendaraan", JSON.stringify(dataKendaraan));
+
+    render();
+
+    document.getElementById("namaPelanggan").value = "";
+    document.getElementById("stnk").value = "";
+    document.getElementById("noPlat").value = "";
+    document.getElementById("noRangka").value = "";
+    document.getElementById("noMesin").value = "";
+    document.getElementById("merk").value = "";
+    document.getElementById("jenis").value = "";
+    document.getElementById("infoPencarian").innerHTML = "";
+
+    alert("Data kendaraan berhasil disimpan");
+}
 
     // Eksekusi fungsi saat pertama kali halaman diakses
     inisialisasiDatalist();
