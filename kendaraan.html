@@ -131,53 +131,33 @@
     }
 
     // FUNGSI UTAMA TOMBOL SIMPAN DATA KENDARAAN
-   function simpan(){
+  function simpan(){
+
+    alert("TEST SIMPAN");
 
     let namaPelanggan = document.getElementById("namaPelanggan").value.trim();
     let stnk = document.getElementById("stnk").value.trim();
-    let noPlat = document.getElementById("noPlat").value.trim().toUpperCase();
-    let noRangka = document.getElementById("noRangka").value.trim().toUpperCase();
-    let noMesin = document.getElementById("noMesin").value.trim().toUpperCase();
-    let merk = document.getElementById("merk").value.trim();
-    let jenis = document.getElementById("jenis").value;
-
-    if(namaPelanggan === ""){
-        alert("Nama pelanggan harus diisi");
-        return;
-    }
-
-    if(stnk === ""){
-        alert("Pelanggan belum ditemukan di Data Pelanggan");
-        return;
-    }
 
     dataKendaraan.push({
         id: Date.now(),
         namaPelanggan: namaPelanggan,
         stnk: stnk,
-        noPlat: noPlat,
-        noRangka: noRangka,
-        noMesin: noMesin,
-        merk: merk,
-        jenis: jenis
+        noPlat: document.getElementById("noPlat").value,
+        noRangka: document.getElementById("noRangka").value,
+        noMesin: document.getElementById("noMesin").value,
+        merk: document.getElementById("merk").value,
+        jenis: document.getElementById("jenis").value
     });
 
-    localStorage.setItem("dataKendaraan", JSON.stringify(dataKendaraan));
+    localStorage.setItem(
+        "dataKendaraan",
+        JSON.stringify(dataKendaraan)
+    );
 
     render();
 
-    document.getElementById("namaPelanggan").value = "";
-    document.getElementById("stnk").value = "";
-    document.getElementById("noPlat").value = "";
-    document.getElementById("noRangka").value = "";
-    document.getElementById("noMesin").value = "";
-    document.getElementById("merk").value = "";
-    document.getElementById("jenis").value = "";
-    document.getElementById("infoPencarian").innerHTML = "";
-
-    alert("Data kendaraan berhasil disimpan");
+    alert("BERHASIL DISIMPAN");
 }
-
     // Eksekusi fungsi saat pertama kali halaman diakses
     inisialisasiDatalist();
     render();
