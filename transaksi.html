@@ -2,120 +2,100 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Transaksi Biro Jasa</title>
+    <title>Transaksi - Askara Zayyan</title>
     <style>
-        *{ margin:0; padding:0; box-sizing:border-box; font-family:Segoe UI,sans-serif; }
-        body{ background:#f4f6f9; padding:20px; }
-        .container{ max-width:1100px; margin:auto; background:white; padding:20px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,.1); }
-        .header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
-        .btn{ padding:10px 15px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; text-decoration:none; color:white; }
-        .back{ background:#546e7a; }
-        .save{ background:#0d47a1; }
-        .form-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; margin-bottom:20px; }
-        input, select { padding:12px; border:1px solid #ddd; border-radius:6px; font-size: 14px; }
-        table{ width:100%; border-collapse:collapse; }
-        th{ background:#0d47a1; color:white; padding:10px; }
-        td{ padding:10px; border-bottom:1px solid #ddd; text-align: center; }
-        th { text-align: center; }
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; color: white; background: #e65100; }
+        body { font-family: sans-serif; background: #f4f6f9; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
+        input, select { padding: 10px; margin: 5px 0; width: 100%; border: 1px solid #ddd; border-radius: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+        .btn { padding: 10px 15px; cursor: pointer; border: none; border-radius: 5px; color: white; }
+        .btn-save { background: #2e7d32; }
+        .btn-del { background: #c62828; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header">
-        <a href="dashboard.html" class="btn back">⬅ Dashboard</a>
-        <h2>Data Transaksi</h2>
-    </div>
-
-    <div class="form-grid">
-        <input type="text" id="idTransaksi" placeholder="No. Invoice / Transaksi" readonly>
-        <input type="text" id="namaPelanggan" placeholder="Nama Pelanggan">
-        <input type="text" id="noPlat" placeholder="No. Plat Kendaraan">
-        <select id="layanan">
-            <option value="">-- Pilih Layanan --</option>
-            <option value="Perpanjang STNK 1 Tahunan">Perpanjang STNK 1 Tahunan</option>
-            <option value="Pajak 5 Tahunan (Ganti Plat)">Pajak 5 Tahunan (Ganti Plat)</option>
-            <option value="Balik Nama (BBN-KB)">Balik Nama (BBN-KB)</option>
-            <option value="Mutasi Keluar/Masuk">Mutasi Keluar/Masuk</option>
+    <h2>Input Transaksi</h2>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <select id="pilihPelanggan" onchange="updateKendaraan()">
+            <option value="">-- Pilih Pelanggan --</option>
         </select>
-        <button class="btn save" onclick="simpan()">Buat Transaksi</button>
+        <select id="pilihKendaraan">
+            <option value="">-- Pilih Nopol Kendaraan --</option>
+        </select>
+        <input type="number" id="biaya" placeholder="Total Biaya (Rp)">
+        <input type="number" id="dp" placeholder="Uang Muka/DP (Rp)">
+        <input type="text" id="status" placeholder="Status (Contoh: Proses/Selesai)">
+        <button class="btn btn-save" onclick="simpanTransaksi()">Simpan Transaksi</button>
     </div>
 
     <table>
         <thead>
-            <tr>
-                <th>No. Transaksi</th>
-                <th>Pelanggan</th>
-                <th>No. Plat</th>
-                <th>Jenis Layanan</th>
-                <th>Status Berkas</th>
-                </tr>
+            <tr><th>Pelanggan</th><th>Nopol</th><th>Biaya</th><th>DP</th><th>Sisa</th><th>Status</th><th>Aksi</th></tr>
         </thead>
-        <tbody id="isiTabel"></tbody>
+        <tbody id="tabelTransaksi"></tbody>
     </table>
 </div>
 
 <script>
-    let dataTransaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+    let pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
+    let kendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
+    let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
 
-    // Fungsi generate ID otomatis agar rapi
-    function generateInvoice() {
-        document.getElementById("idTransaksi").value = "TRX-" + Math.floor(100000 + Math.random() * 900000);
+    // Isi dropdown pelanggan
+    let selPelanggan = document.getElementById("pilihPelanggan");
+    pelanggan.forEach(p => {
+        selPelanggan.innerHTML += `<option value="${p.nama}">${p.nama}</option>`;
+    });
+
+    // Update dropdown kendaraan berdasarkan nama pelanggan
+    function updateKendaraan() {
+        let nama = document.getElementById("pilihPelanggan").value;
+        let selKendaraan = document.getElementById("pilihKendaraan");
+        selKendaraan.innerHTML = `<option value="">-- Pilih Nopol --</option>`;
+        
+        kendaraan.filter(k => k.namaPelanggan === nama).forEach(k => {
+            selKendaraan.innerHTML += `<option value="${k.noPlat}">${k.noPlat}</option>`;
+        });
     }
 
-    function render(){
-        let html = "";
-        dataTransaksi.forEach((t)=>{
-            html += `
-            <tr>
-                <td><strong>${t.idTransaksi}</strong></td>
-                <td>${t.namaPelanggan}</td>
-                <td>${t.noPlat.toUpperCase()}</td>
-                <td>${t.layanan}</td>
-                <td><span class="badge">${t.statusBerkas}</span></td>
-                </tr>
-            `;
+    function render() {
+        let tbody = document.getElementById("tabelTransaksi");
+        tbody.innerHTML = "";
+        transaksi.forEach((t, index) => {
+            let sisa = t.biaya - t.dp;
+            tbody.innerHTML += `<tr>
+                <td>${t.nama}</td><td>${t.nopol}</td><td>${t.biaya}</td><td>${t.dp}</td>
+                <td>${sisa}</td><td>${t.status}</td>
+                <td><button class="btn btn-del" onclick="hapus(${index})">Hapus</button></td>
+            </tr>`;
         });
-
-        document.getElementById("isiTabel").innerHTML = html;
-        localStorage.setItem("dataTransaksi", JSON.stringify(dataTransaksi));
-        generateInvoice();
     }
 
-    function simpan(){
-        let idTransaksi = document.getElementById("idTransaksi").value;
-        let namaPelanggan = document.getElementById("namaPelanggan").value;
-        let noPlat = document.getElementById("noPlat").value;
-        let layanan = document.getElementById("layanan").value;
-
-        if(namaPelanggan==="" || noPlat==="" || layanan==="") {
-            alert("Harap lengkapi detail data transaksi");
-            return;
-        }
-
-        dataTransaksi.push({
-            id: Date.now(),
-            idTransaksi: idTransaksi,
-            namaPelanggan: namaPelanggan,
-            noPlat: noPlat,
-            layanan: layanan,
-            statusBerkas: "PROSES" // Default status awal berkas masuk
-        });
-
+    function simpanTransaksi() {
+        let t = {
+            nama: document.getElementById("pilihPelanggan").value,
+            nopol: document.getElementById("pilihKendaraan").value,
+            biaya: Number(document.getElementById("biaya").value),
+            dp: Number(document.getElementById("dp").value),
+            status: document.getElementById("status").value
+        };
+        transaksi.push(t);
+        localStorage.setItem("dataTransaksi", JSON.stringify(transaksi));
         render();
-
-        // Reset Form lapangan inputan kecuali id otomatis
-        document.getElementById("namaPelanggan").value = "";
-        document.getElementById("noPlat").value = "";
-        document.getElementById("layanan").value = "";
     }
 
-    // Seluruh baris fungsi hapus (.splice) dibuang agar pegawai tidak bisa memanipulasi riwayat berkas
+    function hapus(index) {
+        if(confirm("Hapus data ini?")) {
+            transaksi.splice(index, 1);
+            localStorage.setItem("dataTransaksi", JSON.stringify(transaksi));
+            render();
+        }
+    }
 
     render();
 </script>
-
 </body>
 </html>
