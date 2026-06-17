@@ -1,85 +1,9 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Kendaraan</title>
-    <style>
-        *{ margin:0; padding:0; box-sizing:border-box; font-family:Segoe UI,sans-serif; }
-        body{ background:#f4f6f9; padding:20px; }
-        .container{ max-width:1200px; margin:auto; background:white; padding:20px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,.1); }
-        .header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
-        .btn{ padding:10px 15px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; text-decoration:none; color:white; }
-        .back{ background:#546e7a; }
-        .save{ background:#2e7d32; }
-        .form-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin-bottom:20px; }
-        input, select { padding:12px; border:1px solid #ddd; border-radius:6px; font-size: 14px; }
-        table{ width:100%; border-collapse:collapse; margin-top: 15px; }
-        th{ background:#2e7d32; color:white; padding:10px; font-size: 14px; }
-        td{ padding:10px; border-bottom:1px solid #ddd; text-align: center; font-size: 14px; }
-        th { text-align: center; }
-        .suggest-info { font-size: 11px; color: #2e7d32; font-weight: bold; margin-top: 4px; }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <div class="header">
-        <a href="dashboard.html" class="btn back">⬅ Dashboard</a>
-        <h2>Data Kendaraan</h2>
-    </div>
-
-    <div class="form-grid">
-        <div>
-            <input type="text" id="namaPelanggan" list="listPelanggan" placeholder="Ketik Nama Pelanggan" oninput="cariPelangganOtomatis()" style="width: 100%;">
-            <datalist id="listPelanggan"></datalist>
-            <div id="infoPencarian" class="suggest-info"></div>
-        </div>
-        
-        <input type="text" id="stnk" placeholder="Nama Asli STNK" readonly style="background: #eee; font-weight: bold;">
-        
-        <input type="text" id="noPlat" placeholder="Nomor Polisi (No. Plat)">
-        <input type="text" id="noRangka" placeholder="Nomor Rangka">
-        <input type="text" id="noMesin" placeholder="Nomor Mesin">
-        <input type="text" id="merk" placeholder="Merk / Tipe (Contoh: Honda Vario)">
-        
-        <select id="jenis">
-            <option value="">-- Pilih Jenis --</option>
-            <option value="Motor">Motor</option>
-            <option value="Mobil">Mobil</option>
-        </select>
-        
-        <button class="btn save" onclick="simpan()">Simpan Kendaraan</button>
-    </div>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Pemilik (Pelanggan)</th>
-                <th>Nama Asli STNK</th>
-                <th>No. Plat / Nopol</th>
-                <th>No. Rangka</th>
-                <th>No. Mesin</th>
-                <th>Merk & Tipe</th>
-                <th>Jenis Kendaraan</th>
-            </tr>
-        </thead>
-        <tbody id="isiTabel"></tbody>
-    </table>
-</div>
-
 <script>
     // Load database dari localStorage browser
-    <script>
+    let dataPelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
+    let dataKendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
 
-alert("FILE KENDARAAN TERBARU LOADED");
-
-let dataPelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
-let dataKendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
-
-console.log("DATA KENDARAAN:", dataKendaraan);
-    console.log("DATA PELANGGAN:", dataPelanggan);
-    // Memasukkan list database pelanggan ke rekomendasi pilihan bawan inputan
+    // Memasukkan list database pelanggan ke rekomendasi pilihan bawaan inputan
     function inisialisasiDatalist() {
         let datalist = document.getElementById("listPelanggan");
         datalist.innerHTML = "";
@@ -90,7 +14,7 @@ console.log("DATA KENDARAAN:", dataKendaraan);
         });
     }
 
-    // FUNGSI PENCARIAN OTOMATIS (Mencari teks yang mengandung unsur ketikan petugas)
+    // FUNGSI PENCARIAN OTOMATIS
     function cariPelangganOtomatis() {
         let inputNama = document.getElementById("namaPelanggan").value.trim().toUpperCase();
         let infoBox = document.getElementById("infoPencarian");
@@ -101,8 +25,7 @@ console.log("DATA KENDARAAN:", dataKendaraan);
             return;
         }
         
-        // Cari pelanggan di database yang mirip
-        let pelangganDitemukan = dataPelanggan.find(p => p.nama.trim().toUpperCase().includes(inputNama));
+        let pelangganDitemukan = dataPelanggan.find(p => p.nama.trim().toUpperCase() === inputNama);
 
         if (pelangganDitemukan) {
             document.getElementById("stnk").value = pelangganDitemukan.stnk || "";
@@ -111,70 +34,71 @@ console.log("DATA KENDARAAN:", dataKendaraan);
         } else {
             document.getElementById("stnk").value = "";
             infoBox.style.color = "#c62828";
-            infoBox.innerText = "⚠ Nama belum terdaftar di Data Pelanggan";
+            infoBox.innerText = "⚠ Nama belum terdaftar";
         }
     }
 
-    // Menampilkan isi database kendaraan ke dalam tabel bawah secara real-time
+    // Menampilkan isi database kendaraan ke dalam tabel
     function render(){
+        let html = "";
+        dataKendaraan.forEach((k)=>{
+            html += `
+            <tr>
+                <td>${k.namaPelanggan || ""}</td>
+                <td>${k.stnk || ""}</td>
+                <td>${k.noPlat || ""}</td>
+                <td>${k.noRangka || ""}</td>
+                <td>${k.noMesin || ""}</td>
+                <td>${k.merk || ""}</td>
+                <td>${k.jenis || ""}</td>
+            </tr>
+            `;
+        });
 
-    let html = "";
+        document.getElementById("isiTabel").innerHTML = html;
+    }
 
-    dataKendaraan.forEach((k)=>{
+    // FUNGSI SIMPAN
+    function simpan(){
+        let namaPelanggan = document.getElementById("namaPelanggan").value.trim();
+        let stnk = document.getElementById("stnk").value.trim();
+        let noPlat = document.getElementById("noPlat").value;
+        let noRangka = document.getElementById("noRangka").value;
+        let noMesin = document.getElementById("noMesin").value;
+        let merk = document.getElementById("merk").value;
+        let jenis = document.getElementById("jenis").value;
 
-        html += `
-        <tr>
-            <td>${k.namaPelanggan || ""}</td>
-            <td>${k.stnk || ""}</td>
-            <td>${k.noPlat || ""}</td>
-            <td>${k.noRangka || ""}</td>
-            <td>${k.noMesin || ""}</td>
-            <td>${k.merk || ""}</td>
-            <td>${k.jenis || ""}</td>
-        </tr>
-        `;
+        if(namaPelanggan === "" || stnk === "") {
+            alert("Silakan pilih pelanggan yang terdaftar terlebih dahulu!");
+            return;
+        }
 
-    });
+        dataKendaraan.push({
+            id: Date.now(),
+            namaPelanggan: namaPelanggan,
+            stnk: stnk,
+            noPlat: noPlat,
+            noRangka: noRangka,
+            noMesin: noMesin,
+            merk: merk,
+            jenis: jenis
+        });
 
-    document.getElementById("isiTabel").innerHTML = html;
+        localStorage.setItem("dataKendaraan", JSON.stringify(dataKendaraan));
+        render();
+        alert("Data berhasil disimpan");
+        
+        // Reset form
+        document.getElementById("namaPelanggan").value = "";
+        document.getElementById("stnk").value = "";
+        document.getElementById("noPlat").value = "";
+        document.getElementById("noRangka").value = "";
+        document.getElementById("noMesin").value = "";
+        document.getElementById("merk").value = "";
+        document.getElementById("jenis").value = "";
+    }
 
-    localStorage.setItem(
-        "dataKendaraan",
-        JSON.stringify(dataKendaraan)
-    );
-}
-    // FUNGSI UTAMA TOMBOL SIMPAN DATA KENDARAAN
-function simpan(){
-
-    alert("SIMPAN");
-
-    let namaPelanggan = document.getElementById("namaPelanggan").value.trim();
-    let stnk = document.getElementById("stnk").value.trim();
-
-    dataKendaraan.push({
-        id: Date.now(),
-        namaPelanggan: namaPelanggan,
-        stnk: stnk,
-        noPlat: document.getElementById("noPlat").value,
-        noRangka: document.getElementById("noRangka").value,
-        noMesin: document.getElementById("noMesin").value,
-        merk: document.getElementById("merk").value,
-        jenis: document.getElementById("jenis").value
-    });
-
-    localStorage.setItem(
-        "dataKendaraan",
-        JSON.stringify(dataKendaraan)
-    );
-
-    render();
-
-    alert("BERHASIL DISIMPAN");
-}
     // Eksekusi fungsi saat pertama kali halaman diakses
     inisialisasiDatalist();
     render();
 </script>
-
-</body>
-</html>
