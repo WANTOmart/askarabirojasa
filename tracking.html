@@ -2,69 +2,72 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tracking Berkas</title>
+    <title>Tracking Berkas - Askara Zayyan</title>
     <style>
-        body { font-family: Segoe UI, sans-serif; background: #f4f6f9; padding: 20px; }
-        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,.1); }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f6f9; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn { padding: 10px 15px; cursor: pointer; border: none; border-radius: 6px; font-weight: bold; text-decoration: none; color: white; }
+        .back { background: #546e7a; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { background: #0d47a1; color: white; padding: 10px; }
-        td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
-        select { padding: 5px; border-radius: 4px; }
-        .status-btn { padding: 5px 10px; border-radius: 5px; border: none; cursor: pointer; }
+        th { background: #0d47a1; color: white; padding: 12px; }
+        td { padding: 12px; border-bottom: 1px solid #ddd; text-align: center; }
+        .status-badge { padding: 5px 10px; border-radius: 15px; font-size: 12px; font-weight: bold; }
+        .proses { background: #fff3e0; color: #e65100; }
+        .selesai { background: #e8f5e9; color: #2e7d32; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <a href="dashboard.html">⬅ Kembali ke Dashboard</a>
-    <h2>Tracking Status Berkas</h2>
-    
+    <div class="header">
+        <a href="dashboard.html" class="btn back">⬅ Dashboard</a>
+        <h2>Tracking Status Berkas</h2>
+    </div>
+
     <table>
         <thead>
             <tr>
-                <th>Nota</th>
-                <th>Nama STNK</th>
-                <th>Plat</th>
+                <th>Pelanggan</th>
+                <th>Nopol</th>
                 <th>Status Berkas</th>
                 <th>Update</th>
             </tr>
         </thead>
-        <tbody id="isiTabel"></tbody>
+        <tbody id="tabelTracking"></tbody>
     </table>
 </div>
 
 <script>
-    let dataTransaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+    let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
 
-    function render() {
-        let html = "";
-        dataTransaksi.forEach((t, index) => {
-            html += `<tr>
-                <td>${t.nota}</td>
-                <td>${t.stnk}</td>
-                <td>${t.plat}</td>
+    function renderTracking() {
+        let tbody = document.getElementById("tabelTracking");
+        tbody.innerHTML = "";
+        
+        transaksi.forEach((t, index) => {
+            let statusClass = t.status.toUpperCase() === "SELESAI" ? "selesai" : "proses";
+            tbody.innerHTML += `<tr>
+                <td>${t.nama}</td>
+                <td>${t.nopol}</td>
+                <td><span class="status-badge ${statusClass}">${t.status}</span></td>
                 <td>
                     <select onchange="updateStatus(${index}, this.value)">
-                        <option value="BERKAS DITERIMA" ${t.statusBerkas === 'BERKAS DITERIMA' ? 'selected' : ''}>Diterima</option>
-                        <option value="DIPROSES" ${t.statusBerkas === 'DIPROSES' ? 'selected' : ''}>Diproses</option>
-                        <option value="SELESAI" ${t.statusBerkas === 'SELESAI' ? 'selected' : ''}>Selesai</option>
-                        <option value="DIAMBIL" ${t.statusBerkas === 'DIAMBIL' ? 'selected' : ''}>Diambil</option>
+                        <option value="PROSES" ${t.status === "PROSES" ? "selected" : ""}>Proses</option>
+                        <option value="SELESAI" ${t.status === "SELESAI" ? "selected" : ""}>Selesai</option>
                     </select>
                 </td>
-                <td>${t.statusBerkas}</td>
             </tr>`;
         });
-        document.getElementById("isiTabel").innerHTML = html;
     }
 
-    function updateStatus(index, status) {
-        dataTransaksi[index].statusBerkas = status;
-        localStorage.setItem("dataTransaksi", JSON.stringify(dataTransaksi));
-        render(); // Refresh tabel
+    function updateStatus(index, newStatus) {
+        transaksi[index].status = newStatus;
+        localStorage.setItem("dataTransaksi", JSON.stringify(transaksi));
+        renderTracking();
     }
 
-    render();
+    renderTracking();
 </script>
 </body>
 </html>
