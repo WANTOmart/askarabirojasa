@@ -2,101 +2,72 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Penyerahan Berkas</title>
+    <title>Penyerahan Berkas - Askara Zayyan</title>
     <style>
-        body { font-family: Segoe UI, sans-serif; background: #f4f6f9; padding: 20px; }
-        .container { max-width: 1100px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,.1); }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f6f9; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn { padding: 8px 15px; cursor: pointer; border: none; border-radius: 6px; font-weight: bold; text-decoration: none; color: white; }
+        .back { background: #546e7a; }
+        .serah { background: #1565c0; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { background: #0d47a1; color: white; padding: 12px; }
+        th { background: #1565c0; color: white; padding: 12px; }
         td { padding: 12px; border-bottom: 1px solid #ddd; text-align: center; }
-        .btn-print { background: #2e7d32; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
-        @media print { .no-print { display: none; } }
+        .status-selesai { color: green; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header no-print">
-        <a href="dashboard.html">⬅ Kembali ke Dashboard</a>
-        <h2>Penyerahan Berkas Selesai & Lunas</h2>
+    <div class="header">
+        <a href="dashboard.html" class="btn back">⬅ Dashboard</a>
+        <h2>Penyerahan Berkas Selesai</h2>
     </div>
-    
+
     <table>
         <thead>
             <tr>
-                <th>Nota</th>
-                <th>Nama STNK</th>
-                <th>Layanan</th>
-                <th>Biaya</th>
-                <th>DP</th>
-                <th>Sisa</th>
-                <th class="no-print">Aksi</th>
+                <th>Pelanggan</th>
+                <th>Nopol</th>
+                <th>Status Berkas</th>
+                <th>Aksi</th>
             </tr>
         </thead>
-        <tbody id="isiTabel"></tbody>
+        <tbody id="tabelPenyerahan"></tbody>
     </table>
 </div>
 
 <script>
-    let dataTransaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+    let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
 
-    function render() {
-        let html = "";
-        dataTransaksi.forEach((t, index) => {
-            // Hanya tampilkan jika status SELESAI dan sudah LUNAS (sisa <= 0)
-            if (t.statusBerkas === "SELESAI" && Number(t.sisa) <= 0) {
-                html += `<tr>
-                    <td>${t.nota}</td>
-                    <td>${t.stnk}</td>
-                    <td>${t.layanan}</td>
-                    <td>Rp ${Number(t.biaya).toLocaleString('id-ID')}</td>
-                    <td>Rp ${Number(t.dp).toLocaleString('id-ID')}</td>
-                    <td>Rp ${Number(t.sisa).toLocaleString('id-ID')}</td>
-                    <td class="no-print">
-                        <button class="btn-print" onclick="cetak(${index})">Cetak Bukti</button>
-                    </td>
+    function renderPenyerahan() {
+        let tbody = document.getElementById("tabelPenyerahan");
+        tbody.innerHTML = "";
+        
+        transaksi.forEach((t, index) => {
+            // Hanya tampilkan jika statusnya sudah SELESAI
+            if (t.status.toUpperCase() === "SELESAI") {
+                tbody.innerHTML += `<tr>
+                    <td>${t.nama}</td>
+                    <td>${t.nopol}</td>
+                    <td class="status-selesai">Siap Diserahkan</td>
+                    <td><button class="btn serah" onclick="serahkan(${index})">Konfirmasi Penyerahan</button></td>
                 </tr>`;
             }
         });
-        document.getElementById("isiTabel").innerHTML = html || "<tr><td colspan='7'>Tidak ada berkas yang sudah selesai dan lunas.</td></tr>";
     }
 
-    function cetak(index) {
-        let t = dataTransaksi[index];
-        let printWindow = window.open('', '_blank');
-        printWindow.document.write(`
-            <html><head><title>Bukti Penyerahan</title></head>
-            <body style="font-family:sans-serif; padding:20px;">
-                <div style="text-align:center;">
-                    <img src="logo.jpg" style="width:120px;">
-                    <h2 style="margin:5px 0;">BIRO JASA STNK ASKARA ZAYYAN</h2>
-                    <p style="margin:0;">Melayani Dengan Hati</p>
-                </div>
-                <hr style="margin:20px 0;">
-                <p><strong>Nota:</strong> ${t.nota}</p>
-                <p><strong>Nama:</strong> ${t.stnk}</p>
-                <p><strong>Kendaraan:</strong> ${t.plat} (${t.merk})</p>
-                <p><strong>Layanan:</strong> ${t.layanan}</p>
-                <hr>
-                <p>Biaya Jasa: Rp ${Number(t.biaya).toLocaleString('id-ID')}</p>
-                <p>Dibayar (DP): Rp ${Number(t.dp).toLocaleString('id-ID')}</p>
-                <p><strong>Sisa Kurangan: Rp ${Number(t.sisa).toLocaleString('id-ID')}</strong></p>
-                <hr>
-                <p style="text-align:center;">Status: <b>LUNAS</b></p>
-                <br>
-                <div style="text-align:right;">
-                    Tanda Terima,<br><br><br>
-                    (..........................)
-                </div>
-            </body></html>
-        `);
-        printWindow.document.close();
-        setTimeout(() => { printWindow.print(); }, 500);
+    function serahkan(index) {
+        if(confirm("Apakah berkas sudah diserahkan kepada pemilik?")) {
+            // Anda bisa mengubah status menjadi 'DISERAHKAN' atau menghapusnya dari list ini
+            transaksi[index].status = "DISERAHKAN";
+            localStorage.setItem("dataTransaksi", JSON.stringify(transaksi));
+            renderPenyerahan();
+            alert("Berkas tercatat telah diserahkan!");
+        }
     }
 
-    render();
+    renderPenyerahan();
 </script>
 </body>
 </html>
