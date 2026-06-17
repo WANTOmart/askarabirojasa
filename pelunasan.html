@@ -2,72 +2,77 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pelunasan Pembayaran</title>
+    <title>Pelunasan - Askara Zayyan</title>
     <style>
-        body { font-family: Segoe UI, sans-serif; background: #f4f6f9; padding: 20px; }
-        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,.1); }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f6f9; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn { padding: 8px 12px; cursor: pointer; border: none; border-radius: 6px; font-weight: bold; text-decoration: none; color: white; }
+        .back { background: #546e7a; }
+        .lunas { background: #0d47a1; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { background: #2e7d32; color: white; padding: 10px; }
-        td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
-        .btn-lunas { background: #2e7d32; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+        th { background: #0d47a1; color: white; padding: 12px; }
+        td { padding: 12px; border-bottom: 1px solid #ddd; text-align: center; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <a href="dashboard.html">⬅ Kembali ke Dashboard</a>
-    <h2>Data Transaksi Belum Lunas</h2>
-    
+    <div class="header">
+        <a href="dashboard.html" class="btn back">⬅ Dashboard</a>
+        <h2>Data Pelunasan Piutang</h2>
+    </div>
+
     <table>
         <thead>
             <tr>
-                <th>Nota</th>
-                <th>Nama STNK</th>
+                <th>Pelanggan</th>
+                <th>Nopol</th>
                 <th>Total Biaya</th>
-                <th>Sisa Tagihan</th>
+                <th>DP</th>
+                <th>Sisa Piutang</th>
                 <th>Aksi</th>
             </tr>
         </thead>
-        <tbody id="isiTabel"></tbody>
+        <tbody id="tabelPelunasan"></tbody>
     </table>
 </div>
 
 <script>
-    let dataTransaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+    let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
 
-    function render() {
-        let html = "";
-        dataTransaksi.forEach((t, index) => {
-            // Hanya tampilkan jika sisa masih di atas 0
-            if (Number(t.sisa) > 0) {
-                html += `<tr>
-                    <td>${t.nota}</td>
-                    <td>${t.stnk}</td>
-                    <td>Rp ${Number(t.biaya).toLocaleString('id-ID')}</td>
-                    <td>Rp ${Number(t.sisa).toLocaleString('id-ID')}</td>
-                    <td>
-                        <button class="btn-lunas" onclick="lunasi(${index})">Lunasi</button>
-                    </td>
+    function renderPelunasan() {
+        let tbody = document.getElementById("tabelPelunasan");
+        tbody.innerHTML = "";
+        
+        transaksi.forEach((t, index) => {
+            let sisa = t.biaya - t.dp;
+            
+            // Hanya tampilkan jika masih ada sisa piutang
+            if (sisa > 0) {
+                tbody.innerHTML += `<tr>
+                    <td>${t.nama}</td>
+                    <td>${t.nopol}</td>
+                    <td>Rp ${t.biaya.toLocaleString()}</td>
+                    <td>Rp ${t.dp.toLocaleString()}</td>
+                    <td><strong>Rp ${sisa.toLocaleString()}</strong></td>
+                    <td><button class="btn lunas" onclick="lunaskan(${index})">Bayar Lunas</button></td>
                 </tr>`;
             }
         });
-        document.getElementById("isiTabel").innerHTML = html || "<tr><td colspan='5'>Semua transaksi sudah lunas!</td></tr>";
     }
 
-    function lunasi(index) {
-        if(confirm("Apakah pelanggan sudah membayar sisa tagihan?")) {
-            // Update sisa menjadi 0
-            dataTransaksi[index].sisa = 0;
-            dataTransaksi[index].dp = dataTransaksi[index].biaya;
-            
-            localStorage.setItem("dataTransaksi", JSON.stringify(dataTransaksi));
-            render();
-            alert("Transaksi berhasil dilunasi!");
+    function lunaskan(index) {
+        if(confirm("Apakah pelanggan ini sudah melunasi sisa pembayaran?")) {
+            // Update DP menjadi sama dengan biaya (artinya lunas)
+            transaksi[index].dp = transaksi[index].biaya;
+            localStorage.setItem("dataTransaksi", JSON.stringify(transaksi));
+            renderPelunasan();
+            alert("Pembayaran telah dilunasi!");
         }
     }
 
-    render();
+    renderPelunasan();
 </script>
 </body>
 </html>
