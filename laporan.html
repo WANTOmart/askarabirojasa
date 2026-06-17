@@ -1,385 +1,97 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Laporan Keuangan</title>
-
-<style>
-
-*{
-    box-sizing:border-box;
-    font-family:Segoe UI,sans-serif;
-}
-
-body{
-    background:#f4f6f9;
-    padding:20px;
-}
-
-.container{
-    max-width:1200px;
-    margin:auto;
-}
-
-.header{
-    background:#0d47a1;
-    color:white;
-    padding:15px;
-    border-radius:10px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:20px;
-}
-
-.back{
-    color:white;
-    text-decoration:none;
-    background:rgba(255,255,255,.2);
-    padding:8px 12px;
-    border-radius:5px;
-}
-
-.grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:15px;
-    margin-bottom:20px;
-}
-
-.card{
-    background:white;
-    padding:20px;
-    border-radius:10px;
-    box-shadow:0 2px 8px rgba(0,0,0,.1);
-}
-
-.card h3{
-    color:#666;
-    margin-bottom:10px;
-}
-
-.card p{
-    font-size:24px;
-    font-weight:bold;
-}
-
-.masuk{
-    color:green;
-}
-
-.keluar{
-    color:red;
-}
-
-.laba{
-    color:#0d47a1;
-}
-
-.form-box{
-    background:white;
-    padding:20px;
-    border-radius:10px;
-    margin-bottom:20px;
-    box-shadow:0 2px 8px rgba(0,0,0,.1);
-}
-
-input{
-    width:100%;
-    padding:10px;
-    margin-bottom:10px;
-    border:1px solid #ddd;
-    border-radius:5px;
-}
-
-button{
-    background:#0d47a1;
-    color:white;
-    border:none;
-    padding:10px 15px;
-    border-radius:5px;
-    cursor:pointer;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-    background:white;
-}
-
-th{
-    background:#0d47a1;
-    color:white;
-    padding:10px;
-}
-
-td{
-    padding:10px;
-    border-bottom:1px solid #ddd;
-}
-
-.btn-hapus{
-    background:red;
-}
-
-</style>
+    <meta charset="UTF-8">
+    <title>Keuangan - Askara Zayyan</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f6f9; padding: 20px; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn { padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; color: white; font-weight: bold; text-decoration: none; }
+        .back { background: #546e7a; }
+        .save { background: #c62828; }
+        .btn-del { background: #d32f2f; padding: 5px 10px; font-size: 12px; }
+        .form-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        input { padding: 12px; border: 1px solid #ddd; border-radius: 6px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #c62828; color: white; padding: 10px; }
+        td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
+        .summary { margin-top: 20px; padding: 15px; background: #e8f5e9; border-radius: 8px; font-weight: bold; }
+    </style>
 </head>
 <body>
 
 <div class="container">
+    <div class="header">
+        <a href="dashboard.html" class="btn back">⬅ Dashboard</a>
+        <h2>Data Pengeluaran</h2>
+    </div>
 
-<div class="header">
-<h2>Laporan Keuangan</h2>
+    <div class="form-grid">
+        <input type="text" id="keterangan" placeholder="Keterangan (misal: Bensin)">
+        <input type="number" id="jumlah" placeholder="Jumlah (Rp)">
+        <button class="btn save" onclick="tambahPengeluaran()">Tambah</button>
+    </div>
 
-<a href="dashboard.html" class="back">
-⬅ Dashboard
-</a>
-</div>
+    <div class="summary" id="ringkasan"></div>
 
-<div class="grid">
-
-<div class="card">
-<h3>Total DP Masuk</h3>
-<p class="masuk" id="dpMasuk">
-Rp 0
-</p>
-</div>
-
-<div class="card">
-<h3>Total Pelunasan</h3>
-<p class="masuk" id="pelunasanMasuk">
-Rp 0
-</p>
-</div>
-
-<div class="card">
-<h3>Total Pemasukan</h3>
-<p class="masuk" id="totalMasuk">
-Rp 0
-</p>
-</div>
-
-<div class="card">
-<h3>Pengeluaran</h3>
-<p class="keluar" id="totalKeluar">
-Rp 0
-</p>
-</div>
-
-<div class="card">
-<h3>Laba Bersih</h3>
-<p class="laba" id="laba">
-Rp 0
-</p>
-</div>
-
-</div>
-
-<div class="form-box">
-
-<h3>Input Pengeluaran Operasional</h3>
-
-<input
-type="text"
-id="keterangan"
-placeholder="Keterangan">
-
-<input
-type="number"
-id="jumlah"
-placeholder="Jumlah">
-
-<button onclick="tambahPengeluaran()">
-Tambah Pengeluaran
-</button>
-
-</div>
-
-<div class="form-box">
-
-<h3>Riwayat Pengeluaran</h3>
-
-<table>
-
-<thead>
-<tr>
-<th>Tanggal</th>
-<th>Keterangan</th>
-<th>Jumlah</th>
-<th>Aksi</th>
-</tr>
-</thead>
-
-<tbody id="isiTabel"></tbody>
-
-</table>
-
-</div>
-
+    <table>
+        <thead>
+            <tr><th>Keterangan</th><th>Jumlah</th><th>Aksi</th></tr>
+        </thead>
+        <tbody id="tabelPengeluaran"></tbody>
+    </table>
 </div>
 
 <script>
+    let pengeluaran = JSON.parse(localStorage.getItem("dataPengeluaran")) || [];
+    let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
 
-function formatRp(nilai){
+    function render() {
+        let tbody = document.getElementById("tabelPengeluaran");
+        tbody.innerHTML = "";
+        let totalKeluar = 0;
 
-    return "Rp " +
-    Number(nilai)
-    .toLocaleString("id-ID");
-}
+        pengeluaran.forEach((p, index) => {
+            totalKeluar += Number(p.jumlah);
+            tbody.innerHTML += `<tr>
+                <td>${p.keterangan}</td>
+                <td>Rp ${Number(p.jumlah).toLocaleString()}</td>
+                <td><button class="btn btn-del" onclick="hapus(${index})">Hapus</button></td>
+            </tr>`;
+        });
 
-function render(){
+        let totalMasuk = 0;
+        transaksi.forEach(t => totalMasuk += Number(t.biaya));
 
-    let transaksi =
-    JSON.parse(localStorage.getItem("dataTransaksi"))
-    || [];
-
-    let pengeluaran =
-    JSON.parse(localStorage.getItem("pengeluaran"))
-    || [];
-
-    let totalDP = 0;
-    let totalPelunasan = 0;
-
-    transaksi.forEach(t=>{
-
-        totalDP += Number(t.dp);
-
-        totalPelunasan +=
-        Number(t.biayaJasa)
-        - Number(t.sisa)
-        - Number(t.dp)
-        + Number(t.dp);
-
-    });
-
-    let totalKeluar = 0;
-
-    pengeluaran.forEach(p=>{
-        totalKeluar += Number(p.jumlah);
-    });
-
-    let totalMasuk =
-    totalDP + totalPelunasan;
-
-    let laba =
-    totalMasuk - totalKeluar;
-
-    document.getElementById("dpMasuk")
-    .innerText = formatRp(totalDP);
-
-    document.getElementById("pelunasanMasuk")
-    .innerText = formatRp(totalPelunasan);
-
-    document.getElementById("totalMasuk")
-    .innerText = formatRp(totalMasuk);
-
-    document.getElementById("totalKeluar")
-    .innerText = formatRp(totalKeluar);
-
-    document.getElementById("laba")
-    .innerText = formatRp(laba);
-
-    renderPengeluaran();
-}
-
-function tambahPengeluaran(){
-
-    let ket =
-    document.getElementById("keterangan").value;
-
-    let jumlah =
-    document.getElementById("jumlah").value;
-
-    if(ket==="" || jumlah===""){
-        alert("Lengkapi data");
-        return;
+        document.getElementById("ringkasan").innerHTML = `
+            Total Pemasukan: Rp ${totalMasuk.toLocaleString()} <br>
+            Total Pengeluaran: Rp ${totalKeluar.toLocaleString()} <br>
+            Laba Bersih: Rp ${(totalMasuk - totalKeluar).toLocaleString()}
+        `;
     }
 
-    let data =
-    JSON.parse(localStorage.getItem("pengeluaran"))
-    || [];
+    function tambahPengeluaran() {
+        let ket = document.getElementById("keterangan").value;
+        let jml = document.getElementById("jumlah").value;
+        if(!ket || !jml) return alert("Isi data lengkap!");
+        
+        pengeluaran.push({ keterangan: ket, jumlah: jml });
+        localStorage.setItem("dataPengeluaran", JSON.stringify(pengeluaran));
+        render();
+        document.getElementById("keterangan").value = "";
+        document.getElementById("jumlah").value = "";
+    }
 
-    data.push({
-
-        tanggal:
-        new Date()
-        .toLocaleDateString("id-ID"),
-
-        keterangan:ket,
-
-        jumlah:Number(jumlah)
-
-    });
-
-    localStorage.setItem(
-    "pengeluaran",
-    JSON.stringify(data));
-
-    document.getElementById("keterangan").value="";
-    document.getElementById("jumlah").value="";
+    function hapus(index) {
+        if(confirm("Hapus data pengeluaran ini?")) {
+            pengeluaran.splice(index, 1);
+            localStorage.setItem("dataPengeluaran", JSON.stringify(pengeluaran));
+            render();
+        }
+    }
 
     render();
-}
-
-function renderPengeluaran(){
-
-    let data =
-    JSON.parse(localStorage.getItem("pengeluaran"))
-    || [];
-
-    let tbody =
-    document.getElementById("isiTabel");
-
-    tbody.innerHTML="";
-
-    data.forEach((p,index)=>{
-
-        tbody.innerHTML += `
-        <tr>
-
-        <td>${p.tanggal}</td>
-
-        <td>${p.keterangan}</td>
-
-        <td>
-        ${formatRp(p.jumlah)}
-        </td>
-
-        <td>
-
-        <button
-        class="btn-hapus"
-        onclick="hapus(${index})">
-        Hapus
-        </button>
-
-        </td>
-
-        </tr>
-        `;
-    });
-
-}
-
-function hapus(index){
-
-    let data =
-    JSON.parse(localStorage.getItem("pengeluaran"))
-    || [];
-
-    data.splice(index,1);
-
-    localStorage.setItem(
-    "pengeluaran",
-    JSON.stringify(data));
-
-    render();
-}
-
-render();
-
 </script>
-
 </body>
 </html>
