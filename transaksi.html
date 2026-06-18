@@ -16,13 +16,14 @@
         th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
         th { background: #f5f5f5; }
         .btn-back { background: #546e7a; color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; display: inline-block; margin-bottom: 15px; }
+        .btn-print { background: #0277bd; color: white; padding: 5px 8px; border: none; border-radius: 4px; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <a href="dashboard.html" class="btn-back">← Kembali ke Dashboard</a>
-    <h2>Input Transaksi Baru</h2>
+    <h2>Input Transaksi</h2>
     
     <div class="form-grid">
         <select id="pilihPelanggan" onchange="filterKendaraan()">
@@ -38,7 +39,8 @@
             <option value="Cabut Berkas">Cabut Berkas</option>
             <option value="Pajak 5 Tahunan">Pajak 5 Tahunan</option>
         </select>
-        <input type="number" id="biaya" placeholder="Total Biaya (Rp)">
+        <input type="number" id="biayaModal" placeholder="Biaya Resmi/Modal (Rp)">
+        <input type="number" id="biayaJasa" placeholder="Biaya Jasa Anda (Rp)">
         <input type="number" id="dp" placeholder="Uang Muka / DP (Rp)">
     </div>
     <button onclick="simpanTransaksi()">Simpan Transaksi</button>
@@ -49,10 +51,12 @@
                 <th>Pelanggan</th>
                 <th>Kendaraan</th>
                 <th>Layanan</th>
-                <th>Biaya</th>
+                <th>Modal</th>
+                <th>Jasa</th>
+                <th>Total</th>
                 <th>DP</th>
                 <th>Sisa</th>
-                <th>Status</th>
+                <th>Aksi</th>
             </tr>
         </thead>
         <tbody id="tabelTransaksi"></tbody>
@@ -60,7 +64,6 @@
 </div>
 
 <script>
-    // Load Pelanggan ke Select
     function loadData() {
         let pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
         let selectP = document.getElementById("pilihPelanggan");
@@ -72,12 +75,10 @@
         });
     }
 
-    // Filter kendaraan sesuai pelanggan yang dipilih
     function filterKendaraan() {
         let nama = document.getElementById("pilihPelanggan").value;
         let kendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
         let selectK = document.getElementById("pilihKendaraan");
-        
         selectK.innerHTML = '<option value="">-- Pilih Kendaraan --</option>';
         kendaraan.filter(k => k.pengurus === nama).forEach(k => {
             let opt = document.createElement("option");
@@ -91,34 +92,49 @@
         let pelanggan = document.getElementById("pilihPelanggan").value;
         let kendaraan = document.getElementById("pilihKendaraan").value;
         let layanan = document.getElementById("jenisLayanan").value;
-        let biaya = Number(document.getElementById("biaya").value);
+        let modal = Number(document.getElementById("biayaModal").value);
+        let jasa = Number(document.getElementById("biayaJasa").value);
+        let total = modal + jasa;
         let dp = Number(document.getElementById("dp").value);
-        let sisa = biaya - dp;
+        let sisa = total - dp;
         let statusBerkas = "PROSES";
 
-        if(pelanggan && kendaraan && layanan && biaya) {
+        if(pelanggan && kendaraan && layanan && modal && jasa) {
             let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-            transaksi.push({pelanggan, kendaraan, layanan, biaya, dp, sisa, statusBerkas});
+            transaksi.push({pelanggan, kendaraan, layanan, modal, jasa, total, dp, sisa, statusBerkas});
             localStorage.setItem("dataTransaksi", JSON.stringify(transaksi));
-            alert("Transaksi Berhasil Disimpan!");
             location.reload();
         } else {
             alert("Mohon lengkapi semua data!");
         }
     }
 
+    function cetakStruk(index) {
+        let t = JSON.parse(localStorage.getItem("dataTransaksi"))[index];
+        let win = window.open('', '', 'width=400,height=500');
+        win.document.write(`<html><body style="font-family:monospace; padding:20px;" onload="window.print(); window.close();">
+            <div style="text-align:center;"><h3>BIRO JASA STNK<br>ASKARA ZAYYAN</h3></div>
+            <p>Pelanggan: ${t.pelanggan}<br>Layanan: ${t.layanan}</p><hr>
+            <p>Modal: Rp ${t.modal.toLocaleString()}<br>Jasa: Rp ${t.jasa.toLocaleString()}<br>
+            Total: Rp ${t.total.toLocaleString()}<br>DP: Rp ${t.dp.toLocaleString()}<br>
+            Sisa: Rp ${t.sisa.toLocaleString()}</p>
+        </body></html>`);
+    }
+
     function tampilkan() {
         let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
         let html = "";
-        transaksi.forEach(t => {
+        transaksi.forEach((t, i) => {
             html += `<tr>
                 <td>${t.pelanggan}</td>
                 <td>${t.kendaraan}</td>
                 <td>${t.layanan}</td>
-                <td>Rp ${t.biaya.toLocaleString()}</td>
-                <td>Rp ${t.dp.toLocaleString()}</td>
-                <td>Rp ${t.sisa.toLocaleString()}</td>
-                <td>${t.statusBerkas}</td>
+                <td>${t.modal.toLocaleString()}</td>
+                <td>${t.jasa.toLocaleString()}</td>
+                <td>${t.total.toLocaleString()}</td>
+                <td>${t.dp.toLocaleString()}</td>
+                <td>${t.sisa.toLocaleString()}</td>
+                <td><button class="btn-print" onclick="cetakStruk(${i})">Cetak</button></td>
             </tr>`;
         });
         document.getElementById("tabelTransaksi").innerHTML = html;
@@ -127,6 +143,5 @@
     loadData();
     tampilkan();
 </script>
-
 </body>
 </html>
