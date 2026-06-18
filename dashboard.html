@@ -2,97 +2,59 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Owner</title>
+    <title>Dashboard - Biro Jasa STNK</title>
     <style>
-        *{ box-sizing:border-box; margin:0; padding:0; font-family:Segoe UI,sans-serif; }
-        body{ background:#f4f6f9; }
-        .header{ background:#0d47a1; color:white; padding:15px 20px; display:flex; justify-content:space-between; align-items:center; }
-        .logout{ background:#c62828; color:white; text-decoration:none; padding:8px 15px; border-radius:5px; }
-        .container{ max-width:1200px; margin:auto; padding:20px; }
-        .welcome{ background:white; padding:20px; border-radius:10px; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,.1); text-align: center; }
-        .welcome img { width: 150px; height: auto; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto; }
-        .grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:15px; margin-bottom:20px; }
-        .card{ background:white; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.1); }
-        .card h4{ color:#666; margin-bottom:10px; }
-        .card p{ font-size:20px; font-weight:bold; }
-        .menu{ background:white; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.1); }
-        .menu-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:15px; }
-        .menu a{ text-decoration:none; text-align:center; padding:20px; background:#f5f5f5; border-radius:10px; color:#333; font-weight:bold; }
-        .menu a:hover{ background:#0d47a1; color:white; }
+        * { font-family: Segoe UI, sans-serif; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; padding: 20px; }
+        .card { background: #0d47a1; color: white; padding: 20px; border-radius: 10px; }
+        .menu { padding: 20px; }
+        a { display: block; margin: 10px 0; color: #0d47a1; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h2>Dashboard Owner</h2>
-    <a href="index.html" class="logout">Keluar</a>
+<div class="grid">
+    <div class="card"><h3>Total Omzet</h3><h2 id="omzet">Rp 0</h2></div>
+    <div class="card"><h3>Laba Bersih (Jasa)</h3><h2 id="laba">Rp 0</h2></div>
+    <div class="card"><h3>Total Piutang</h3><h2 id="piutang">Rp 0</h2></div>
 </div>
 
-<div class="welcome" style="text-align: center;">
-    <img src="logo.jpg" alt="Logo" style="width: 150px; height: auto; margin-bottom: 10px;">
-    <h2>Dashboard Owner</h2>
-    <p>BIRO JASA STNK ASKARA ZAYYAN</p>
-</div>
-
-    <div class="grid">
-        <div class="card"><h4>Total Pelanggan</h4><p id="pelanggan">0</p></div>
-        <div class="card"><h4>Total Kendaraan</h4><p id="kendaraan">0</p></div>
-        <div class="card"><h4>Total Transaksi</h4><p id="transaksi">0</p></div>
-        <div class="card"><h4>Total Omzet</h4><p id="omzet">Rp 0</p></div>
-        <div class="card"><h4>Total DP</h4><p id="dp">Rp 0</p></div>
-        <div class="card"><h4>Total Piutang</h4><p id="piutang">Rp 0</p></div>
-        <div class="card"><h4>Laba Bersih</h4><p id="laba">Rp 0</p></div>
-        <div class="card"><h4>Berkas Selesai</h4><p id="selesai">0</p></div>
-    </div>
-
-    <div class="menu">
-        <h3>Menu Utama</h3><br>
-        <div class="menu-grid">
-            <a href="pelanggan.html">👤 Pelanggan</a>
-            <a href="kendaraan.html">🚗 Kendaraan</a>
-            <a href="transaksi.html">📝 Transaksi</a>
-            <a href="tracking.html">🔍 Tracking</a>
-            <a href="pelunasan.html">💰 Pelunasan</a>
-            <a href="penyerahan_berkas.html">📂 Penyerahan</a>
-            <a href="pengeluaran.html">📊 Pengeluaran</a>
-        </div>
-    </div>
+<div class="menu">
+    <a href="transaksi.html">1. Input Transaksi</a>
+    <a href="pelunasan.html">2. Pelunasan</a>
+    <a href="penyerahan_berkas.html">3. Penyerahan Berkas</a>
+    <a href="pengeluaran.html">4. Catat Pengeluaran</a>
 </div>
 
 <script>
-    function rupiah(angka){ return "Rp " + Number(angka).toLocaleString("id-ID"); }
-
-    function loadDashboard(){
-        let pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
-        let kendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
+    function updateDashboard() {
         let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
         let pengeluaran = JSON.parse(localStorage.getItem("dataPengeluaran")) || [];
+        
+        let totalOmzet = 0;
+        let totalJasa = 0;
+        let totalPiutang = 0;
+        let totalKeluar = 0;
 
-        let omzet = 0, dp = 0, piutang = 0, selesai = 0;
-
-        transaksi.forEach(t=>{
-            omzet += Number(t.biaya);
-            dp += Number(t.dp);
-            piutang += Number(t.sisa);
-            if(t.statusBerkas === "SELESAI") { selesai++; }
+        transaksi.forEach(t => {
+            totalOmzet += Number(t.total);
+            totalJasa += Number(t.jasa);
+            totalPiutang += Number(t.sisa);
         });
 
-        let totalKeluar = 0;
-        pengeluaran.forEach(p => { totalKeluar += Number(p.jumlah); });
+        pengeluaran.forEach(p => {
+            totalKeluar += Number(p.jumlah);
+        });
 
-        document.getElementById("pelanggan").innerText = pelanggan.length;
-        document.getElementById("kendaraan").innerText = kendaraan.length;
-        document.getElementById("transaksi").innerText = transaksi.length;
-        document.getElementById("omzet").innerText = rupiah(omzet);
-        document.getElementById("dp").innerText = rupiah(dp);
-        document.getElementById("piutang").innerText = rupiah(piutang);
-        document.getElementById("laba").innerText = rupiah(omzet - totalKeluar);
-        document.getElementById("selesai").innerText = selesai;
+        // Laba = Total Jasa - Biaya Pengeluaran Kantor
+        let labaBersih = totalJasa - totalKeluar;
+
+        document.getElementById("omzet").innerText = "Rp " + totalOmzet.toLocaleString();
+        document.getElementById("laba").innerText = "Rp " + labaBersih.toLocaleString();
+        document.getElementById("piutang").innerText = "Rp " + totalPiutang.toLocaleString();
     }
 
-    loadDashboard();
+    updateDashboard();
 </script>
-
 </body>
 </html>
