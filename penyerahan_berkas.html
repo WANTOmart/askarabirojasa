@@ -7,15 +7,16 @@
     <style>
         * { box-sizing: border-box; font-family: Segoe UI, sans-serif; }
         body { background: #f4f6f9; padding: 20px; }
-        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+        .container { max-width: 1100px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
         h2 { color: #0d47a1; margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
         th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
         th { background: #f5f5f5; }
         .btn-handover { background: #6a1b9a; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; }
         .btn-print { background: #0277bd; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; margin-left: 5px; }
         .btn-back { background: #546e7a; color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; display: inline-block; margin-bottom: 15px; }
-        .status-selesai { color: #2e7d32; font-weight: bold; }
+        .status-lunas { color: #2e7d32; font-weight: bold; }
+        .status-piutang { color: #c62828; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -29,7 +30,10 @@
             <tr>
                 <th>Pelanggan</th>
                 <th>Kendaraan</th>
-                <th>Status Berkas</th>
+                <th>Total Biaya</th>
+                <th>DP</th>
+                <th>Sisa</th>
+                <th>Status Pembayaran</th>
                 <th>Aksi</th>
             </tr>
         </thead>
@@ -47,11 +51,11 @@
                 <div style="text-align:center;">
                     <h3>SURAT SERAH TERIMA<br>ASKARA ZAYYAN</h3>
                 </div>
-                <p>Telah diterima berkas kendaraan:</p>
                 <p>Pelanggan: ${t.pelanggan}<br>
                 Kendaraan: ${t.kendaraan}<br>
-                Layanan: ${t.layanan}</p>
-                <br><br>
+                Total: Rp ${t.biaya.toLocaleString()}<br>
+                Status: ${t.sisa == 0 ? 'LUNAS' : 'PIUTANG'}</p>
+                <hr>
                 <p>Tanda Tangan Pelanggan,</p>
                 <br><br><br>
                 <p>( ......................... )</p>
@@ -66,10 +70,15 @@
         
         transaksi.forEach((t, index) => {
             if (t.statusBerkas === "SELESAI") {
+                let statusBayar = t.sisa == 0 ? '<span class="status-lunas">LUNAS</span>' : `<span class="status-piutang">Sisa: Rp ${t.sisa.toLocaleString()}</span>`;
+                
                 html += `<tr>
                     <td>${t.pelanggan}</td>
                     <td>${t.kendaraan}</td>
-                    <td class="status-selesai">Siap Diserahkan</td>
+                    <td>Rp ${t.biaya.toLocaleString()}</td>
+                    <td>Rp ${t.dp.toLocaleString()}</td>
+                    <td>Rp ${t.sisa.toLocaleString()}</td>
+                    <td>${statusBayar}</td>
                     <td>
                         <button class="btn-handover" onclick="serahkan(${index})">Serah Terima</button>
                         <button class="btn-print" onclick="cetakBukti(${index})">Cetak</button>
@@ -78,13 +87,18 @@
             }
         });
         
-        if (html === "") html = "<tr><td colspan='4' style='text-align:center;'>Tidak ada berkas siap diserahkan.</td></tr>";
+        if (html === "") html = "<tr><td colspan='7' style='text-align:center;'>Tidak ada berkas siap diserahkan.</td></tr>";
         document.getElementById("tabelPenyerahan").innerHTML = html;
     }
 
     function serahkan(index) {
+        let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+        // Cek jika belum lunas
+        if (transaksi[index].sisa > 0) {
+            alert("Perhatian: Transaksi ini belum lunas (Ada piutang).");
+        }
+        
         if(confirm("Apakah berkas sudah diserahkan kepada pelanggan?")) {
-            let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
             transaksi[index].statusBerkas = "DISERAHKAN";
             localStorage.setItem("dataTransaksi", JSON.stringify(transaksi));
             tampilkanPenyerahan();
