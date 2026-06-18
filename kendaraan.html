@@ -11,7 +11,7 @@
         h2 { margin-bottom: 20px; color: #0d47a1; }
         .form-group { margin-bottom: 15px; }
         input, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 5px; }
-        button { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; }
+        button { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
         .btn-add { background: #2e7d32; color: white; }
         .btn-back { background: #546e7a; color: white; margin-bottom: 10px; display: inline-block; text-decoration: none; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
@@ -28,9 +28,10 @@
     
     <div class="form-group">
         <select id="pilihPelanggan">
-            <option value="">-- Pilih Pelanggan --</option>
+            <option value="">-- Pilih Pelanggan (Pengurus) --</option>
         </select>
-        <input type="text" id="nopol" placeholder="Nomor Polisi (Contoh: P 1234 ABC)">
+        <input type="text" id="namaStnk" placeholder="Nama di STNK">
+        <input type="text" id="nopol" placeholder="Nomor Polisi">
         <input type="text" id="merk" placeholder="Merk/Tipe Kendaraan">
         <button class="btn-add" onclick="tambahKendaraan()">Tambah Kendaraan</button>
     </div>
@@ -38,7 +39,8 @@
     <table>
         <thead>
             <tr>
-                <th>Pemilik</th>
+                <th>Pengurus</th>
+                <th>Nama di STNK</th>
                 <th>No. Polisi</th>
                 <th>Merk</th>
                 <th>Aksi</th>
@@ -49,7 +51,6 @@
 </div>
 
 <script>
-    // Memuat data pelanggan ke dalam dropdown
     function loadPelangganOptions() {
         let pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
         let select = document.getElementById("pilihPelanggan");
@@ -66,7 +67,8 @@
         let html = "";
         kendaraan.forEach((k, index) => {
             html += `<tr>
-                <td>${k.pemilik}</td>
+                <td>${k.pengurus}</td>
+                <td>${k.namaStnk}</td>
                 <td>${k.nopol}</td>
                 <td>${k.merk}</td>
                 <td><button class="btn-del" onclick="hapusKendaraan(${index})">Hapus</button></td>
@@ -76,21 +78,23 @@
     }
 
     function tambahKendaraan() {
-        let pemilik = document.getElementById("pilihPelanggan").value;
+        let pengurus = document.getElementById("pilihPelanggan").value;
+        let namaStnk = document.getElementById("namaStnk").value;
         let nopol = document.getElementById("nopol").value;
         let merk = document.getElementById("merk").value;
 
-        if(pemilik && nopol && merk) {
+        if(pengurus && namaStnk && nopol && merk) {
             let kendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
-            kendaraan.push({pemilik, nopol, merk});
+            kendaraan.push({pengurus, namaStnk, nopol, merk});
             localStorage.setItem("dataKendaraan", JSON.stringify(kendaraan));
             
             // Reset input
+            document.getElementById("namaStnk").value = "";
             document.getElementById("nopol").value = "";
             document.getElementById("merk").value = "";
             tampilkanKendaraan();
         } else {
-            alert("Harap isi semua kolom dan pilih pelanggan!");
+            alert("Harap isi semua kolom!");
         }
     }
 
