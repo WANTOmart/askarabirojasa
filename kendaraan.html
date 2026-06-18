@@ -17,7 +17,6 @@
     function cariPelangganOtomatis() {
         let inputNama = document.getElementById("namaPelanggan").value.trim().toUpperCase();
         let infoBox = document.getElementById("infoPencarian");
-        
         let pelangganDitemukan = dataPelanggan.find(p => p.nama.trim().toUpperCase() === inputNama);
 
         if (pelangganDitemukan) {
@@ -32,7 +31,7 @@
     // Menampilkan data ke tabel
     function render(){
         let html = "";
-        dataKendaraan.forEach((k)=>{
+        dataKendaraan.forEach((k, index)=>{
             html += `<tr>
                 <td>${k.namaPelanggan}</td>
                 <td>${k.stnk}</td>
@@ -41,9 +40,19 @@
                 <td>${k.noMesin}</td>
                 <td>${k.merk}</td>
                 <td>${k.jenis}</td>
+                <td><button onclick="hapusData(${index})" style="background:#d32f2f; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Hapus</button></td>
             </tr>`;
         });
         document.getElementById("isiTabel").innerHTML = html;
+    }
+
+    // Fungsi Hapus
+    function hapusData(index) {
+        if(confirm("Yakin ingin menghapus data ini?")) {
+            dataKendaraan.splice(index, 1);
+            localStorage.setItem("dataKendaraan", JSON.stringify(dataKendaraan));
+            render();
+        }
     }
 
     // Simpan data
@@ -62,7 +71,6 @@
             return;
         }
 
-        // Simpan ke array
         dataKendaraan.push({
             namaPelanggan: namaPelanggan,
             stnk: stnk,
@@ -73,10 +81,9 @@
             jenis: jenis
         });
 
-        // Simpan ke localStorage
         localStorage.setItem("dataKendaraan", JSON.stringify(dataKendaraan));
         
-        // Bersihkan input setelah simpan
+        // Reset form
         document.getElementById("namaPelanggan").value = "";
         document.getElementById("stnk").value = "";
         document.getElementById("noPlat").value = "";
@@ -89,6 +96,9 @@
         render();
         alert("Data berhasil disimpan");
     }
+
+    // Perbarui header tabel agar ada kolom aksi
+    document.querySelector("thead tr").innerHTML += "<th>Aksi</th>";
 
     inisialisasiDatalist();
     render();
