@@ -7,42 +7,45 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Segoe UI, sans-serif; }
         body { background: #f4f6f9; padding: 20px; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
         h2 { margin-bottom: 20px; color: #0d47a1; }
-        .form-group { margin-bottom: 15px; }
-        input, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 5px; }
-        button { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
-        .btn-add { background: #2e7d32; color: white; }
-        .btn-back { background: #546e7a; color: white; margin-bottom: 10px; display: inline-block; text-decoration: none; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 12px; border: none; border-radius: 5px; cursor: pointer; background: #2e7d32; color: white; width: 100%; }
+        .btn-back { background: #546e7a; color: white; padding: 8px 15px; display: inline-block; text-decoration: none; border-radius: 5px; margin-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
         th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
         th { background: #f5f5f5; }
-        .btn-del { background: #c62828; color: white; padding: 5px 10px; }
+        .btn-del { background: #c62828; color: white; padding: 5px 8px; border-radius: 4px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <a href="dashboard.html" class="btn-back">Kembali ke Dashboard</a>
+    <a href="dashboard.html" class="btn-back">← Kembali</a>
     <h2>Data Kendaraan</h2>
     
-    <div class="form-group">
-        <select id="pilihPelanggan">
-            <option value="">-- Pilih Pelanggan (Pengurus) --</option>
+    <div class="form-grid">
+        <select id="pilihPelanggan" onchange="isiOtomatis()">
+            <option value="">-- Pilih Nama Pelanggan --</option>
         </select>
-        <input type="text" id="namaStnk" placeholder="Nama di STNK">
+        <input type="text" id="namaStnk" placeholder="Nama di STNK Asli">
         <input type="text" id="nopol" placeholder="Nomor Polisi">
-        <input type="text" id="merk" placeholder="Merk/Tipe Kendaraan">
-        <button class="btn-add" onclick="tambahKendaraan()">Tambah Kendaraan</button>
+        <input type="text" id="merk" placeholder="Merk / Tipe Kendaraan">
+        <input type="text" id="norangka" placeholder="Nomor Rangka">
+        <input type="text" id="nomesin" placeholder="Nomor Mesin">
     </div>
+    <button onclick="tambahKendaraan()">Simpan Data Kendaraan</button>
 
     <table>
         <thead>
             <tr>
                 <th>Pengurus</th>
-                <th>Nama di STNK</th>
+                <th>Nama STNK</th>
                 <th>No. Polisi</th>
-                <th>Merk</th>
+                <th>Merk/Tipe</th>
+                <th>No. Rangka</th>
+                <th>No. Mesin</th>
                 <th>Aksi</th>
             </tr>
         </thead>
@@ -51,57 +54,70 @@
 </div>
 
 <script>
+    // Memuat data pelanggan ke dropdown
     function loadPelangganOptions() {
         let pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
         let select = document.getElementById("pilihPelanggan");
         pelanggan.forEach(p => {
             let opt = document.createElement("option");
-            opt.value = p.nama;
+            opt.value = JSON.stringify(p); // Menyimpan objek agar mudah diakses
             opt.innerHTML = p.nama;
             select.appendChild(opt);
         });
     }
 
+    // Mengisi Nama STNK otomatis saat pelanggan dipilih
+    function isiOtomatis() {
+        let val = document.getElementById("pilihPelanggan").value;
+        if(val) {
+            let data = JSON.parse(val);
+            // Asumsi di data pelanggan ada field 'namaStnk' atau sesuaikan dengan data Anda
+            document.getElementById("namaStnk").value = data.namaStnk || "";
+        }
+    }
+
+    function tambahKendaraan() {
+        let pObj = JSON.parse(document.getElementById("pilihPelanggan").value || "{}");
+        let pengurus = pObj.nama;
+        let namaStnk = document.getElementById("namaStnk").value;
+        let nopol = document.getElementById("nopol").value;
+        let merk = document.getElementById("merk").value;
+        let norangka = document.getElementById("norangka").value;
+        let nomesin = document.getElementById("nomesin").value;
+
+        if(pengurus && nopol) {
+            let kendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
+            kendaraan.push({pengurus, namaStnk, nopol, merk, norangka, nomesin});
+            localStorage.setItem("dataKendaraan", JSON.stringify(kendaraan));
+            
+            alert("Data berhasil disimpan!");
+            location.reload();
+        } else {
+            alert("Pilih pelanggan dan isi Nomor Polisi!");
+        }
+    }
+
     function tampilkanKendaraan() {
         let kendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
         let html = "";
-        kendaraan.forEach((k, index) => {
+        kendaraan.forEach((k, i) => {
             html += `<tr>
                 <td>${k.pengurus}</td>
                 <td>${k.namaStnk}</td>
                 <td>${k.nopol}</td>
                 <td>${k.merk}</td>
-                <td><button class="btn-del" onclick="hapusKendaraan(${index})">Hapus</button></td>
+                <td>${k.norangka}</td>
+                <td>${k.nomesin}</td>
+                <td><button class="btn-del" onclick="hapus(${i})">X</button></td>
             </tr>`;
         });
         document.getElementById("tabelKendaraan").innerHTML = html;
     }
 
-    function tambahKendaraan() {
-        let pengurus = document.getElementById("pilihPelanggan").value;
-        let namaStnk = document.getElementById("namaStnk").value;
-        let nopol = document.getElementById("nopol").value;
-        let merk = document.getElementById("merk").value;
-
-        if(pengurus && namaStnk && nopol && merk) {
-            let kendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
-            kendaraan.push({pengurus, namaStnk, nopol, merk});
-            localStorage.setItem("dataKendaraan", JSON.stringify(kendaraan));
-            
-            // Reset input
-            document.getElementById("namaStnk").value = "";
-            document.getElementById("nopol").value = "";
-            document.getElementById("merk").value = "";
-            tampilkanKendaraan();
-        } else {
-            alert("Harap isi semua kolom!");
-        }
-    }
-
-    function hapusKendaraan(index) {
-        let kendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
-        kendaraan.splice(index, 1);
-        localStorage.setItem("dataKendaraan", JSON.stringify(kendaraan));
+    function hapus(i) {
+        let k = JSON.parse(localStorage.getItem("dataKendaraan"));
+        k.splice(i, 1);
+        localStorage.setItem("dataKendaraan", JSON.stringify(k));
         tampilkanKendaraan();
     }
 
