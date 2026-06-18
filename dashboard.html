@@ -2,59 +2,97 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard - Biro Jasa STNK</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Pelanggan</title>
     <style>
-        * { font-family: Segoe UI, sans-serif; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; padding: 20px; }
-        .card { background: #0d47a1; color: white; padding: 20px; border-radius: 10px; }
-        .menu { padding: 20px; }
-        a { display: block; margin: 10px 0; color: #0d47a1; text-decoration: none; font-weight: bold; }
+        *{ margin:0; padding:0; box-sizing:border-box; font-family:Segoe UI,sans-serif; }
+        body{ background:#f4f6f9; padding:20px; }
+        .container{ max-width:1100px; margin:auto; background:white; padding:20px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,.1); }
+        .header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+        .btn{ padding:10px 15px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; text-decoration:none; color:white; }
+        .back{ background:#546e7a; }
+        .save{ background:#0d47a1; }
+        .form-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:10px; margin-bottom:20px; }
+        input{ padding:12px; border:1px solid #ddd; border-radius:6px; }
+        table{ width:100%; border-collapse:collapse; }
+        th{ background:#0d47a1; color:white; padding:10px; }
+        td{ padding:10px; border-bottom:1px solid #ddd; }
     </style>
 </head>
 <body>
 
-<div class="grid">
-    <div class="card"><h3>Total Omzet</h3><h2 id="omzet">Rp 0</h2></div>
-    <div class="card"><h3>Laba Bersih (Jasa)</h3><h2 id="laba">Rp 0</h2></div>
-    <div class="card"><h3>Total Piutang</h3><h2 id="piutang">Rp 0</h2></div>
-</div>
+<div class="container">
+    <div class="header">
+        <a href="dashboard.html" class="btn back">⬅ Dashboard</a>
+        <h2>Data Pelanggan</h2>
+    </div>
 
-<div class="menu">
-    <a href="transaksi.html">1. Input Transaksi</a>
-    <a href="pelunasan.html">2. Pelunasan</a>
-    <a href="penyerahan_berkas.html">3. Penyerahan Berkas</a>
-    <a href="pengeluaran.html">4. Catat Pengeluaran</a>
+    <div class="form-grid">
+        <input type="text" id="nama" placeholder="Nama Lengkap">
+        <input type="text" id="telepon" placeholder="No Telepon">
+        <input type="text" id="stnk" placeholder="Nama Asli STNK">
+        <button class="btn save" onclick="simpan()">Simpan Pelanggan</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nama Lengkap</th>
+                <th>No Telepon</th>
+                <th>Nama STNK</th>
+                </tr>
+        </thead>
+        <tbody id="isiTabel"></tbody>
+    </table>
 </div>
 
 <script>
-    function updateDashboard() {
-        let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-        let pengeluaran = JSON.parse(localStorage.getItem("dataPengeluaran")) || [];
-        
-        let totalOmzet = 0;
-        let totalJasa = 0;
-        let totalPiutang = 0;
-        let totalKeluar = 0;
+    let dataPelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
 
-        transaksi.forEach(t => {
-            totalOmzet += Number(t.total);
-            totalJasa += Number(t.jasa);
-            totalPiutang += Number(t.sisa);
+    function render(){
+        let html = "";
+        dataPelanggan.forEach((p)=>{
+            html += `
+            <tr>
+                <td>${p.nama}</td>
+                <td>${p.telepon}</td>
+                <td>${p.stnk}</td>
+                </tr>
+            `;
         });
 
-        pengeluaran.forEach(p => {
-            totalKeluar += Number(p.jumlah);
-        });
-
-        // Laba = Total Jasa - Biaya Pengeluaran Kantor
-        let labaBersih = totalJasa - totalKeluar;
-
-        document.getElementById("omzet").innerText = "Rp " + totalOmzet.toLocaleString();
-        document.getElementById("laba").innerText = "Rp " + labaBersih.toLocaleString();
-        document.getElementById("piutang").innerText = "Rp " + totalPiutang.toLocaleString();
+        document.getElementById("isiTabel").innerHTML = html;
+        localStorage.setItem("dataPelanggan", JSON.stringify(dataPelanggan));
     }
 
-    updateDashboard();
+    function simpan(){
+        let nama = document.getElementById("nama").value;
+        let telepon = document.getElementById("telepon").value;
+        let stnk = document.getElementById("stnk").value;
+
+        if(nama==="" || telepon==="" || stnk==="") {
+            alert("Lengkapi data");
+            return;
+        }
+
+        dataPelanggan.push({
+            id: Date.now(),
+            nama: nama,
+            telepon: telepon,
+            stnk: stnk
+        });
+
+        render();
+
+        document.getElementById("nama").value="";
+        document.getElementById("telepon").value="";
+        document.getElementById("stnk").value="";
+    }
+
+    // Fungsi hapus() telah dibuang sepenuhnya untuk keamanan hak akses pegawai
+
+    render();
 </script>
+
 </body>
 </html>
