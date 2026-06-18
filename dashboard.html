@@ -3,96 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Pelanggan</title>
+    <title>Dashboard - BIRO JASA STNK ASKARA ZAYYAN</title>
     <style>
-        *{ margin:0; padding:0; box-sizing:border-box; font-family:Segoe UI,sans-serif; }
-        body{ background:#f4f6f9; padding:20px; }
-        .container{ max-width:1100px; margin:auto; background:white; padding:20px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,.1); }
-        .header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
-        .btn{ padding:10px 15px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; text-decoration:none; color:white; }
-        .back{ background:#546e7a; }
-        .save{ background:#0d47a1; }
-        .form-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:10px; margin-bottom:20px; }
-        input{ padding:12px; border:1px solid #ddd; border-radius:6px; }
-        table{ width:100%; border-collapse:collapse; }
-        th{ background:#0d47a1; color:white; padding:10px; }
-        td{ padding:10px; border-bottom:1px solid #ddd; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #f4f6f9; padding: 20px; }
+        .header-box { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #eee; }
+        .card h3 { font-size: 14px; color: #666; margin-bottom: 10px; }
+        .card h2 { font-size: 22px; color: #333; }
+        .menu-box { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 15px; }
+        .btn-menu { padding: 15px; text-align: center; background: #f8f9fa; border: 1px solid #ddd; border-radius: 8px; text-decoration: none; color: #333; font-weight: 600; transition: 0.3s; }
+        .btn-menu:hover { background: #e0e0e0; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <a href="dashboard.html" class="btn back">⬅ Dashboard</a>
-        <h2>Data Pelanggan</h2>
-    </div>
+<div class="header-box">
+    <h1>Selamat Datang</h1>
+    <p>BIRO JASA STNK ASKARA ZAYYAN</p>
+</div>
 
-    <div class="form-grid">
-        <input type="text" id="nama" placeholder="Nama Lengkap">
-        <input type="text" id="telepon" placeholder="No Telepon">
-        <input type="text" id="stnk" placeholder="Nama Asli STNK">
-        <button class="btn save" onclick="simpan()">Simpan Pelanggan</button>
-    </div>
+<div class="stats-grid">
+    <div class="card"><h3>Total Pelanggan</h3><h2 id="totPelanggan">0</h2></div>
+    <div class="card"><h3>Total Kendaraan</h3><h2 id="totKendaraan">0</h2></div>
+    <div class="card"><h3>Total Transaksi</h3><h2 id="totTransaksi">0</h2></div>
+    <div class="card"><h3>Total Omzet</h3><h2 id="totOmzet">Rp 0</h2></div>
+    <div class="card"><h3>Total DP</h3><h2 id="totDp">Rp 0</h2></div>
+    <div class="card"><h3>Total Piutang</h3><h2 id="totPiutang">Rp 0</h2></div>
+    <div class="card"><h3>Laba Bersih</h3><h2 id="labaBersih">Rp 0</h2></div>
+    <div class="card"><h3>Berkas Selesai</h3><h2 id="berkasSelesai">0</h2></div>
+</div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Nama Lengkap</th>
-                <th>No Telepon</th>
-                <th>Nama STNK</th>
-                </tr>
-        </thead>
-        <tbody id="isiTabel"></tbody>
-    </table>
+<div class="menu-box">
+    <h3>Menu Utama</h3>
+    <div class="menu-grid">
+        <a href="pelanggan.html" class="btn-menu">👤 Pelanggan</a>
+        <a href="kendaraan.html" class="btn-menu">🚗 Kendaraan</a>
+        <a href="transaksi.html" class="btn-menu">📝 Transaksi</a>
+        <a href="tracking.html" class="btn-menu">🔍 Tracking</a>
+        <a href="pelunasan.html" class="btn-menu">💰 Pelunasan</a>
+        <a href="penyerahan_berkas.html" class="btn-menu">📁 Penyerahan</a>
+        <a href="pengeluaran.html" class="btn-menu">📊 Keuangan</a>
+    </div>
 </div>
 
 <script>
-    let dataPelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
+    function updateDashboard() {
+        const pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
+        const kendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
+        const transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+        const pengeluaran = JSON.parse(localStorage.getItem("dataPengeluaran")) || [];
 
-    function render(){
-        let html = "";
-        dataPelanggan.forEach((p)=>{
-            html += `
-            <tr>
-                <td>${p.nama}</td>
-                <td>${p.telepon}</td>
-                <td>${p.stnk}</td>
-                </tr>
-            `;
+        let omzet = 0, dp = 0, piutang = 0, jasa = 0, selesai = 0;
+
+        transaksi.forEach(t => {
+            omzet += Number(t.total);
+            dp += Number(t.dp);
+            piutang += Number(t.sisa);
+            jasa += Number(t.jasa);
+            if(t.statusBerkas === "SELESAI" || t.statusBerkas === "DISERAHKAN") selesai++;
         });
 
-        document.getElementById("isiTabel").innerHTML = html;
-        localStorage.setItem("dataPelanggan", JSON.stringify(dataPelanggan));
+        let totalKeluar = pengeluaran.reduce((sum, p) => sum + Number(p.jumlah), 0);
+        let laba = jasa - totalKeluar;
+
+        document.getElementById("totPelanggan").innerText = pelanggan.length;
+        document.getElementById("totKendaraan").innerText = kendaraan.length;
+        document.getElementById("totTransaksi").innerText = transaksi.length;
+        document.getElementById("totOmzet").innerText = "Rp " + omzet.toLocaleString();
+        document.getElementById("totDp").innerText = "Rp " + dp.toLocaleString();
+        document.getElementById("totPiutang").innerText = "Rp " + piutang.toLocaleString();
+        document.getElementById("labaBersih").innerText = "Rp " + laba.toLocaleString();
+        document.getElementById("berkasSelesai").innerText = selesai;
     }
 
-    function simpan(){
-        let nama = document.getElementById("nama").value;
-        let telepon = document.getElementById("telepon").value;
-        let stnk = document.getElementById("stnk").value;
-
-        if(nama==="" || telepon==="" || stnk==="") {
-            alert("Lengkapi data");
-            return;
-        }
-
-        dataPelanggan.push({
-            id: Date.now(),
-            nama: nama,
-            telepon: telepon,
-            stnk: stnk
-        });
-
-        render();
-
-        document.getElementById("nama").value="";
-        document.getElementById("telepon").value="";
-        document.getElementById("stnk").value="";
-    }
-
-    // Fungsi hapus() telah dibuang sepenuhnya untuk keamanan hak akses pegawai
-
-    render();
+    updateDashboard();
 </script>
-
 </body>
 </html>
