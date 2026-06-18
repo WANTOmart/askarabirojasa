@@ -3,104 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Pelanggan</title>
+    <title>Manajemen Pelanggan</title>
     <style>
-        *{ margin:0; padding:0; box-sizing:border-box; font-family:Segoe UI,sans-serif; }
-        body{ background:#f4f6f9; padding:20px; }
-        .container{ max-width:1100px; margin:auto; background:white; padding:20px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,.1); }
-        .header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
-        .btn{ padding:10px 15px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; text-decoration:none; color:white; }
-        .back{ background:#546e7a; }
-        .save{ background:#0d47a1; }
-        .btn-hapus{ background:#d32f2f; color:white; padding:5px 10px; border:none; border-radius:4px; cursor:pointer; }
-        .btn-hapus:hover { background:#b71c1c; }
-        .form-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:10px; margin-bottom:20px; }
-        input{ padding:12px; border:1px solid #ddd; border-radius:6px; }
-        table{ width:100%; border-collapse:collapse; }
-        th{ background:#0d47a1; color:white; padding:10px; }
-        td{ padding:10px; border-bottom:1px solid #ddd; text-align: center; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Segoe UI, sans-serif; }
+        body { background: #f4f6f9; padding: 20px; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+        h2 { margin-bottom: 20px; color: #0d47a1; }
+        .form-group { margin-bottom: 15px; }
+        input { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; }
+        .btn-add { background: #2e7d32; color: white; }
+        .btn-back { background: #546e7a; color: white; margin-bottom: 10px; display: inline-block; text-decoration: none; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #f5f5f5; }
+        .btn-del { background: #c62828; color: white; padding: 5px 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header">
-        <a href="dashboard.html" class="btn back">⬅ Dashboard</a>
-        <h2>Data Pelanggan</h2>
-    </div>
-
-    <div class="form-grid">
+    <a href="dashboard.html" class="btn-back">Kembali ke Dashboard</a>
+    <h2>Data Pelanggan</h2>
+    
+    <div class="form-group">
         <input type="text" id="nama" placeholder="Nama Lengkap">
-        <input type="text" id="telepon" placeholder="No Telepon">
-        <input type="text" id="stnk" placeholder="Nama Asli STNK">
-        <button class="btn save" onclick="simpan()">Simpan Pelanggan</button>
+        <input type="text" id="hp" placeholder="No. HP">
+        <button class="btn-add" onclick="tambahPelanggan()">Tambah Pelanggan</button>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th>Nama Lengkap</th>
-                <th>No Telepon</th>
-                <th>Nama STNK</th>
+                <th>Nama</th>
+                <th>No. HP</th>
                 <th>Aksi</th>
             </tr>
         </thead>
-        <tbody id="isiTabel"></tbody>
+        <tbody id="tabelPelanggan"></tbody>
     </table>
 </div>
 
 <script>
-    let dataPelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
-
-    function render(){
+    function tampilkanPelanggan() {
+        let pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
         let html = "";
-        dataPelanggan.forEach((p)=>{
-            html += `
-            <tr>
+        pelanggan.forEach((p, index) => {
+            html += `<tr>
                 <td>${p.nama}</td>
-                <td>${p.telepon}</td>
-                <td>${p.stnk}</td>
-                <td><button class="btn-hapus" onclick="hapus(${p.id})">Hapus</button></td>
-            </tr>
-            `;
+                <td>${p.hp}</td>
+                <td><button class="btn-del" onclick="hapusPelanggan(${index})">Hapus</button></td>
+            </tr>`;
         });
-
-        document.getElementById("isiTabel").innerHTML = html;
-        localStorage.setItem("dataPelanggan", JSON.stringify(dataPelanggan));
+        document.getElementById("tabelPelanggan").innerHTML = html;
     }
 
-    function simpan(){
+    function tambahPelanggan() {
         let nama = document.getElementById("nama").value;
-        let telepon = document.getElementById("telepon").value;
-        let stnk = document.getElementById("stnk").value;
-
-        if(nama==="" || telepon==="" || stnk==="") {
-            alert("Lengkapi data");
-            return;
-        }
-
-        dataPelanggan.push({
-            id: Date.now(),
-            nama: nama,
-            telepon: telepon,
-            stnk: stnk
-        });
-
-        render();
-
-        document.getElementById("nama").value="";
-        document.getElementById("telepon").value="";
-        document.getElementById("stnk").value="";
-    }
-
-    function hapus(id){
-        if(confirm("Apakah Anda yakin ingin menghapus data ini?")) {
-            dataPelanggan = dataPelanggan.filter(p => p.id !== id);
-            render();
+        let hp = document.getElementById("hp").value;
+        if(nama && hp) {
+            let pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
+            pelanggan.push({nama, hp});
+            localStorage.setItem("dataPelanggan", JSON.stringify(pelanggan));
+            document.getElementById("nama").value = "";
+            document.getElementById("hp").value = "";
+            tampilkanPelanggan();
+        } else {
+            alert("Harap isi semua kolom!");
         }
     }
 
-    render();
+    function hapusPelanggan(index) {
+        let pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
+        pelanggan.splice(index, 1);
+        localStorage.setItem("dataPelanggan", JSON.stringify(pelanggan));
+        tampilkanPelanggan();
+    }
+
+    tampilkanPelanggan();
 </script>
 
 </body>
