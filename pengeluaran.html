@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Keuangan</title>
+    <style>
+        * { box-sizing: border-box; font-family: Segoe UI, sans-serif; }
+        body { background: #f4f6f9; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+        h2 { color: #0d47a1; margin-bottom: 20px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-bottom: 20px; }
+        input { padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 10px; background: #c62828; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #f5f5f5; }
+        .btn-back { background: #546e7a; color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; display: inline-block; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="dashboard.html" class="btn-back">← Kembali ke Dashboard</a>
+    <h2>Catat Pengeluaran Kantor</h2>
+
+    <div class="form-grid">
+        <input type="text" id="keterangan" placeholder="Keterangan (Contoh: Bensin, Fotokopi)">
+        <input type="number" id="jumlah" placeholder="Jumlah (Rp)">
+        <button onclick="tambahPengeluaran()">Tambah</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Keterangan</th>
+                <th>Jumlah</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody id="tabelPengeluaran"></tbody>
+    </table>
+</div>
+
+<script>
+    function tambahPengeluaran() {
+        let keterangan = document.getElementById("keterangan").value;
+        let jumlah = Number(document.getElementById("jumlah").value);
+
+        if(keterangan && jumlah > 0) {
+            let pengeluaran = JSON.parse(localStorage.getItem("dataPengeluaran")) || [];
+            pengeluaran.push({keterangan, jumlah});
+            localStorage.setItem("dataPengeluaran", JSON.stringify(pengeluaran));
+            
+            document.getElementById("keterangan").value = "";
+            document.getElementById("jumlah").value = "";
+            tampilkan();
+        } else {
+            alert("Harap isi keterangan dan jumlah yang benar!");
+        }
+    }
+
+    function tampilkan() {
+        let pengeluaran = JSON.parse(localStorage.getItem("dataPengeluaran")) || [];
+        let html = "";
+        pengeluaran.forEach((p, index) => {
+            html += `<tr>
+                <td>${p.keterangan}</td>
+                <td>Rp ${p.jumlah.toLocaleString()}</td>
+                <td><button onclick="hapus(${index})" style="background:#555">Hapus</button></td>
+            </tr>`;
+        });
+        document.getElementById("tabelPengeluaran").innerHTML = html;
+    }
+
+    function hapus(index) {
+        let p = JSON.parse(localStorage.getItem("dataPengeluaran"));
+        p.splice(index, 1);
+        localStorage.setItem("dataPengeluaran", JSON.stringify(p));
+        tampilkan();
+    }
+
+    tampilkan();
+</script>
+
+</body>
+</html>
