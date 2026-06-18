@@ -1,104 +1,109 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Kendaraan</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Segoe UI, sans-serif; }
+        body { background: #f4f6f9; padding: 20px; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+        h2 { margin-bottom: 20px; color: #0d47a1; }
+        .form-group { margin-bottom: 15px; }
+        input, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; }
+        .btn-add { background: #2e7d32; color: white; }
+        .btn-back { background: #546e7a; color: white; margin-bottom: 10px; display: inline-block; text-decoration: none; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #f5f5f5; }
+        .btn-del { background: #c62828; color: white; padding: 5px 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="dashboard.html" class="btn-back">Kembali ke Dashboard</a>
+    <h2>Data Kendaraan</h2>
+    
+    <div class="form-group">
+        <select id="pilihPelanggan">
+            <option value="">-- Pilih Pelanggan --</option>
+        </select>
+        <input type="text" id="nopol" placeholder="Nomor Polisi (Contoh: P 1234 ABC)">
+        <input type="text" id="merk" placeholder="Merk/Tipe Kendaraan">
+        <button class="btn-add" onclick="tambahKendaraan()">Tambah Kendaraan</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Pemilik</th>
+                <th>No. Polisi</th>
+                <th>Merk</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody id="tabelKendaraan"></tbody>
+    </table>
+</div>
+
 <script>
-    // Pastikan script berjalan setelah HTML selesai dimuat
-    document.addEventListener("DOMContentLoaded", function() {
-        let dataPelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
-        let dataKendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
+    // Memuat data pelanggan ke dalam dropdown
+    function loadPelangganOptions() {
+        let pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
+        let select = document.getElementById("pilihPelanggan");
+        pelanggan.forEach(p => {
+            let opt = document.createElement("option");
+            opt.value = p.nama;
+            opt.innerHTML = p.nama;
+            select.appendChild(opt);
+        });
+    }
 
-        // Mengisi datalist pelanggan dengan pengecekan null
-        function inisialisasiDatalist() {
-            let datalist = document.getElementById("listPelanggan");
-            if (!datalist) return; // Mencegah error jika id tidak ditemukan
+    function tampilkanKendaraan() {
+        let kendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
+        let html = "";
+        kendaraan.forEach((k, index) => {
+            html += `<tr>
+                <td>${k.pemilik}</td>
+                <td>${k.nopol}</td>
+                <td>${k.merk}</td>
+                <td><button class="btn-del" onclick="hapusKendaraan(${index})">Hapus</button></td>
+            </tr>`;
+        });
+        document.getElementById("tabelKendaraan").innerHTML = html;
+    }
+
+    function tambahKendaraan() {
+        let pemilik = document.getElementById("pilihPelanggan").value;
+        let nopol = document.getElementById("nopol").value;
+        let merk = document.getElementById("merk").value;
+
+        if(pemilik && nopol && merk) {
+            let kendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
+            kendaraan.push({pemilik, nopol, merk});
+            localStorage.setItem("dataKendaraan", JSON.stringify(kendaraan));
             
-            datalist.innerHTML = "";
-            dataPelanggan.forEach(p => {
-                let option = document.createElement("option");
-                option.value = p.nama;
-                datalist.appendChild(option);
-            });
-        }
-
-        // Mencari otomatis saat mengetik nama pelanggan
-        window.cariPelangganOtomatis = function() {
-            let input = document.getElementById("namaPelanggan");
-            let infoBox = document.getElementById("infoPencarian");
-            if (!input) return;
-
-            let inputNama = input.value.trim().toUpperCase();
-            let pelangganDitemukan = dataPelanggan.find(p => p.nama.trim().toUpperCase() === inputNama);
-
-            if (pelangganDitemukan) {
-                document.getElementById("stnk").value = pelangganDitemukan.stnk;
-                infoBox.innerText = "✓ Ditemukan";
-            } else {
-                document.getElementById("stnk").value = "";
-                infoBox.innerText = "";
-            }
-        };
-
-        // Menampilkan data ke tabel
-        function render(){
-            let tabel = document.getElementById("isiTabel");
-            if (!tabel) return;
-
-            let html = "";
-            dataKendaraan.forEach((k, index)=>{
-                html += `<tr>
-                    <td>${k.namaPelanggan}</td>
-                    <td>${k.stnk}</td>
-                    <td>${k.noPlat}</td>
-                    <td>${k.noRangka}</td>
-                    <td>${k.noMesin}</td>
-                    <td>${k.merk}</td>
-                    <td>${k.jenis}</td>
-                    <td><button onclick="hapusData(${index})" style="background:#d32f2f; color:white; border:none; padding:5px 10px; cursor:pointer;">Hapus</button></td>
-                </tr>`;
-            });
-            tabel.innerHTML = html;
-        }
-
-        // Fungsi Hapus
-        window.hapusData = function(index) {
-            if(confirm("Yakin ingin menghapus data ini?")) {
-                dataKendaraan.splice(index, 1);
-                localStorage.setItem("dataKendaraan", JSON.stringify(dataKendaraan));
-                render();
-            }
-        };
-
-        // Simpan data
-        window.simpan = function(){
-            let nama = document.getElementById("namaPelanggan").value.trim();
-            let stnk = document.getElementById("stnk").value.trim();
-            let plat = document.getElementById("noPlat").value.trim();
-            let rangka = document.getElementById("noRangka").value.trim();
-            let mesin = document.getElementById("noMesin").value.trim();
-            let merk = document.getElementById("merk").value.trim();
-            let jenis = document.getElementById("jenis").value;
-
-            if(!nama || !stnk || !plat || !rangka || !mesin || !merk || !jenis) {
-                alert("Harap isi semua kolom!");
-                return;
-            }
-
-            dataKendaraan.push({namaPelanggan: nama, stnk: stnk, noPlat: plat, noRangka: rangka, noMesin: mesin, merk: merk, jenis: jenis});
-            localStorage.setItem("dataKendaraan", JSON.stringify(dataKendaraan));
-            
-            // Bersihkan input
-            document.getElementById("namaPelanggan").value = "";
-            document.getElementById("stnk").value = "";
-            document.getElementById("noPlat").value = "";
-            document.getElementById("noRangka").value = "";
-            document.getElementById("noMesin").value = "";
+            // Reset input
+            document.getElementById("nopol").value = "";
             document.getElementById("merk").value = "";
-            document.getElementById("jenis").value = "";
-            document.getElementById("infoPencarian").innerText = "";
-            
-            render();
-            alert("Data tersimpan");
-        };
+            tampilkanKendaraan();
+        } else {
+            alert("Harap isi semua kolom dan pilih pelanggan!");
+        }
+    }
 
-        // Inisialisasi awal
-        inisialisasiDatalist();
-        render();
-    });
+    function hapusKendaraan(index) {
+        let kendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
+        kendaraan.splice(index, 1);
+        localStorage.setItem("dataKendaraan", JSON.stringify(kendaraan));
+        tampilkanKendaraan();
+    }
+
+    loadPelangganOptions();
+    tampilkanKendaraan();
 </script>
+
+</body>
+</html>
