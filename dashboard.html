@@ -16,15 +16,48 @@
         .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 15px; }
         .btn-menu { padding: 15px; text-align: center; background: #f8f9fa; border: 1px solid #ddd; border-radius: 8px; text-decoration: none; color: #333; font-weight: 600; transition: 0.3s; }
         .btn-menu:hover { background: #e0e0e0; }
+   <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - BIRO JASA STNK ASKARA ZAYYAN</title>
+
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #f4f6f9; padding: 20px; }
+
+        .header-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        /* TAMBAHKAN DI SINI */
+        .logo-dashboard {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            margin-bottom: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+        }
     </style>
 </head>
-<body>
-
-<div class="header-box">
-    <img src="logo-az.jpeg" alt="Logo Askara Zayyan" class="logo-dashboard">
-    <h1>Selamat Datang</h1>
-    <p>BIRO JASA STNK ASKARA ZAYYAN</p>
-</div>
 
 <div class="stats-grid">
     <div class="card"><h3>Total Pelanggan</h3><h2 id="totPelanggan">0</h2></div>
