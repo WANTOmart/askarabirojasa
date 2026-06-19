@@ -5,28 +5,28 @@ function loadData(){
 let pelanggan =
 JSON.parse(localStorage.getItem("dataPelanggan")) || [];
 
-let select =
+let pilih =
 document.getElementById("pilihPelanggan");
 
 
-select.innerHTML =
+pilih.innerHTML =
 '<option value="">-- Pilih Pelanggan --</option>';
 
 
 pelanggan.forEach(p=>{
 
-let option=document.createElement("option");
+let o=document.createElement("option");
 
-option.value=p.nama;
+o.value=p.nama;
 
-option.textContent=p.nama;
+o.textContent=p.nama;
 
-select.appendChild(option);
+pilih.appendChild(o);
 
 });
 
-}
 
+}
 
 
 
@@ -40,31 +40,32 @@ let kendaraan =
 JSON.parse(localStorage.getItem("dataKendaraan")) || [];
 
 
-let select =
+let pilih =
 document.getElementById("pilihKendaraan");
 
 
-select.innerHTML =
+
+pilih.innerHTML =
 '<option value="">-- Pilih Kendaraan --</option>';
+
 
 
 kendaraan.forEach(k=>{
 
 
-if(k.pengurus==nama || k.pemilik==nama){
+if(k.pemilik==nama || k.pengurus==nama){
 
 
-let option=document.createElement("option");
+let o=document.createElement("option");
 
 
-option.value=k.nopol;
+o.value=k.nopol;
 
 
-option.textContent =
-k.nopol+" - "+k.merk;
+o.textContent=k.nopol+" - "+k.merk;
 
 
-select.appendChild(option);
+pilih.appendChild(o);
 
 
 }
@@ -74,6 +75,8 @@ select.appendChild(option);
 
 
 }
+
+
 
 
 
@@ -109,26 +112,23 @@ Number(document.getElementById("dp").value);
 
 if(pelanggan=="" || kendaraan=="" || layanan==""){
 
-alert("Data belum lengkap");
+
+alert("Lengkapi data dulu");
+
 
 return;
+
 
 }
 
 
 
-let total = modal + jasa;
-
-let sisa = total - dp;
-
-
-
-let data =
+let transaksi =
 JSON.parse(localStorage.getItem("dataTransaksi")) || [];
 
 
 
-data.push({
+transaksi.push({
 
 pelanggan:pelanggan,
 
@@ -140,26 +140,31 @@ modal:modal,
 
 jasa:jasa,
 
-total:total,
+total:modal+jasa,
 
 dp:dp,
 
-sisa:sisa,
+sisa:(modal+jasa)-dp
 
-status:"PROSES"
 
 });
 
 
 
+
 localStorage.setItem(
+
 "dataTransaksi",
-JSON.stringify(data)
+
+JSON.stringify(transaksi)
+
 );
 
 
 
-alert("Berhasil disimpan");
+
+alert("Berhasil Disimpan");
+
 
 
 tampilkan();
@@ -174,45 +179,69 @@ tampilkan();
 
 
 
+
+
 function tampilkan(){
 
 
+
 let data =
+
 JSON.parse(localStorage.getItem("dataTransaksi")) || [];
 
 
-let isi="";
+
+let tabel =
+document.getElementById("tabelTransaksi");
+
+
+
+tabel.innerHTML="";
+
 
 
 
 data.forEach((t,i)=>{
 
 
-isi += `
+tabel.innerHTML += `
+
 
 <tr>
 
+
 <td>${t.pelanggan}</td>
+
 
 <td>${t.kendaraan}</td>
 
+
 <td>${t.layanan}</td>
 
-<td>${t.modal.toLocaleString()}</td>
 
-<td>${t.jasa.toLocaleString()}</td>
+<td>Rp ${t.modal.toLocaleString()}</td>
 
-<td>${t.total.toLocaleString()}</td>
 
-<td>${t.dp.toLocaleString()}</td>
+<td>Rp ${t.jasa.toLocaleString()}</td>
 
-<td>${t.sisa.toLocaleString()}</td>
+
+<td>Rp ${t.total.toLocaleString()}</td>
+
+
+<td>Rp ${t.dp.toLocaleString()}</td>
+
+
+<td>Rp ${t.sisa.toLocaleString()}</td>
 
 
 <td>
 
-<button class="btn-print" onclick="cetak(${i})">
+<button class="btn-print"
+
+onclick="cetak(${i})">
+
 Cetak
+
 </button>
 
 
@@ -221,14 +250,12 @@ Cetak
 
 </tr>
 
+
+
 `;
 
 
 });
-
-
-
-document.getElementById("tabelTransaksi").innerHTML = isi;
 
 
 
@@ -241,19 +268,22 @@ document.getElementById("tabelTransaksi").innerHTML = isi;
 
 
 
+
 function cetak(i){
 
 
 let data =
+
 JSON.parse(localStorage.getItem("dataTransaksi"))[i];
 
 
-let w =
-window.open("","","width=400,height=500");
+
+let w = window.open("","","width=400,height=500");
 
 
 
 w.document.write(`
+
 
 <h3 align="center">
 
@@ -285,7 +315,6 @@ DP : Rp ${data.dp.toLocaleString()}<br>
 Sisa : Rp ${data.sisa.toLocaleString()}
 
 
-
 `);
 
 
@@ -295,6 +324,7 @@ w.print();
 
 
 }
+
 
 
 
