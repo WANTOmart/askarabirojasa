@@ -1,272 +1,101 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Transaksi</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Segoe UI, sans-serif; }
+        body { background: #f4f6f9; padding: 20px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+        h2 { margin-bottom: 20px; color: #0d47a1; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 12px; border: none; border-radius: 5px; cursor: pointer; background: #2e7d32; color: white; width: 100%; margin-top: 10px; }
+        .btn-back { background: #546e7a; color: white; padding: 8px 15px; display: inline-block; text-decoration: none; border-radius: 5px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="dashboard.html" class="btn-back">← Kembali</a>
+    <h2>Form Transaksi Baru</h2>
+    
+    <div class="form-group">
+        <label>Pelanggan</label>
+        <select id="pilihPelanggan" onchange="filterKendaraan()">
+            <option value="">-- Pilih Pelanggan --</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Kendaraan (Nopol)</label>
+        <select id="pilihKendaraan">
+            <option value="">-- Pilih Kendaraan --</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Status Berkas</label>
+        <select id="statusBerkas">
+            <option value="PROSES">PROSES</option>
+            <option value="SELESAI">SELESAI</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <input type="number" id="total" placeholder="Total Biaya (Rp)">
+        <input type="number" id="dp" placeholder="DP (Rp)">
+        <input type="number" id="jasa" placeholder="Biaya Jasa (Rp)">
+    </div>
+
+    <button onclick="simpanTransaksi()">Simpan Transaksi</button>
+</div>
+
 <script>
-
-function loadData(){
-
-let pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
-
-let select = document.getElementById("pilihPelanggan");
-
-
-pelanggan.forEach(p=>{
-
-let option=document.createElement("option");
-
-option.value=p.nama;
-
-option.textContent=p.nama;
-
-select.appendChild(option);
-
-});
-
-}
-
-
-
-
-function filterKendaraan(){
-
-let nama=document.getElementById("pilihPelanggan").value;
-
-
-let kendaraan=JSON.parse(localStorage.getItem("dataKendaraan")) || [];
-
-
-let select=document.getElementById("pilihKendaraan");
-
-
-select.innerHTML='<option value="">-- Pilih Kendaraan --</option>';
-
-
-
-kendaraan.forEach(k=>{
-
-
-if(k.pengurus==nama || k.pemilik==nama){
-
-
-let option=document.createElement("option");
-
-
-option.value=k.nopol;
-
-
-option.textContent=k.nopol+" - "+k.merk;
-
-
-select.appendChild(option);
-
-
-}
-
-
-});
-
-
-}
-
-
-
-
-
-
-
-function simpanTransaksi(){
-
-
-let pelanggan=document.getElementById("pilihPelanggan").value;
-
-let kendaraan=document.getElementById("pilihKendaraan").value;
-
-let layanan=document.getElementById("jenisLayanan").value;
-
-
-let modal=Number(document.getElementById("biayaModal").value);
-
-let jasa=Number(document.getElementById("biayaJasa").value);
-
-let dp=Number(document.getElementById("dp").value);
-
-
-
-if(pelanggan=="" || kendaraan=="" || layanan==""){
-
-alert("Data belum lengkap");
-
-return;
-
-}
-
-
-
-let data=JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-
-
-
-data.push({
-
-pelanggan:pelanggan,
-
-kendaraan:kendaraan,
-
-layanan:layanan,
-
-modal:modal,
-
-jasa:jasa,
-
-total:modal+jasa,
-
-dp:dp,
-
-sisa:(modal+jasa)-dp
-
-});
-
-
-
-localStorage.setItem(
-"dataTransaksi",
-JSON.stringify(data)
-);
-
-
-
-alert("Berhasil disimpan");
-
-
-tampilkan();
-
-
-}
-
-
-
-
-
-
-
-
-function tampilkan(){
-
-
-let data=JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-
-
-let isi="";
-
-
-data.forEach((t,i)=>{
-
-
-isi += `
-
-<tr>
-
-<td>${t.pelanggan}</td>
-
-<td>${t.kendaraan}</td>
-
-<td>${t.layanan}</td>
-
-<td>${t.modal.toLocaleString()}</td>
-
-<td>${t.jasa.toLocaleString()}</td>
-
-<td>${t.total.toLocaleString()}</td>
-
-<td>${t.dp.toLocaleString()}</td>
-
-<td>${t.sisa.toLocaleString()}</td>
-
-
-<td>
-
-<button class="btn-print" onclick="cetak(${i})">
-
-Cetak
-
-</button>
-
-</td>
-
-
-</tr>
-
-`;
-
-});
-
-
-document.getElementById("tabelTransaksi").innerHTML=isi;
-
-
-}
-
-
-
-
-
-
-
-
-function cetak(i){
-
-
-let data=JSON.parse(localStorage.getItem("dataTransaksi"))[i];
-
-
-let w=window.open("","","width=400,height=500");
-
-
-w.document.write(`
-
-
-<h3 align="center">
-
-BIRO JASA STNK<br>
-
-ASKARA ZAYYAN
-
-</h3>
-
-
-<hr>
-
-
-Pelanggan : ${data.pelanggan}<br>
-
-Kendaraan : ${data.kendaraan}<br>
-
-Layanan : ${data.layanan}<br><br>
-
-
-Modal : Rp ${data.modal.toLocaleString()}<br>
-
-Jasa : Rp ${data.jasa.toLocaleString()}<br>
-
-Total : Rp ${data.total.toLocaleString()}<br>
-
-DP : Rp ${data.dp.toLocaleString()}<br>
-
-Sisa : Rp ${data.sisa.toLocaleString()}
-
-
-
-`);
-
-
-w.print();
-
-
-}
-
-
-
-
-loadData();
-
-tampilkan();
-
-
+    // Load pelanggan ke dropdown
+    const pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
+    const kendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
+
+    const selPelanggan = document.getElementById("pilihPelanggan");
+    pelanggan.forEach(p => {
+        selPelanggan.innerHTML += `<option value="${p.nama}">${p.nama}</option>`;
+    });
+
+    // Filter kendaraan berdasarkan pelanggan yang dipilih
+    function filterKendaraan() {
+        let nama = document.getElementById("pilihPelanggan").value;
+        let selKendaraan = document.getElementById("pilihKendaraan");
+        selKendaraan.innerHTML = '<option value="">-- Pilih Kendaraan --</option>';
+        
+        kendaraan.filter(k => k.pengurus === nama).forEach(k => {
+            selKendaraan.innerHTML += `<option value="${k.nopol}">${k.nopol} - ${k.merk}</option>`;
+        });
+    }
+
+    function simpanTransaksi() {
+        let pengurus = document.getElementById("pilihPelanggan").value;
+        let nopol = document.getElementById("pilihKendaraan").value;
+        let total = document.getElementById("total").value;
+        let dp = document.getElementById("dp").value;
+        let jasa = document.getElementById("jasa").value;
+        let statusBerkas = document.getElementById("statusBerkas").value;
+        
+        let sisa = total - dp;
+
+        if(pengurus && nopol && total) {
+            let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+            transaksi.push({pengurus, nopol, total, dp, jasa, sisa, statusBerkas, tgl: new Date().toLocaleDateString()});
+            localStorage.setItem("dataTransaksi", JSON.stringify(transaksi));
+            
+            alert("Transaksi berhasil disimpan!");
+            window.location.href = "dashboard.html";
+        } else {
+            alert("Mohon isi data dengan lengkap!");
+        }
+    }
 </script>
+
+</body>
+</html>
