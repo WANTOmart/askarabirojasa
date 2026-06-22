@@ -3,33 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pelunasan Pembayaran</title>
+    <title>Pelunasan Piutang</title>
     <style>
-        * { box-sizing: border-box; font-family: Segoe UI, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Segoe UI, sans-serif; }
         body { background: #f4f6f9; padding: 20px; }
-        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
-        h2 { color: #0d47a1; margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+        h2 { margin-bottom: 20px; color: #0d47a1; }
+        .btn-back { background: #546e7a; color: white; padding: 8px 15px; display: inline-block; text-decoration: none; border-radius: 5px; margin-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
         th { background: #f5f5f5; }
-        .btn-pay { background: #0277bd; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; }
-        .btn-back { background: #546e7a; color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; display: inline-block; margin-bottom: 15px; }
-        .lunas { color: #2e7d32; font-weight: bold; }
+        .btn-lunas { background: #2e7d32; color: white; padding: 6px 12px; border-radius: 4px; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <a href="dashboard.html" class="btn-back">← Kembali ke Dashboard</a>
-    <h2>Data Piutang & Pelunasan</h2>
-
+    <a href="dashboard.html" class="btn-back">← Kembali</a>
+    <h2>Daftar Piutang (Belum Lunas)</h2>
+    
     <table>
         <thead>
             <tr>
                 <th>Pelanggan</th>
-                <th>Kendaraan</th>
-                <th>Total</th>
-                <th>DP</th>
+                <th>Nopol</th>
                 <th>Sisa Piutang</th>
                 <th>Aksi</th>
             </tr>
@@ -44,33 +41,31 @@
         let html = "";
         
         transaksi.forEach((t, index) => {
-            if (t.sisa > 0) {
+            // Hanya tampilkan jika sisa > 0
+            if (Number(t.sisa) > 0) {
                 html += `<tr>
-                    <td>${t.pelanggan}</td>
-                    <td>${t.kendaraan}</td>
-                    <td>Rp ${t.biaya.toLocaleString()}</td>
-                    <td>Rp ${t.dp.toLocaleString()}</td>
-                    <td><strong>Rp ${t.sisa.toLocaleString()}</strong></td>
-                    <td><button class="btn-pay" onclick="lunasi(${index})">Lunasi</button></td>
+                    <td>${t.pengurus}</td>
+                    <td>${t.nopol}</td>
+                    <td>Rp ${Number(t.sisa).toLocaleString("id-ID")}</td>
+                    <td><button class="btn-lunas" onclick="lunasi(${index})">LUNAS</button></td>
                 </tr>`;
             }
         });
         
-        if (html === "") html = "<tr><td colspan='6' style='text-align:center;'>Tidak ada piutang. Semua sudah lunas!</td></tr>";
-        document.getElementById("tabelPelunasan").innerHTML = html;
+        document.getElementById("tabelPelunasan").innerHTML = html || '<tr><td colspan="4" style="text-align:center;">Tidak ada piutang saat ini.</td></tr>';
     }
 
     function lunasi(index) {
-        if(confirm("Apakah Anda yakin ingin melunasi transaksi ini?")) {
-            let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-            
-            // Update DP agar sama dengan biaya (lunas)
-            transaksi[index].dp = transaksi[index].biaya;
+        if(confirm('Ubah status menjadi Lunas?')) {
+            let transaksi = JSON.parse(localStorage.getItem("dataTransaksi"));
+            // Set sisa jadi 0
             transaksi[index].sisa = 0;
+            // Update juga DP agar sama dengan Total (Opsional, agar omzet tetap valid)
+            transaksi[index].dp = transaksi[index].total;
             
             localStorage.setItem("dataTransaksi", JSON.stringify(transaksi));
-            alert("Pembayaran telah dilunasi!");
             tampilkanPiutang();
+            alert("Pembayaran berhasil dilunasi!");
         }
     }
 
