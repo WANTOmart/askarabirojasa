@@ -2,92 +2,46 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Pelunasan Piutang</title>
+    <title>Pelunasan</title>
     <style>
-        body { font-family: Segoe UI, sans-serif; padding: 20px; background: #f4f6f9; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
-        h2 { margin-bottom: 20px; color: #0d47a1; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        th { background: #f5f5f5; }
-        .btn-lunas { background: #2e7d32; color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 4px; }
-        .btn-print { background: #0288d1; color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 4px; }
-        .btn-del { background: #c62828; color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 4px; }
+        * { font-family: Segoe UI, sans-serif; }
+        body { background: #f4f6f9; padding: 20px; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
+        .btn-back-box { display: inline-block; padding: 10px 20px; border: 2px solid #546e7a; border-radius: 8px; color: #546e7a; text-decoration: none; font-weight: bold; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 12px; }
     </style>
 </head>
 <body>
-
 <div class="container">
-    <a href="dashboard.html" style="text-decoration:none; color:#546e7a;">← Kembali</a>
-    <h2>Daftar Piutang (Kekurangan Pembayaran)</h2>
+    <a href="dashboard.html" class="btn-back-box">← Kembali ke Dashboard</a>
+    <h2>Daftar Piutang</h2>
     <table id="tabelPelunasan"></table>
 </div>
 
 <script>
     function tampilkanPiutang() {
         let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-        let html = "<tr><th>Pelanggan</th><th>Total</th><th>DP</th><th>Sisa (Kekurangan)</th><th>Aksi</th></tr>";
-        let adaPiutang = false;
-
+        let html = "<tr><th>Pelanggan</th><th>Sisa</th><th>Aksi</th></tr>";
         tr.forEach((t, i) => {
-            let total = Number(t.total);
-            let dp = Number(t.dp);
-            let sisa = total - dp;
-            
+            let sisa = Number(t.total) - Number(t.dp);
             if (sisa > 0) {
-                adaPiutang = true;
-                html += `<tr>
-                    <td>${t.pengurus}</td>
-                    <td>Rp ${total.toLocaleString('id-ID')}</td>
-                    <td>Rp ${dp.toLocaleString('id-ID')}</td>
-                    <td><b>Rp ${sisa.toLocaleString('id-ID')}</b></td>
-                    <td>
-                        <button class="btn-lunas" onclick="lunasi(${i})">LUNAS</button>
-                        <button class="btn-print" onclick="cetakLunas('${t.pengurus}', ${sisa})">Cetak</button>
-                        <button class="btn-del" onclick="hapusTransaksi(${i})">Hapus</button>
-                    </td>
-                </tr>`;
+                html += `<tr><td>${t.pengurus}</td><td>Rp ${sisa.toLocaleString()}</td>
+                <td><button onclick="lunasi(${i})">LUNAS</button>
+                <button onclick="cetakLunas('${t.pengurus}', ${sisa})">Cetak</button></td></tr>`;
             }
         });
-        document.getElementById("tabelPelunasan").innerHTML = adaPiutang ? html : "<tr><td colspan='5' style='text-align:center;'>Tidak ada piutang saat ini.</td></tr>";
-    }
-
-    function lunasi(i) {
-        if(confirm('Ubah status transaksi ini menjadi Lunas?')) {
-            let tr = JSON.parse(localStorage.getItem("dataTransaksi"));
-            tr[i].dp = tr[i].total; // Update DP menjadi sama dengan total
-            localStorage.setItem("dataTransaksi", JSON.stringify(tr));
-            tampilkanPiutang();
-        }
-    }
-
-    function hapusTransaksi(i) {
-        if(confirm('Hapus data transaksi ini?')) {
-            let tr = JSON.parse(localStorage.getItem("dataTransaksi"));
-            tr.splice(i, 1);
-            localStorage.setItem("dataTransaksi", JSON.stringify(tr));
-            tampilkanPiutang();
-        }
+        document.getElementById("tabelPelunasan").innerHTML = html;
     }
 
     function cetakLunas(nama, sisa) {
         let w = window.open('', '_blank');
-        w.document.write(`
-            <html>
-                <body style="font-family:sans-serif; text-align:center;">
-                    <img src="logo-az.jpeg" style="width:120px;">
-                    <h2>Kwitansi Pelunasan</h2>
-                    <div style="text-align:left; display:inline-block;">
-                        <p>Diterima dari: <b>${nama}</b></p>
-                        <p>Jumlah Pelunasan: <b>Rp ${sisa.toLocaleString('id-ID')}</b></p>
-                        <p>Status: <b>LUNAS</b></p>
-                    </div>
-                    <br><br><br>
-                    <p>Tanda Tangan,</p><br><br>
-                    <p>(BIRO JASA ASKARA ZAYYAN)</p>
-                </body>
-            </html>
-        `);
+        w.document.write(`<html><body style="text-align:center; font-family:sans-serif;">
+            <img src="logo-az.jpeg" style="width:120px;">
+            <h2>Kwitansi Pelunasan</h2>
+            <p>Diterima dari: <b>${nama}</b></p>
+            <p>Jumlah Pelunasan: <b>Rp ${sisa.toLocaleString()}</b></p>
+            <p>Status: <b>LUNAS</b></p></body></html>`);
         w.print();
     }
     tampilkanPiutang();
