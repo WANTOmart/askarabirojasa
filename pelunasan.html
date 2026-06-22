@@ -40,13 +40,53 @@
         localStorage.setItem("dataTransaksi", JSON.stringify(tr));
         tampilkanPiutang();
     }
+function cetakDP(nama, dp) {
+    let w = window.open('', '_blank');
+    w.document.write(`
+        <html>
+            <head>
+                <style>
+                    body { font-family: sans-serif; text-align: center; }
+                    .logo { width: 150px; margin-bottom: 10px; }
+                    .content { text-align: left; display: inline-block; }
+                </style>
+            </head>
+            <body>
+                <img src="logo-az.jpeg" class="logo">
+                <h2>Kwitansi DP</h2>
+                <div class="content">
+                    <p>Diterima dari: <b>${nama}</b></p>
+                    <p>Nominal DP: <b>Rp ${dp.toLocaleString('id-ID')}</b></p>
+                    <p>Status: Pembayaran Awal</p>
+                </div>
+            </body>
+        </html>`);
+    w.print();
+}
 
-    function cetakLunas(nama, sisa) {
-        let w = window.open('', '_blank');
-        w.document.write(`<html><body><h2>Kwitansi Pelunasan</h2><p>Diterima dari: ${nama}</p>
-        <p>Nominal Pelunasan: Rp ${sisa.toLocaleString('id-ID')}</p><p>Status: LUNAS</p></body></html>`);
-        w.print();
-    }
+function cetakLunas(nama, sisa) {
+    let w = window.open('', '_blank');
+    w.document.write(`
+        <html>
+            <head>
+                <style>
+                    body { font-family: sans-serif; text-align: center; }
+                    .logo { width: 150px; margin-bottom: 10px; }
+                    .content { text-align: left; display: inline-block; }
+                </style>
+            </head>
+            <body>
+                <img src="logo-az.jpeg" class="logo">
+                <h2>Kwitansi Pelunasan</h2>
+                <div class="content">
+                    <p>Diterima dari: <b>${nama}</b></p>
+                    <p>Nominal Pelunasan: <b>Rp ${sisa.toLocaleString('id-ID')}</b></p>
+                    <p>Status: <b>LUNAS</b></p>
+                </div>
+            </body>
+        </html>`);
+    w.print();
+}
     tampilkanPiutang();
 </script>
 </body>
