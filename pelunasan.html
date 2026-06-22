@@ -3,24 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <title>Pelunasan</title>
-    <style>body { font-family: sans-serif; padding: 20px; } table { width: 100%; border-collapse: collapse; }</style>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+    </style>
 </head>
 <body>
 <div class="container">
     <a href="dashboard.html">← Kembali</a>
     <h2>Daftar Piutang</h2>
-    <table border="1" id="tabelPelunasan"></table>
+    <table id="tabelPelunasan"></table>
 </div>
 
 <script>
     function tampilkanPiutang() {
         let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-        let html = "<tr><th>Pelanggan</th><th>Sisa</th><th>Aksi</th></tr>";
+        let html = "<tr><th>Pelanggan</th><th>Total</th><th>DP</th><th>Sisa</th><th>Aksi</th></tr>";
         tr.forEach((t, i) => {
-            if (t.sisa > 0) {
-                html += `<tr><td>${t.pengurus}</td><td>Rp ${Number(t.sisa).toLocaleString()}</td>
+            let total = Number(t.total);
+            let dp = Number(t.dp);
+            let sisa = total - dp;
+            if (sisa > 0) {
+                html += `<tr><td>${t.pengurus}</td><td>Rp ${total.toLocaleString('id-ID')}</td>
+                <td>Rp ${dp.toLocaleString('id-ID')}</td><td>Rp ${sisa.toLocaleString('id-ID')}</td>
                 <td><button onclick="lunasi(${i})">LUNAS</button>
-                <button onclick="cetakLunas('${t.pengurus}', ${t.sisa})">Cetak</button></td></tr>`;
+                <button onclick="cetakLunas('${t.pengurus}', ${sisa})">Cetak</button></td></tr>`;
             }
         });
         document.getElementById("tabelPelunasan").innerHTML = html;
@@ -28,14 +36,15 @@
 
     function lunasi(i) {
         let tr = JSON.parse(localStorage.getItem("dataTransaksi"));
-        tr[i].sisa = 0;
+        tr[i].dp = tr[i].total; // DP jadi sama dengan total agar sisa 0
         localStorage.setItem("dataTransaksi", JSON.stringify(tr));
         tampilkanPiutang();
     }
 
-    function cetakLunas(nama, jumlah) {
+    function cetakLunas(nama, sisa) {
         let w = window.open('', '_blank');
-        w.document.write(`<html><body><h2>Kwitansi Pelunasan</h2><p>Diterima dari: ${nama}</p><p>Jumlah: Rp ${jumlah.toLocaleString()}</p></body></html>`);
+        w.document.write(`<html><body><h2>Kwitansi Pelunasan</h2><p>Diterima dari: ${nama}</p>
+        <p>Nominal Pelunasan: Rp ${sisa.toLocaleString('id-ID')}</p><p>Status: LUNAS</p></body></html>`);
         w.print();
     }
     tampilkanPiutang();
