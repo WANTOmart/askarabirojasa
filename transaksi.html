@@ -5,9 +5,10 @@
     <title>Transaksi</title>
     <style>
         body { font-family: sans-serif; padding: 20px; background: #f4f6f9; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 10px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #f5f5f5; }
         .btn-del { background: #c62828; color: white; border: none; padding: 5px 10px; cursor: pointer; }
     </style>
 </head>
@@ -19,25 +20,41 @@
     <select id="pilihKendaraan"><option value="">-- Pilih Kendaraan --</option></select>
     <input type="number" id="total" placeholder="Total Biaya">
     <input type="number" id="dp" placeholder="DP">
-    <button onclick="simpanTransaksi()">Simpan</button>
+    <button onclick="simpanTransaksi()">Simpan Transaksi</button>
     <table id="tabelTransaksi"></table>
 </div>
 
 <script>
+    function tampilkanTabel() {
+        let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+        let html = "<tr><th>Pelanggan</th><th>Nopol</th><th>Total</th><th>DP</th><th>Sisa</th><th>Aksi</th></tr>";
+        tr.forEach((t, i) => {
+            let total = Number(t.total);
+            let dp = Number(t.dp);
+            let sisa = total - dp;
+            html += `<tr><td>${t.pengurus}</td><td>${t.nopol}</td>
+            <td>Rp ${total.toLocaleString('id-ID')}</td><td>Rp ${dp.toLocaleString('id-ID')}</td>
+            <td>Rp ${sisa.toLocaleString('id-ID')}</td>
+            <td><button onclick="cetakDP('${t.pengurus}', ${dp})">Cetak DP</button>
+            <button class="btn-del" onclick="hapusTransaksi(${i})">Hapus</button></td></tr>`;
+        });
+        document.getElementById("tabelTransaksi").innerHTML = html;
+    }
+
     function simpanTransaksi() {
         let p = document.getElementById("pilihPelanggan").value;
         let k = document.getElementById("pilihKendaraan").value;
         let t = document.getElementById("total").value;
         let d = document.getElementById("dp").value;
         let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-        tr.push({pengurus: p, nopol: k, total: t, dp: d, sisa: t-d, statusBerkas: 'PROSES'});
+        tr.push({pengurus: p, nopol: k, total: t, dp: d, statusBerkas: 'PROSES'});
         localStorage.setItem("dataTransaksi", JSON.stringify(tr));
         tampilkanTabel();
     }
 
     function cetakDP(nama, dp) {
         let w = window.open('', '_blank');
-        w.document.write(`<html><body><h2>Kwitansi DP</h2><p>Diterima dari: ${nama}</p><p>Jumlah: Rp ${dp.toLocaleString()}</p></body></html>`);
+        w.document.write(`<html><body><h2>Kwitansi DP</h2><p>Diterima dari: ${nama}</p><p>Nominal DP: Rp ${dp.toLocaleString('id-ID')}</p></body></html>`);
         w.print();
     }
 
@@ -46,17 +63,6 @@
         tr.splice(i, 1);
         localStorage.setItem("dataTransaksi", JSON.stringify(tr));
         tampilkanTabel();
-    }
-
-    function tampilkanTabel() {
-        let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-        let html = "<tr><th>Pelanggan</th><th>Nopol</th><th>DP</th><th>Aksi</th></tr>";
-        tr.forEach((t, i) => {
-            html += `<tr><td>${t.pengurus}</td><td>${t.nopol}</td><td>${t.dp}</td>
-            <td><button onclick="cetakDP('${t.pengurus}', ${t.dp})">Cetak DP</button>
-            <button class="btn-del" onclick="hapusTransaksi(${i})">Hapus</button></td></tr>`;
-        });
-        document.getElementById("tabelTransaksi").innerHTML = html;
     }
     tampilkanTabel();
 </script>
