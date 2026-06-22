@@ -2,131 +2,63 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Input & Daftar Transaksi</title>
+    <title>Transaksi</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Segoe UI, sans-serif; }
-        body { background: #f4f6f9; padding: 20px; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
-        h2 { margin-bottom: 20px; color: #0d47a1; }
-        .form-group { margin-bottom: 15px; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
-        button { padding: 12px; border: none; border-radius: 5px; cursor: pointer; background: #2e7d32; color: white; width: 100%; }
-        .btn-back { background: #546e7a; color: white; padding: 8px 15px; display: inline-block; text-decoration: none; border-radius: 5px; margin-bottom: 15px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 30px; font-size: 14px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background: #f5f5f5; }
-        .btn-del { background: #c62828; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; border: none; }
+        body { font-family: sans-serif; padding: 20px; background: #f4f6f9; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; }
+        .btn-del { background: #c62828; color: white; border: none; padding: 5px 10px; cursor: pointer; }
     </style>
 </head>
 <body>
-
 <div class="container">
-    <a href="dashboard.html" class="btn-back">← Kembali</a>
+    <a href="dashboard.html">← Kembali</a>
     <h2>Transaksi Baru</h2>
-    
-    <div class="form-group">
-        <select id="pilihPelanggan" onchange="filterKendaraan()">
-            <option value="">-- Pilih Pelanggan --</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <select id="pilihKendaraan">
-            <option value="">-- Pilih Kendaraan --</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <input type="number" id="total" placeholder="Total Biaya (Rp)">
-        <input type="number" id="dp" placeholder="DP (Rp)">
-        <input type="number" id="jasa" placeholder="Biaya Jasa (Rp)">
-        <select id="statusBerkas" style="margin-top:10px;">
-            <option value="PROSES">PROSES</option>
-            <option value="SELESAI">SELESAI</option>
-            <option value="DISERAHKAN">DISERAHKAN</option>
-        </select>
-    </div>
-    <button onclick="simpanTransaksi()">Simpan Transaksi</button>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Pengurus</th>
-                <th>Nopol</th>
-                <th>Total</th>
-                <th>Sisa</th>
-                <th>Status</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody id="tabelTransaksi"></tbody>
-    </table>
+    <select id="pilihPelanggan" onchange="filterKendaraan()"><option value="">-- Pilih Pelanggan --</option></select>
+    <select id="pilihKendaraan"><option value="">-- Pilih Kendaraan --</option></select>
+    <input type="number" id="total" placeholder="Total Biaya">
+    <input type="number" id="dp" placeholder="DP">
+    <button onclick="simpanTransaksi()">Simpan</button>
+    <table id="tabelTransaksi"></table>
 </div>
 
 <script>
-    const pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
-    const kendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
-
-    const selPelanggan = document.getElementById("pilihPelanggan");
-    pelanggan.forEach(p => {
-        selPelanggan.innerHTML += `<option value="${p.nama}">${p.nama}</option>`;
-    });
-
-    function filterKendaraan() {
-        let nama = document.getElementById("pilihPelanggan").value;
-        let selKendaraan = document.getElementById("pilihKendaraan");
-        selKendaraan.innerHTML = '<option value="">-- Pilih Kendaraan --</option>';
-        kendaraan.filter(k => k.pengurus === nama).forEach(k => {
-            selKendaraan.innerHTML += `<option value="${k.nopol}">${k.nopol} - ${k.merk}</option>`;
-        });
-    }
-
     function simpanTransaksi() {
-        let pengurus = document.getElementById("pilihPelanggan").value;
-        let nopol = document.getElementById("pilihKendaraan").value;
-        let total = document.getElementById("total").value;
-        let dp = document.getElementById("dp").value;
-        let jasa = document.getElementById("jasa").value;
-        let statusBerkas = document.getElementById("statusBerkas").value;
-        let sisa = total - dp;
-
-        if(pengurus && nopol && total) {
-            let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-            transaksi.push({pengurus, nopol, total, dp, jasa, sisa, statusBerkas});
-            localStorage.setItem("dataTransaksi", JSON.stringify(transaksi));
-            alert("Berhasil disimpan!");
-            tampilkanTabel();
-        } else {
-            alert("Mohon isi data dengan lengkap!");
-        }
+        let p = document.getElementById("pilihPelanggan").value;
+        let k = document.getElementById("pilihKendaraan").value;
+        let t = document.getElementById("total").value;
+        let d = document.getElementById("dp").value;
+        let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+        tr.push({pengurus: p, nopol: k, total: t, dp: d, sisa: t-d, statusBerkas: 'PROSES'});
+        localStorage.setItem("dataTransaksi", JSON.stringify(tr));
+        tampilkanTabel();
     }
 
-    function hapusTransaksi(index) {
-        if(confirm('Hapus transaksi ini?')) {
-            let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-            transaksi.splice(index, 1);
-            localStorage.setItem("dataTransaksi", JSON.stringify(transaksi));
-            tampilkanTabel();
-        }
+    function cetakDP(nama, dp) {
+        let w = window.open('', '_blank');
+        w.document.write(`<html><body><h2>Kwitansi DP</h2><p>Diterima dari: ${nama}</p><p>Jumlah: Rp ${dp.toLocaleString()}</p></body></html>`);
+        w.print();
+    }
+
+    function hapusTransaksi(i) {
+        let tr = JSON.parse(localStorage.getItem("dataTransaksi"));
+        tr.splice(i, 1);
+        localStorage.setItem("dataTransaksi", JSON.stringify(tr));
+        tampilkanTabel();
     }
 
     function tampilkanTabel() {
-        let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-        let html = "";
-        transaksi.forEach((t, index) => {
-            html += `<tr>
-                <td>${t.pengurus}</td>
-                <td>${t.nopol}</td>
-                <td>Rp ${Number(t.total).toLocaleString()}</td>
-                <td>Rp ${Number(t.sisa).toLocaleString()}</td>
-                <td>${t.statusBerkas}</td>
-                <td><button class="btn-del" onclick="hapusTransaksi(${index})">Hapus</button></td>
-            </tr>`;
+        let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+        let html = "<tr><th>Pelanggan</th><th>Nopol</th><th>DP</th><th>Aksi</th></tr>";
+        tr.forEach((t, i) => {
+            html += `<tr><td>${t.pengurus}</td><td>${t.nopol}</td><td>${t.dp}</td>
+            <td><button onclick="cetakDP('${t.pengurus}', ${t.dp})">Cetak DP</button>
+            <button class="btn-del" onclick="hapusTransaksi(${i})">Hapus</button></td></tr>`;
         });
         document.getElementById("tabelTransaksi").innerHTML = html;
     }
-
     tampilkanTabel();
 </script>
-
 </body>
 </html>
