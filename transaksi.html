@@ -16,6 +16,7 @@
         table { width: 100%; border-collapse: collapse; margin-top: 30px; font-size: 14px; }
         th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
         th { background: #f5f5f5; }
+        .btn-del { background: #c62828; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; border: none; }
     </style>
 </head>
 <body>
@@ -41,9 +42,10 @@
         <select id="statusBerkas" style="margin-top:10px;">
             <option value="PROSES">PROSES</option>
             <option value="SELESAI">SELESAI</option>
+            <option value="DISERAHKAN">DISERAHKAN</option>
         </select>
     </div>
-    <button onclick="simpanTransaksi()">Simpan & Tampilkan</button>
+    <button onclick="simpanTransaksi()">Simpan Transaksi</button>
 
     <table>
         <thead>
@@ -53,6 +55,7 @@
                 <th>Total</th>
                 <th>Sisa</th>
                 <th>Status</th>
+                <th>Aksi</th>
             </tr>
         </thead>
         <tbody id="tabelTransaksi"></tbody>
@@ -63,7 +66,6 @@
     const pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
     const kendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
 
-    // Load pelanggan ke dropdown
     const selPelanggan = document.getElementById("pilihPelanggan");
     pelanggan.forEach(p => {
         selPelanggan.innerHTML += `<option value="${p.nama}">${p.nama}</option>`;
@@ -98,22 +100,32 @@
         }
     }
 
+    function hapusTransaksi(index) {
+        if(confirm('Hapus transaksi ini?')) {
+            let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+            transaksi.splice(index, 1);
+            localStorage.setItem("dataTransaksi", JSON.stringify(transaksi));
+            tampilkanTabel();
+        }
+    }
+
     function tampilkanTabel() {
         let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
         let html = "";
-        transaksi.forEach(t => {
+        transaksi.forEach((t, index) => {
             html += `<tr>
                 <td>${t.pengurus}</td>
                 <td>${t.nopol}</td>
                 <td>Rp ${Number(t.total).toLocaleString()}</td>
                 <td>Rp ${Number(t.sisa).toLocaleString()}</td>
                 <td>${t.statusBerkas}</td>
+                <td><button class="btn-del" onclick="hapusTransaksi(${index})">Hapus</button></td>
             </tr>`;
         });
         document.getElementById("tabelTransaksi").innerHTML = html;
     }
 
-    tampilkanTabel(); // Panggil saat halaman dimuat
+    tampilkanTabel();
 </script>
 
 </body>
