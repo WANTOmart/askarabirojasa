@@ -16,31 +16,79 @@
     </style>
 </head>
 <body>
+
 <div class="container">
     <a href="dashboard.html" class="btn-back-box">← Kembali ke Dashboard</a>
     <h2>Daftar Piutang</h2>
-    <table id="tabelPelunasan"></table>
+    <table id="tabelPelunasan">
+        <thead>
+            <tr><th>Pelanggan</th><th>Sisa</th><th>Aksi</th></tr>
+        </thead>
+        <tbody id="bodyPelunasan"></tbody>
+    </table>
 </div>
 
 <script>
+    // FUNGSI UTAMA UNTUK MENAMPILKAN DATA
     function tampilkanPiutang() {
         let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-        let html = "<tr><th>Pelanggan</th><th>Sisa</th><th>Aksi</th></tr>";
+        let html = "";
+        
         tr.forEach((t, i) => {
             let sisa = Number(t.total) - Number(t.dp);
             if (sisa > 0) {
-                html += `<tr><td>${t.pengurus}</td><td>Rp ${sisa.toLocaleString()}</td>
-                <td>
-                    <button class="btn-lunas" onclick="lunasi(${i})">LUNAS</button>
-                    <button class="btn-print" onclick="cetakLunas('${t.pengurus}', ${sisa})">Cetak</button>
-                    <button class="btn-del" onclick="hapusTransaksi(${i})">Hapus</button>
-                </td></tr>`;
+                html += `<tr>
+                    <td>${t.pengurus}</td>
+                    <td>Rp ${sisa.toLocaleString()}</td>
+                    <td>
+                        <button class="btn-lunas" onclick="lunasi(${i})">LUNAS</button>
+                        <button class="btn-print" onclick="cetakLunas('${t.pengurus}', ${sisa})">Cetak</button>
+                        <button class="btn-del" onclick="hapusTransaksi(${i})">Hapus</button>
+                    </td>
+                </tr>`;
             }
         });
-        document.getElementById("tabelPelunasan").innerHTML = html;
+        document.getElementById("bodyPelunasan").innerHTML = html;
     }
-    
-    // ... (fungsi lunasi, hapusTransaksi, dan cetakLunas tetap sama)
+
+    // FUNGSI LUNAS
+    function lunasi(i) {
+        if(confirm('Ubah status transaksi ini menjadi Lunas?')) {
+            let tr = JSON.parse(localStorage.getItem("dataTransaksi"));
+            tr[i].dp = tr[i].total; 
+            localStorage.setItem("dataTransaksi", JSON.stringify(tr));
+            tampilkanPiutang();
+        }
+    }
+
+    // FUNGSI HAPUS
+    function hapusTransaksi(i) {
+        if(confirm('Hapus data transaksi ini?')) {
+            let tr = JSON.parse(localStorage.getItem("dataTransaksi"));
+            tr.splice(i, 1);
+            localStorage.setItem("dataTransaksi", JSON.stringify(tr));
+            tampilkanPiutang();
+        }
+    }
+
+    // FUNGSI CETAK
+    function cetakLunas(nama, sisa) {
+        let w = window.open('', '_blank');
+        w.document.write(`
+            <html><body style="font-family:sans-serif; text-align:center;">
+                <img src="logo-az.jpeg" style="width:120px;">
+                <h2>Kwitansi Pelunasan</h2>
+                <div style="text-align:left; display:inline-block;">
+                    <p>Diterima dari: <b>${nama}</b></p>
+                    <p>Jumlah Pelunasan: <b>Rp ${sisa.toLocaleString()}</b></p>
+                    <p>Status: <b>LUNAS</b></p>
+                </div>
+            </body></html>
+        `);
+        w.document.close(); // Penting agar perintah print berjalan
+        w.print();
+    }
+
     tampilkanPiutang();
 </script>
 </body>
