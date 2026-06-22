@@ -2,90 +2,69 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Penyerahan Berkas</title>
+    <title>Transaksi Baru</title>
     <style>
-        body { font-family: Segoe UI, sans-serif; padding: 20px; background: #f4f6f9; }
+        * { box-sizing: border-box; font-family: Segoe UI, sans-serif; }
+        body { background: #f4f6f9; padding: 20px; }
         .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
         .btn-back-box { display: inline-block; padding: 10px 20px; border: 2px solid #546e7a; border-radius: 8px; color: #546e7a; text-decoration: none; font-weight: bold; margin-bottom: 20px; transition: 0.3s; }
         .btn-back-box:hover { background-color: #546e7a; color: white; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th, td { border: 1px solid #ddd; padding: 10px; }
         th { background: #f5f5f5; }
-        .btn-serah { background: #0288d1; color: white; padding: 8px 12px; border: none; cursor: pointer; border-radius: 4px; }
-        .btn-print { background: #388e3c; color: white; padding: 8px 12px; border: none; cursor: pointer; border-radius: 4px; }
+        .btn-del { background: #c62828; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; }
+        .btn-print { background: #0288d1; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; }
     </style>
 </head>
 <body>
-
 <div class="container">
     <a href="dashboard.html" class="btn-back-box">← Kembali ke Dashboard</a>
-    <h2>Penyerahan Berkas</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Pelanggan</th>
-                <th>Nopol</th>
-                <th>Status</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody id="tabelPenyerahan"></tbody>
-    </table>
+    <h2>Transaksi Baru</h2>
+    <select id="pilihPelanggan" onchange="filterKendaraan()"><option value="">-- Pilih Pelanggan --</option></select>
+    <select id="pilihKendaraan" style="margin:10px 0;"><option value="">-- Pilih Kendaraan --</option></select>
+    <input type="number" id="total" placeholder="Total Biaya" style="width:100%; padding:10px; margin-bottom:10px;">
+    <input type="number" id="dp" placeholder="DP" style="width:100%; padding:10px; margin-bottom:10px;">
+    <button onclick="simpanTransaksi()" style="width:100%; padding:12px; background:#2e7d32; color:white; border:none; cursor:pointer;">Simpan</button>
+    <table id="tabelTransaksi"></table>
 </div>
 
 <script>
-    function tampilkanPenyerahan() {
+    function tampilkanTabel() {
         let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-        let html = "";
-        tr.forEach((t, index) => {
-            html += `<tr>
-                <td>${t.pengurus}</td>
-                <td>${t.nopol}</td>
-                <td>${t.statusBerkas}</td>
-                <td>
-                    <button class="btn-serah" onclick="serahkan(${index})">Serahkan</button>
-                    <button class="btn-print" onclick="cetakTandaTerima('${t.pengurus}', '${t.nopol}')">Cetak Bukti</button>
-                </td>
-            </tr>`;
+        let html = "<tr><th>Pelanggan</th><th>Nopol</th><th>Total</th><th>DP</th><th>Sisa</th><th>Aksi</th></tr>";
+        tr.forEach((t, i) => {
+            let sisa = Number(t.total) - Number(t.dp);
+            html += `<tr><td>${t.pengurus}</td><td>${t.nopol}</td><td>${Number(t.total).toLocaleString()}</td>
+            <td>${Number(t.dp).toLocaleString()}</td><td>${sisa.toLocaleString()}</td>
+            <td><button class="btn-print" onclick="cetakDP('${t.pengurus}', '${t.nopol}', ${t.dp})">Cetak</button>
+            <button class="btn-del" onclick="hapusTransaksi(${i})">Hapus</button></td></tr>`;
         });
-        document.getElementById("tabelPenyerahan").innerHTML = html;
+        document.getElementById("tabelTransaksi").innerHTML = html;
     }
 
-    function serahkan(index) {
-        if(confirm('Ubah status berkas menjadi DISERAHKAN?')) {
-            let tr = JSON.parse(localStorage.getItem("dataTransaksi"));
-            tr[index].statusBerkas = "DISERAHKAN";
-            localStorage.setItem("dataTransaksi", JSON.stringify(tr));
-            tampilkanPenyerahan();
-        }
-    }
-
-    function cetakTandaTerima(nama, nopol) {
+    function cetakDP(nama, nopol, dp) {
         let w = window.open('', '_blank');
-        w.document.write(`
-            <html><body style="font-family:Arial; text-align:center;">
-                <img src="logo-az.jpeg" style="width:150px; margin-bottom:20px;">
-                <h2>TANDA TERIMA BERKAS</h2>
-                <div style="text-align:left; display:inline-block; width: 80%;">
-                    <p>Telah diterima berkas kendaraan:</p>
-                    <p>Nama Pelanggan: <b>${nama}</b></p>
-                    <p>Nomor Polisi: <b>${nopol}</b></p>
-                    <p>Tanggal: ${new Date().toLocaleDateString()}</p>
-                </div>
-                <br><br><br>
-                <table style="width:100%">
-                    <tr><td>Yang Menyerahkan</td><td>Yang Menerima</td></tr>
-                    <tr style="height:100px;">
-                        <td><br>(Biro Jasa Askara Zayyan)</td>
-                        <td><br>(........................)</td>
-                    </tr>
-                </table>
-            </body></html>
-        `);
-        w.document.close();
+        w.document.write(`<html><body style="text-align:center; font-family:sans-serif;">
+            <img src="logo-az.jpeg" style="width:120px;">
+            <h2>Kwitansi DP</h2>
+            <div style="text-align:left; display:inline-block;">
+                <p>Nama: <b>${nama}</b></p><p>Nopol: <b>${nopol}</b></p>
+                <p>Nominal DP: <b>Rp ${Number(dp).toLocaleString()}</b></p>
+            </div></body></html>`);
         w.print();
     }
-    tampilkanPenyerahan();
+    
+    function simpanTransaksi() { /* (Fungsi simpan seperti sebelumnya) */ 
+        let p = document.getElementById("pilihPelanggan").value;
+        let k = document.getElementById("pilihKendaraan").value;
+        let t = document.getElementById("total").value;
+        let d = document.getElementById("dp").value;
+        let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+        tr.push({pengurus: p, nopol: k, total: t, dp: d, statusBerkas: 'PROSES'});
+        localStorage.setItem("dataTransaksi", JSON.stringify(tr));
+        tampilkanTabel();
+    }
+    tampilkanTabel();
 </script>
 </body>
 </html>
