@@ -11,9 +11,8 @@
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
         th { background: #f5f5f5; }
-        .btn-serah { background: #0288d1; color: white; padding: 6px 10px; border: none; cursor: pointer; border-radius: 4px; }
-        .btn-print { background: #388e3c; color: white; padding: 6px 10px; border: none; cursor: pointer; border-radius: 4px; }
-        .btn-del { background: #c62828; color: white; padding: 6px 10px; border: none; cursor: pointer; border-radius: 4px; }
+        .btn-serah { background: #0288d1; color: white; padding: 8px 12px; border: none; cursor: pointer; border-radius: 4px; }
+        .btn-print { background: #388e3c; color: white; padding: 8px 12px; border: none; cursor: pointer; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -36,35 +35,24 @@
 
 <script>
     function tampilkanPenyerahan() {
-        // Mengambil data dari localStorage
-        let dataSimpan = localStorage.getItem("dataTransaksi");
-        let tr = dataSimpan ? JSON.parse(dataSimpan) : [];
-        
+        let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
         let html = "";
-        
-        // Cek jika data ada
-        if (tr.length > 0) {
-            tr.forEach((t, index) => {
-                html += `<tr>
-                    <td>${t.pengurus || '-'}</td>
-                    <td>${t.nopol || '-'}</td>
-                    <td>${t.statusBerkas || 'PROSES'}</td>
-                    <td>
-                        <button class="btn-serah" onclick="serahkan(${index})">Serah</button>
-                        <button class="btn-print" onclick="cetakTandaTerima('${t.pengurus}', '${t.nopol}')">Cetak</button>
-                        <button class="btn-del" onclick="hapusTransaksi(${index})">Hapus</button>
-                    </td>
-                </tr>`;
-            });
-        } else {
-            html = `<tr><td colspan="4" style="text-align:center;">Belum ada data transaksi.</td></tr>`;
-        }
-        
+        tr.forEach((t, index) => {
+            html += `<tr>
+                <td>${t.pengurus}</td>
+                <td>${t.nopol}</td>
+                <td>${t.statusBerkas}</td>
+                <td>
+                    <button class="btn-serah" onclick="serahkan(${index})">Serahkan</button>
+                    <button class="btn-print" onclick="cetakTandaTerima('${t.pengurus}', '${t.nopol}')">Cetak Bukti</button>
+                </td>
+            </tr>`;
+        });
         document.getElementById("tabelPenyerahan").innerHTML = html;
     }
 
     function serahkan(index) {
-        if(confirm('Ubah status menjadi DISERAHKAN?')) {
+        if(confirm('Ubah status berkas menjadi DISERAHKAN?')) {
             let tr = JSON.parse(localStorage.getItem("dataTransaksi"));
             tr[index].statusBerkas = "DISERAHKAN";
             localStorage.setItem("dataTransaksi", JSON.stringify(tr));
@@ -72,39 +60,31 @@
         }
     }
 
-    function hapusTransaksi(index) {
-        if(confirm('Hapus transaksi ini?')) {
-            let tr = JSON.parse(localStorage.getItem("dataTransaksi"));
-            tr.splice(index, 1);
-            localStorage.setItem("dataTransaksi", JSON.stringify(tr));
-            tampilkanPenyerahan();
-        }
-    }
-
     function cetakTandaTerima(nama, nopol) {
-        let namaPengambil = prompt("Masukkan Nama Pengambil Berkas:", nama);
-        if (namaPengambil == null) return; 
-
         let w = window.open('', '_blank');
-        w.document.write(`<html><body style="font-family:Arial; text-align:center;">
-            <img src="logo-az.jpeg" style="width:150px;">
-            <h2>TANDA TERIMA BERKAS</h2>
-            <div style="text-align:left; display:inline-block; width: 80%;">
-                <p>Nama Pelanggan: <b>${nama}</b></p>
-                <p>Nomor Polisi: <b>${nopol}</b></p>
-                <p>Tanggal: ${new Date().toLocaleDateString()}</p>
-            </div>
-            <br><br>
-            <table style="width:100%">
-                <tr><td>Yang Menyerahkan</td><td>Yang Menerima</td></tr>
-                <tr style="height:80px;"><td><br>(Biro Jasa Askara Zayyan)</td><td><br>(<b>${namaPengambil}</b>)</td></tr>
-            </table>
-        </body></html>`);
+        w.document.write(`
+            <html><body style="font-family:Arial; text-align:center;">
+                <img src="logo-az.jpeg" style="width:150px; margin-bottom:20px;">
+                <h2>TANDA TERIMA BERKAS</h2>
+                <div style="text-align:left; display:inline-block; width: 80%;">
+                    <p>Telah diterima berkas kendaraan:</p>
+                    <p>Nama Pelanggan: <b>${nama}</b></p>
+                    <p>Nomor Polisi: <b>${nopol}</b></p>
+                    <p>Tanggal: ${new Date().toLocaleDateString()}</p>
+                </div>
+                <br><br><br>
+                <table style="width:100%">
+                    <tr><td>Yang Menyerahkan</td><td>Yang Menerima</td></tr>
+                    <tr style="height:100px;">
+                        <td><br>(Biro Jasa Askara Zayyan)</td>
+                        <td><br>(........................)</td>
+                    </tr>
+                </table>
+            </body></html>
+        `);
         w.document.close();
         w.print();
     }
-
-    // Panggil fungsi saat halaman dimuat
     tampilkanPenyerahan();
 </script>
 </body>
