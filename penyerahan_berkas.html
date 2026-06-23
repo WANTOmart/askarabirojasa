@@ -1,106 +1,83 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Penyerahan Berkas</title>
-    <style>
-        body { font-family: Segoe UI, sans-serif; padding: 20px; background: #f4f6f9; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
-        .btn-back-box { display: inline-block; padding: 10px 20px; border: 2px solid #546e7a; border-radius: 8px; color: #546e7a; text-decoration: none; font-weight: bold; margin-bottom: 20px; transition: 0.3s; }
-        .btn-back-box:hover { background-color: #546e7a; color: white; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        th { background: #f5f5f5; }
-        .btn-serah { background: #0288d1; color: white; padding: 8px 12px; border: none; cursor: pointer; border-radius: 4px; }
-        .btn-print { background: #388e3c; color: white; padding: 8px 12px; border: none; cursor: pointer; border-radius: 4px; }
-        .btn-del { background: #c62828; color: white; padding: 8px 12px; border: none; cursor: pointer; border-radius: 4px; }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <a href="dashboard.html" class="btn-back-box">← Kembali ke Dashboard</a>
-    <h2>Penyerahan Berkas</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Pelanggan</th>
-                <th>Nopol</th>
-                <th>Status</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody id="tabelPenyerahan"></tbody>
-    </table>
-</div>
-
-<script>
-    function tampilkanPenyerahan() {
-        let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-        let html = "";
-        tr.forEach((t, index) => {
-            html += `<tr>
-                <td>${t.pengurus}</td>
-                <td>${t.nopol}</td>
-                <td>${t.statusBerkas}</td>
-                <td>
-                    <button class="btn-serah" onclick="serahkan(${index})">Serah</button>
-                    <button class="btn-print" onclick="cetakTandaTerima('${t.pengurus}', '${t.nopol}')">Cetak</button>
-                    <button class="btn-del" onclick="hapusTransaksi(${index})">Hapus</button>
-                </td>
-            </tr>`;
-        });
-        document.getElementById("tabelPenyerahan").innerHTML = html;
-    }
-
-    function serahkan(index) {
-        if(confirm('Ubah status menjadi DISERAHKAN?')) {
-            let tr = JSON.parse(localStorage.getItem("dataTransaksi"));
-            tr[index].statusBerkas = "DISERAHKAN";
-            localStorage.setItem("dataTransaksi", JSON.stringify(tr));
-            tampilkanPenyerahan();
-        }
-    }
-
-    function hapusTransaksi(index) {
-        if(confirm('Hapus transaksi ini?')) {
-            let tr = JSON.parse(localStorage.getItem("dataTransaksi"));
-            tr.splice(index, 1);
-            localStorage.setItem("dataTransaksi", JSON.stringify(tr));
-            tampilkanPenyerahan();
-        }
-    }
-
-    function cetakTandaTerima(nama, nopol) {
-        // Prompt untuk mengetik nama pengambil secara manual
+function cetakTandaTerima(nama, nopol, layanan) {
         let namaPengambil = prompt("Masukkan Nama Pengambil Berkas:", nama);
-        if (namaPengambil == null) return; 
+        if (namaPengambil == null || namaPengambil.trim() === "") return; 
 
         let w = window.open('', '_blank');
         w.document.write(`
-            <html><body style="font-family:Arial; text-align:center;">
-                <img src="logo-az.jpeg" style="width:150px; margin-bottom:20px;">
-                <h2>TANDA TERIMA BERKAS</h2>
-                <div style="text-align:left; display:inline-block; width: 80%;">
-                    <p>Telah diterima berkas kendaraan:</p>
-                    <p>Nama Pelanggan: <b>${nama}</b></p>
-                    <p>Nomor Polisi: <b>${nopol}</b></p>
-                    <p>Tanggal: ${new Date().toLocaleDateString()}</p>
+            <html>
+            <head>
+                <title>Tanda Terima Berkas</title>
+                <style>
+                    /* Gaya untuk tampilan cetak */
+                    @media print {
+                        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                    }
+                    .nota-box { 
+                        border: 2px dashed #333; 
+                        padding: 25px; 
+                        max-width: 500px; 
+                        margin: auto; 
+                        text-align: left; 
+                        position: relative; /* Penting untuk posisi logo background */
+                        background: #fff;
+                        overflow: hidden;
+                    }
+                    /* Desain Logo Background (Watermark) */
+                    .bg-logo {
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%) rotate(-15deg); /* Agak miring sedikit biar estetik */
+                        width: 70%; /* Ukuran logo di background */
+                        opacity: 0.08; /* Sangat transparan (8%) supaya tulisan tetap terbaca jelas */
+                        z-index: 0;
+                        pointer-events: none;
+                    }
+                    .konten {
+                        position: relative;
+                        z-index: 1; /* Menaikkan teks di atas logo background */
+                    }
+                </style>
+            </head>
+            <body style="font-family:Arial, sans-serif; text-align:center; padding: 20px;" onload="window.print()">
+                
+                <div class="nota-box">
+                    <img src="logo-az.jpeg" class="bg-logo" alt="Logo BG">
+                    
+                    <div class="konten">
+                        <h2 style="text-align:center; margin-bottom: 5px;">AZ-ZAHRA BIRO JASA</h2>
+                        <p style="text-align:center; font-size:12px; margin-bottom:20px; color:#555;">Bukti Penyerahan Dokumen Kendaraan</p>
+                        <hr style="border: 1px dashed #333;">
+                        
+                        <div style="margin: 15px 0; font-size: 14px; line-height: 1.6;">
+                            <p>Telah diserahkan kembali berkas asli kepada pelanggan dengan rincian berikut:</p>
+                            <p style="margin-left: 10px;">Nama Pelanggan: <b>${nama}</b></p>
+                            <p style="margin-left: 10px;">No. Polisi Kendaraan: <b>${nopol}</b></p>
+                            <p style="margin-left: 10px;">Jenis Layanan: <b>${layanan}</b></p>
+                            <p style="margin-left: 10px;">Tanggal Ambil: ${new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                        </div>
+                        
+                        <hr style="border: 1px dashed #333; margin-top:20px; margin-bottom:30px;">
+                        
+                        <table style="width:100%; font-size: 14px; text-align: center;">
+                            <tr>
+                                <td style="width: 50%;">Yang Menyerahkan,</td>
+                                <td style="width: 50%;">Yang Menerima,</td>
+                            </tr>
+                            <tr style="height:80px;">
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>( AZ-ZAHRA BIRO JASA )</td>
+                                <td>( <b>${namaPengambil}</b> )</td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
-                <br><br>
-                <table style="width:100%">
-                    <tr><td>Yang Menyerahkan</td><td>Yang Menerima</td></tr>
-                    <tr style="height:100px;">
-                        <td><br>(Biro Jasa Askara Zayyan)</td>
-                        <td><br>(<b>${namaPengambil}</b>)</td>
-                    </tr>
-                </table>
-            </body></html>
+                
+            </body>
+            </html>
         `);
         w.document.close();
-        w.print();
     }
-    tampilkanPenyerahan();
-</script>
-</body>
-</html>
