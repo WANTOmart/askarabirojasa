@@ -128,21 +128,15 @@ body{
 <body>
 
 <div class="header-box">
-
     <img src="logo-az.jpeg" alt="Logo Askara Zayyan" class="logo-dashboard">
-
     <h1>ASKARA ZAYYAN</h1>
-
-    <p>BIRO JASA STNK BERMOTOR</p>
-
+    <p>BIRO JASA KENDARAAN BERMOTOR</p>
     <div class="info-bar">
         CEPAT • AMAN • TERPERCAYA
     </div>
-
 </div>
 
 <div class="stats-grid">
-
     <div class="card">
         <h3>Total Pelanggan</h3>
         <h2 id="totPelanggan">0</h2>
@@ -164,7 +158,7 @@ body{
     </div>
 
     <div class="card">
-        <h3>Total DP</h3>
+        <h3>Total Masuk (DP/Lunas)</h3>
         <h2 id="totDp">Rp 0</h2>
     </div>
 
@@ -182,108 +176,78 @@ body{
         <h3>Berkas Selesai</h3>
         <h2 id="berkasSelesai">0</h2>
     </div>
-
 </div>
 
 <div class="menu-box">
-
     <h3>Menu Utama</h3>
-
     <div class="menu-grid">
-
         <a href="pelanggan.html" class="btn-menu">👤 Pelanggan</a>
-
         <a href="kendaraan.html" class="btn-menu">🚗 Kendaraan</a>
-
         <a href="transaksi.html" class="btn-menu">📝 Transaksi</a>
-
         <a href="tracking.html" class="btn-menu">🔍 Tracking</a>
-
         <a href="pelunasan.html" class="btn-menu">💰 Pelunasan</a>
-
         <a href="penyerahan_berkas.html" class="btn-menu">📁 Penyerahan</a>
-
     </div>
-
 </div>
 
 <script>
-
 function angka(value){
     return Number(value) || 0;
 }
 
 function updateDashboard(){
-
-    const pelanggan =
-        JSON.parse(localStorage.getItem("dataPelanggan")) || [];
-
-    const kendaraan =
-        JSON.parse(localStorage.getItem("dataKendaraan")) || [];
-
-    const transaksi =
-        JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-
-    const pengeluaran =
-        JSON.parse(localStorage.getItem("dataPengeluaran")) || [];
+    const pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
+    const kendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
+    const transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+    const pengeluaran = JSON.parse(localStorage.getItem("dataPengeluaran")) || [];
 
     let omzet = 0;
     let dp = 0;
     let piutang = 0;
-    let jasa = 0;
+    let totalJasa = 0;
     let selesai = 0;
 
     transaksi.forEach(t => {
+        // Kalkulasi total biaya yang aman untuk data lama maupun skema data biaya baru
+        let berkas = angka(t.biayaBerkas);
+        let jasa = angka(t.biayaJasa) || angka(t.jasa);
+        let totalBiaya = angka(t.total) || (berkas + jasa);
+        
+        let uangMuka = angka(t.dp);
+        let sisaPiutang = totalBiaya - uangMuka;
 
-        omzet += angka(t.total);
-        dp += angka(t.dp);
-        piutang += angka(t.sisa);
-        jasa += angka(t.jasa);
+        omzet += totalBiaya;
+        dp += uangMuka;
+        
+        // Hanya tambahkan ke piutang jika nilainya di atas 0
+        if (sisaPiutang > 0) {
+            piutang += sisaPiutang;
+        }
+        
+        totalJasa += jasa;
 
-        if(
-            t.statusBerkas === "SELESAI" ||
-            t.statusBerkas === "DISERAHKAN"
-        ){
+        if(t.statusBerkas === "SELESAI" || t.statusBerkas === "DISERAHKAN"){
             selesai++;
         }
-
     });
 
-    const totalKeluar =
-        pengeluaran.reduce(
-            (sum,p) => sum + angka(p.jumlah),
-            0
-        );
+    const totalKeluar = pengeluaran.reduce((sum, p) => sum + angka(p.jumlah), 0);
+    const laba = totalJasa - totalKeluar;
 
-    const laba = jasa - totalKeluar;
-
-    document.getElementById("totPelanggan").innerText =
-        pelanggan.length;
-
-    document.getElementById("totKendaraan").innerText =
-        kendaraan.length;
-
-    document.getElementById("totTransaksi").innerText =
-        transaksi.length;
-
-    document.getElementById("totOmzet").innerText =
-        "Rp " + omzet.toLocaleString("id-ID");
-
-    document.getElementById("totDp").innerText =
-        "Rp " + dp.toLocaleString("id-ID");
-
-    document.getElementById("totPiutang").innerText =
-        "Rp " + piutang.toLocaleString("id-ID");
-
-    document.getElementById("labaBersih").innerText =
-        "Rp " + laba.toLocaleString("id-ID");
-
-    document.getElementById("berkasSelesai").innerText =
-        selesai;
+    // Distribusi nilai ke elemen HTML dashboard
+    document.getElementById("totPelanggan").innerText = pelanggan.length;
+    document.getElementById("totKendaraan").innerText = kendaraan.length;
+    document.getElementById("totTransaksi").innerText = transaksi.length;
+    
+    document.getElementById("totOmzet").innerText = "Rp " + omzet.toLocaleString("id-ID");
+    document.getElementById("totDp").innerText = "Rp " + dp.toLocaleString("id-ID");
+    document.getElementById("totPiutang").innerText = "Rp " + piutang.toLocaleString("id-ID");
+    document.getElementById("labaBersih").innerText = "Rp " + laba.toLocaleString("id-ID");
+    document.getElementById("berkasSelesai").innerText = selesai;
 }
 
+// Jalankan pembaharuan data saat halaman dimuat
 updateDashboard();
-
 </script>
 
 </body>
