@@ -5,18 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Input & Daftar Transaksi</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Segoe UI, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
         body { background: #f4f6f9; padding: 20px; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+        .container { max-width: 950px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
         h2 { margin-bottom: 20px; color: #0d47a1; }
+        .form-container { background: #fcfcfc; padding: 15px; border-radius: 6px; border: 1px solid #eaeaea; margin-bottom: 25px; }
         .form-group { margin-bottom: 15px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
+        .search-group { margin-bottom: 15px; }
         input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
-        button { padding: 10px; border: none; border-radius: 5px; cursor: pointer; background: #2e7d32; color: white; margin-top: 5px; }
-        .btn-del { background: #c62828; }
-        .btn-print { background: #0288d1; }
-        table { width: 100%; border-collapse: collapse; margin-top: 30px; font-size: 14px; }
+        .input-search { border: 2px solid #0d47a1; background: #fff; }
+        button { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; background: #2e7d32; color: white; font-weight: bold; }
+        .btn-add { width: 100%; margin-top: 5px; }
+        .btn-del { background: #c62828; color: white; padding: 5px 8px; border-radius: 4px; }
+        .btn-print { background: #0288d1; color: white; padding: 5px 8px; border-radius: 4px; margin-right: 3px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
         th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background: #f5f5f5; }
+        th { background: #f5f5f5; color: #333; }
+        .badge { padding: 3px 8px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; }
+        .proses { background: #fff3e0; color: #e65100; }
+        .selesai { background: #e8f5e9; color: #2e7d32; }
+        .no-data { text-align: center; color: #888; font-style: italic; }
     </style>
 </head>
 <body>
@@ -25,20 +34,35 @@
     <a href="dashboard.html" style="background:#546e7a; color:white; padding:8px 15px; text-decoration:none; border-radius:5px; display:inline-block; margin-bottom:15px;">← Kembali</a>
     <h2>Transaksi Baru</h2>
     
-    <div class="form-group">
-        <select id="pilihPelanggan" onchange="filterKendaraan()"><option value="">-- Pilih Pelanggan --</option></select>
+    <div class="form-container">
+        <div class="form-group">
+            <select id="pilihPelanggan" onchange="filterKendaraan()">
+                <option value="">-- Pilih Pelanggan --</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <select id="pilihKendaraan">
+                <option value="">-- Pilih Kendaraan --</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <input type="number" id="total" placeholder="Total Biaya (Rp)">
+            <div class="form-row">
+                <input type="number" id="dp" placeholder="DP (Rp) - Boleh dikosongkan">
+                <select id="statusBerkas">
+                    <option value="PROSES">PROSES</option>
+                    <option value="SELESAI">SELESAI</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn-add" onclick="simpanTransaksi()">Simpan Transaksi</button>
     </div>
-    <div class="form-group">
-        <select id="pilihKendaraan"><option value="">-- Pilih Kendaraan --</option></select>
-    </div>
-    <div class="form-group">
-        <input type="number" id="total" placeholder="Total Biaya (Rp)">
-        <input type="number" id="dp" placeholder="DP (Rp)">
-        <select id="statusBerkas" style="margin-top:10px;"><option value="PROSES">PROSES</option><option value="SELESAI">SELESAI</option></select>
-    </div>
-    <button onclick="simpanTransaksi()">Simpan Transaksi</button>
 
-    <table id="tabelTransaksi">
+    <div class="search-group">
+        <input type="text" id="cari" class="input-search" placeholder="🔍 Cari transaksi berdasarkan nama pengurus atau nopol..." onkeyup="tampilkanTabel()">
+    </div>
+
+    <table>
         <thead>
             <tr>
                 <th>Pengurus</th>
@@ -46,7 +70,7 @@
                 <th>Total</th>
                 <th>DP</th>
                 <th>Sisa</th>
-                <th>Status</th>
+                <th>Status Berkas</th>
                 <th>Aksi</th>
             </tr>
         </thead>
@@ -58,37 +82,65 @@
     const pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
     const kendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
 
+    // Mengisi pilihan pelanggan
     const selPelanggan = document.getElementById("pilihPelanggan");
-    pelanggan.forEach(p => selPelanggan.innerHTML += `<option value="${p.nama}">${p.nama}</option>`);
+    pelanggan.forEach(p => {
+        let opt = document.createElement("option");
+        opt.value = p.nama;
+        opt.textContent = p.nama;
+        selPelanggan.appendChild(opt);
+    });
 
+    // Penyaringan plat nomor otomatis berdasarkan pengurus terpilih
     function filterKendaraan() {
         let nama = document.getElementById("pilihPelanggan").value;
         let selKendaraan = document.getElementById("pilihKendaraan");
         selKendaraan.innerHTML = '<option value="">-- Pilih Kendaraan --</option>';
-        kendaraan.filter(k => k.pengurus === nama).forEach(k => selKendaraan.innerHTML += `<option value="${k.nopol}">${k.nopol}</option>`);
+        
+        kendaraan.filter(k => k.pengurus === nama).forEach(k => {
+            let opt = document.createElement("option");
+            opt.value = k.nopol;
+            opt.textContent = k.nopol;
+            selKendaraan.appendChild(opt);
+        });
     }
 
     function simpanTransaksi() {
         let pengurus = document.getElementById("pilihPelanggan").value;
         let nopol = document.getElementById("pilihKendaraan").value;
         let total = document.getElementById("total").value;
-        let dp = document.getElementById("dp").value;
+        let dp = document.getElementById("dp").value || 0; // Jika kosong, set jadi 0
         let statusBerkas = document.getElementById("statusBerkas").value;
         
         if(pengurus && nopol && total) {
             let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-            transaksi.push({pengurus, nopol, total, dp, statusBerkas});
+            transaksi.push({
+                pengurus, 
+                nopol, 
+                total: parseInt(total), 
+                dp: parseInt(dp), 
+                statusBerkas
+            });
             localStorage.setItem("dataTransaksi", JSON.stringify(transaksi));
-            alert("Data tersimpan!");
+            alert("Data transaksi berhasil disimpan!");
+            
+            // Mengosongkan form input kembali
+            document.getElementById("pilihPelanggan").value = "";
+            document.getElementById("pilihKendaraan").innerHTML = '<option value="">-- Pilih Kendaraan --</option>';
+            document.getElementById("total").value = "";
+            document.getElementById("dp").value = "";
+            document.getElementById("statusBerkas").value = "PROSES";
+            document.getElementById("cari").value = "";
+
             tampilkanTabel();
         } else {
-            alert("Isi data dengan lengkap!");
+            alert("Mohon lengkapi Pelanggan, Kendaraan, dan Total Biaya!");
         }
     }
 
     function hapusTransaksi(i) {
-        if(confirm('Hapus transaksi ini?')) {
-            let tr = JSON.parse(localStorage.getItem("dataTransaksi"));
+        if(confirm('Apakah Anda yakin ingin menghapus transaksi ini?')) {
+            let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
             tr.splice(i, 1);
             localStorage.setItem("dataTransaksi", JSON.stringify(tr));
             tampilkanTabel();
@@ -97,38 +149,65 @@
 
     function cetakDP(nama, nopol, dp) {
         let w = window.open('', '_blank');
-        w.document.write(`<html><body style="font-family:sans-serif; text-align:center;">
-            <img src="logo-az.jpeg" style="width:150px;">
-            <h2>Kwitansi DP</h2>
-            <div style="text-align:left; display:inline-block;">
-                <p>Nama: <b>${nama}</b></p>
-                <p>Nopol: <b>${nopol}</b></p>
-                <p>Nominal DP: <b>Rp ${Number(dp).toLocaleString()}</b></p>
-            </div>
-        </body></html>`);
-        w.print();
+        w.document.write(`
+            <html>
+            <head><title>Kwitansi</title></head>
+            <body style="font-family:sans-serif; text-align:center; padding: 20px;" onload="window.print()">
+                <div style="border: 2px dashed #333; padding: 20px; max-width: 400px; margin: auto; text-align: left;">
+                    <h2 style="text-align:center; margin-bottom: 5px;">AZ-ZAHRA BIRO JASA</h2>
+                    <p style="text-align:center; font-size:12px; margin-bottom:20px;">Nota Tanda Terima Titipan (DP)</p>
+                    <hr style="border: 1px dashed #333;">
+                    <p style="margin: 10px 0;">Nama Pengurus: <b>${nama}</b></p>
+                    <p style="margin: 10px 0;">No. Polisi: <b>${nopol}</b></p>
+                    <p style="margin: 10px 0;">Nominal Uang: <b>Rp ${Number(dp).toLocaleString('id-ID')}</b></p>
+                    <hr style="border: 1px dashed #333; margin-top:20px;">
+                    <p style="text-align:center; font-size: 12px; margin-top: 15px;">Simpan resi ini sebagai bukti pengambilan berkas.</p>
+                </div>
+            </body>
+            </html>
+        `);
+        w.document.close();
     }
 
     function tampilkanTabel() {
         let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+        let kataKunci = document.getElementById("cari").value.toLowerCase();
         let html = "";
-        tr.forEach((t, i) => {
-            let sisa = t.total - t.dp;
-            html += `<tr>
-                <td>${t.pengurus}</td><td>${t.nopol}</td>
-                <td>Rp ${Number(t.total).toLocaleString()}</td>
-                <td>Rp ${Number(t.dp).toLocaleString()}</td>
-                <td>Rp ${sisa.toLocaleString()}</td>
-                <td>${t.statusBerkas}</td>
-                <td>
-                    <button class="btn-print" onclick="cetakDP('${t.pengurus}', '${t.nopol}', ${t.dp})">Cetak</button>
-                    <button class="btn-del" onclick="hapusTransaksi(${i})">Hapus</button>
-                </td>
-            </tr>`;
+        
+        let dataDifilter = tr.filter(t => {
+            return t.pengurus.toLowerCase().includes(kataKunci) || t.nopol.toLowerCase().includes(kataKunci);
         });
+
+        if(dataDifilter.length === 0) {
+            html = `<tr><td colspan="7" class="no-data">Data transaksi tidak ditemukan</td></tr>`;
+        } else {
+            tr.forEach((t, i) => {
+                if(t.pengurus.toLowerCase().includes(kataKunci) || t.nopol.toLowerCase().includes(kataKunci)) {
+                    let totalBiaya = Number(t.total) || 0;
+                    let uangMuka = Number(t.dp) || 0;
+                    let sisa = totalBiaya - uangMuka;
+                    
+                    let kelasBadge = t.statusBerkas === "SELESAI" ? "selesai" : "proses";
+
+                    html += `<tr>
+                        <td>${t.pengurus}</td>
+                        <td><strong>${t.nopol}</strong></td>
+                        <td>Rp ${totalBiaya.toLocaleString('id-ID')}</td>
+                        <td>Rp ${uangMuka.toLocaleString('id-ID')}</td>
+                        <td>Rp ${sisa.toLocaleString('id-ID')}</td>
+                        <td><span class="badge ${kelasBadge}">${t.statusBerkas}</span></td>
+                        <td>
+                            <button class="btn-print" onclick="cetakDP('${t.pengurus}', '${t.nopol}', ${uangMuka})">Cetak</button>
+                            <button class="btn-del" onclick="hapusTransaksi(${i})">Hapus</button>
+                        </td>
+                    </tr>`;
+                }
+            });
+        }
         document.getElementById("bodyTabel").innerHTML = html;
     }
 
+    // Pemuatan awal data tabel saat halaman diakses
     tampilkanTabel();
 </script>
 
