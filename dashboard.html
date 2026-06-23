@@ -27,6 +27,26 @@ body{
     margin-bottom:20px;
     box-shadow:0 2px 10px rgba(0,0,0,0.08);
     text-align:center;
+    position: relative;
+}
+
+/* TOMBOL KELUAR */
+.btn-logout {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #c62828;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-logout:hover {
+    background: #b71c1c;
 }
 
 .logo-dashboard{
@@ -56,6 +76,17 @@ body{
     font-weight:bold;
 }
 
+.user-badge {
+    display: inline-block;
+    margin-top: 10px;
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 13px;
+}
+
 /* KARTU STATISTIK */
 .stats-grid{
     display:grid;
@@ -79,6 +110,11 @@ body{
 
 .card h2{
     color:#222;
+}
+
+/* Area khusus data rahasia keuangan admin */
+.admin-only-card {
+    display: block; 
 }
 
 /* MENU */
@@ -121,19 +157,39 @@ body{
     .logo-dashboard{
         width:130px;
     }
+    .btn-logout {
+        position: static;
+        margin-top: 15px;
+        display: inline-block;
+    }
 }
 </style>
 </head>
 
 <body>
 
+<!-- PROTEKSI AKSES LOGIN -->
+<script>
+    // Cek apakah user sudah login atau belum
+    const loginUser = sessionStorage.getItem("loginUser");
+    if (!loginUser) {
+        // Jika belum login, paksa kembali ke halaman login.html
+        window.location.href = "login.html";
+    }
+</script>
+
 <div class="header-box">
+    <!-- Tombol Keluar / Logout -->
+    <button class="btn-logout" onclick="logout()">Logout ✕</button>
+
     <img src="logo-az.jpeg" alt="Logo Askara Zayyan" class="logo-dashboard">
     <h1>ASKARA ZAYYAN</h1>
     <p>BIRO JASA KENDARAAN BERMOTOR</p>
+    
     <div class="info-bar">
         CEPAT • AMAN • TERPERCAYA
     </div>
+    <div class="user-badge" id="namaUser">Login Sebagai: Admin</div>
 </div>
 
 <div class="stats-grid">
@@ -152,22 +208,23 @@ body{
         <h2 id="totTransaksi">0</h2>
     </div>
 
-    <div class="card">
+    <!-- DATA KEUANGAN SENSITIF (BISA OTOMATIS TERSEMBUNYI JIKA PEGAWAI LOGIN) -->
+    <div class="card admin-only-card">
         <h3>Total Omzet</h3>
         <h2 id="totOmzet">Rp 0</h2>
     </div>
 
-    <div class="card">
+    <div class="card admin-only-card">
         <h3>Total Masuk (DP/Lunas)</h3>
         <h2 id="totDp">Rp 0</h2>
     </div>
 
-    <div class="card">
+    <div class="card admin-only-card">
         <h3>Total Piutang</h3>
         <h2 id="totPiutang">Rp 0</h2>
     </div>
 
-    <div class="card">
+    <div class="card admin-only-card">
         <h3>Laba Bersih</h3>
         <h2 id="labaBersih">Rp 0</h2>
     </div>
@@ -196,6 +253,16 @@ function angka(value){
 }
 
 function updateDashboard(){
+    // Menampilkan nama role di header
+    const roleUser = sessionStorage.getItem("loginUser") || "Admin";
+    document.getElementById("namaUser").innerText = "Login Sebagai: " + roleUser.toUpperCase();
+
+    // JIKA YANG LOGIN ADALAH PEGAWAI, SEMBUNYIKAN KARTU KEUANGAN
+    if(roleUser.toLowerCase() === "pegawai") {
+        const adminCards = document.querySelectorAll(".admin-only-card");
+        adminCards.forEach(card => card.style.display = "none");
+    }
+
     const pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
     const kendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
     const transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
@@ -208,7 +275,6 @@ function updateDashboard(){
     let selesai = 0;
 
     transaksi.forEach(t => {
-        // Kalkulasi total biaya yang aman untuk data lama maupun skema data biaya baru
         let berkas = angka(t.biayaBerkas);
         let jasa = angka(t.biayaJasa) || angka(t.jasa);
         let totalBiaya = angka(t.total) || (berkas + jasa);
@@ -219,7 +285,6 @@ function updateDashboard(){
         omzet += totalBiaya;
         dp += uangMuka;
         
-        // Hanya tambahkan ke piutang jika nilainya di atas 0
         if (sisaPiutang > 0) {
             piutang += sisaPiutang;
         }
@@ -234,7 +299,6 @@ function updateDashboard(){
     const totalKeluar = pengeluaran.reduce((sum, p) => sum + angka(p.jumlah), 0);
     const laba = totalJasa - totalKeluar;
 
-    // Distribusi nilai ke elemen HTML dashboard
     document.getElementById("totPelanggan").innerText = pelanggan.length;
     document.getElementById("totKendaraan").innerText = kendaraan.length;
     document.getElementById("totTransaksi").innerText = transaksi.length;
@@ -244,6 +308,14 @@ function updateDashboard(){
     document.getElementById("totPiutang").innerText = "Rp " + piutang.toLocaleString("id-ID");
     document.getElementById("labaBersih").innerText = "Rp " + laba.toLocaleString("id-ID");
     document.getElementById("berkasSelesai").innerText = selesai;
+}
+
+// FUNGSI LOGOUT (KELUAR)
+function logout() {
+    if(confirm("Apakah Anda yakin ingin keluar dari sistem?")) {
+        sessionStorage.removeItem("loginUser"); // Hapus sesi login
+        window.location.href = "login.html"; // Alihkan ke login
+    }
 }
 
 // Jalankan pembaharuan data saat halaman dimuat
