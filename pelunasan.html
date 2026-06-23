@@ -4,91 +4,133 @@
     <meta charset="UTF-8">
     <title>Pelunasan Piutang</title>
     <style>
-        body { font-family: Segoe UI, sans-serif; padding: 20px; background: #f4f6f9; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+        body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #f4f6f9; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
         .btn-back-box { display: inline-block; padding: 10px 20px; border: 2px solid #546e7a; border-radius: 8px; color: #546e7a; text-decoration: none; font-weight: bold; margin-bottom: 20px; }
         .btn-back-box:hover { background-color: #546e7a; color: white; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 12px; }
-        .btn-lunas { background-color: #2e7d32; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
-        .btn-print { background-color: #0288d1; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
-        .btn-del { background-color: #c62828; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: #f5f5f5; color: #333; }
+        .btn-lunas { background-color: #2e7d32; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-print { background-color: #0288d1; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-left: 3px; }
+        .btn-del { background-color: #c62828; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-left: 3px; }
+        .no-data { text-align: center; color: #888; font-style: italic; }
+        .text-piutang { color: #c62828; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <a href="dashboard.html" class="btn-back-box">← Kembali ke Dashboard</a>
-    <h2>Daftar Piutang</h2>
+    <h2>Daftar Piutang Pelanggan</h2>
     <table id="tabelPelunasan">
         <thead>
-            <tr><th>Pelanggan</th><th>Sisa</th><th>Aksi</th></tr>
+            <tr>
+                <th>Pelanggan</th>
+                <th>Nopol</th>
+                <th>Layanan</th>
+                <th>Total Biaya</th>
+                <th>Sisa Piutang</th>
+                <th>Aksi</th>
+            </tr>
         </thead>
         <tbody id="bodyPelunasan"></tbody>
     </table>
 </div>
 
 <script>
-    // FUNGSI UTAMA UNTUK MENAMPILKAN DATA
+    // FUNGSI UTAMA UNTUK MENAMPILKAN DATA PIUTANG
     function tampilkanPiutang() {
         let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
         let html = "";
+        let adaPiutang = false;
         
         tr.forEach((t, i) => {
-            let sisa = Number(t.total) - Number(t.dp);
+            // Kalkulasi total yang kompatibel dengan data lama maupun data baru (Biaya Berkas + Jasa)
+            let berkas = Number(t.biayaBerkas) || 0;
+            let jasa = Number(t.biayaJasa) || 0;
+            let totalBiaya = Number(t.total) || (berkas + jasa);
+            
+            let uangMuka = Number(t.dp) || 0;
+            let sisa = totalBiaya - uangMuka;
+            
             if (sisa > 0) {
+                adaPiutang = true;
+                let namaLayanan = t.layanan || "-";
                 html += `<tr>
                     <td>${t.pengurus}</td>
-                    <td>Rp ${sisa.toLocaleString()}</td>
+                    <td><strong>${t.nopol}</strong></td>
+                    <td><small>${namaLayanan}</small></td>
+                    <td>Rp ${totalBiaya.toLocaleString('id-ID')}</td>
+                    <td class="text-piutang">Rp ${sisa.toLocaleString('id-ID')}</td>
                     <td>
                         <button class="btn-lunas" onclick="lunasi(${i})">LUNAS</button>
-                        <button class="btn-print" onclick="cetakLunas('${t.pengurus}', ${sisa})">Cetak</button>
+                        <button class="btn-print" onclick="cetakLunas('${t.pengurus}', '${t.nopol}', '${namaLayanan}', ${sisa})">Cetak</button>
                         <button class="btn-del" onclick="hapusTransaksi(${i})">Hapus</button>
                     </td>
                 </tr>`;
             }
         });
+        
+        if (!adaPiutang) {
+            html = `<tr><td colspan="6" class="no-data">Hebat! Tidak ada piutang tersisa atau semua transaksi sudah lunas.</td></tr>`;
+        }
+        
         document.getElementById("bodyPelunasan").innerHTML = html;
     }
 
-    // FUNGSI LUNAS
+    // FUNGSI LUNAS (DP disamakan dengan Total Biaya)
     function lunasi(i) {
-        if(confirm('Ubah status transaksi ini menjadi Lunas?')) {
-            let tr = JSON.parse(localStorage.getItem("dataTransaksi"));
-            tr[i].dp = tr[i].total; 
-            localStorage.setItem("dataTransaksi", JSON.stringify(tr));
-            tampilkanPiutang();
+        if(confirm('Apakah Anda yakin ingin mengubah status transaksi ini menjadi LUNAS?')) {
+            let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+            if(tr[i]) {
+                let berkas = Number(tr[i].biayaBerkas) || 0;
+                let jasa = Number(tr[i].biayaJasa) || 0;
+                let totalBiaya = Number(tr[i].total) || (berkas + jasa);
+                
+                tr[i].dp = totalBiaya; // Set nilai DP penuh sebesar total tagihan
+                localStorage.setItem("dataTransaksi", JSON.stringify(tr));
+                tampilkanPiutang();
+            }
         }
     }
 
-    // FUNGSI HAPUS
+    // FUNGSI HAPUS DATA
     function hapusTransaksi(i) {
-        if(confirm('Hapus data transaksi ini?')) {
-            let tr = JSON.parse(localStorage.getItem("dataTransaksi"));
+        if(confirm('Apakah Anda yakin ingin menghapus data piutang/transaksi ini?')) {
+            let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
             tr.splice(i, 1);
             localStorage.setItem("dataTransaksi", JSON.stringify(tr));
             tampilkanPiutang();
         }
     }
 
-    // FUNGSI CETAK
-    function cetakLunas(nama, sisa) {
+    // FUNGSI CETAK NOTA PELUNASAN
+    function cetakLunas(nama, nopol, layanan, sisa) {
         let w = window.open('', '_blank');
         w.document.write(`
-            <html><body style="font-family:sans-serif; text-align:center;">
-                <img src="logo-az.jpeg" style="width:120px;">
-                <h2>Kwitansi Pelunasan</h2>
-                <div style="text-align:left; display:inline-block;">
-                    <p>Diterima dari: <b>${nama}</b></p>
-                    <p>Jumlah Pelunasan: <b>Rp ${sisa.toLocaleString()}</b></p>
-                    <p>Status: <b>LUNAS</b></p>
+            <html>
+            <head><title>Kwitansi Pelunasan</title></head>
+            <body style="font-family:sans-serif; text-align:center; padding: 20px;" onload="window.print()">
+                <div style="border: 2px dashed #333; padding: 20px; max-width: 400px; margin: auto; text-align: left;">
+                    <h2 style="text-align:center; margin-bottom: 5px;">AZ-ZAHRA BIRO JASA</h2>
+                    <p style="text-align:center; font-size:12px; margin-bottom:20px;">Tanda Terima Pelunasan Sisa Pembayaran</p>
+                    <hr style="border: 1px dashed #333;">
+                    <p style="margin: 10px 0;">Telah Diterima Dari: <b>${nama}</b></p>
+                    <p style="margin: 10px 0;">No. Polisi Kendaraan: <b>${nopol}</b></p>
+                    <p style="margin: 10px 0;">Jenis Layanan: <b>${layanan}</b></p>
+                    <p style="margin: 10px 0;">Jumlah Pelunasan: <b>Rp ${Number(sisa).toLocaleString('id-ID')}</b></p>
+                    <hr style="border: 1px dashed #333; margin-top:20px;">
+                    <h3 style="text-align:center; color:#2e7d32; letter-spacing: 2px;">STATUS: LUNAS</h3>
+                    <p style="text-align:center; font-size: 11px; margin-top: 15px; color:#555;">Terima kasih atas kepercayaan Anda menggunakan layanan kami.</p>
                 </div>
-            </body></html>
+            </body>
+            </html>
         `);
-        w.document.close(); // Penting agar perintah print berjalan
-        w.print();
+        w.document.close();
     }
 
+    // Load data di awal
     tampilkanPiutang();
 </script>
 </body>
