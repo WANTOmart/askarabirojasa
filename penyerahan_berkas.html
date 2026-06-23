@@ -58,21 +58,32 @@
             
             let statusBadge = "";
             let kolomInput = "";
-            let tombolSerah = "";
+            let kolomAksi = ""; // Variabel baru untuk menampung tombol dinamis
 
-            // Atur tampilan berdasarkan status berkas (SELESAI, PROSES, atau DISERAHKAN)
+            // JIKA STATUS DISERAHKAN (TOMBOL HAPUS DIHILANGKAN)
             if (t.statusBerkas === "DISERAHKAN") {
                 statusBadge = `<span class="badge-delivered">DISERAHKAN</span>`;
                 kolomInput = `<input type="text" class="input-pengambil" id="pengambil-${index}" value="${pengambilLama}" disabled>`;
-                tombolSerah = `<span style="color:#455a64; font-weight:bold; font-size:13px; margin-right:5px;">✓ Selesai</span>`;
+                
+                // Hanya menampilkan teks Selesai dan tombol Cetak saja
+                kolomAksi = `
+                    <span style="color:#455a64; font-weight:bold; font-size:13px; margin-right:5px;">✓ Selesai</span>
+                    <button class="btn-print" onclick="prosesCetak(${index})">Cetak</button>
+                `;
             } else {
+                // JIKA BELUM DISERAHKAN (PROSES / SELESAI)
                 let labelStatus = t.statusBerkas || "PROSES";
-                // Perbaikan klasifikasi warna badge di sini
                 let kelasStatus = labelStatus === "SELESAI" ? "badge-ready" : "badge-process";
                 
                 statusBadge = `<span class="${kelasStatus}">${labelStatus}</span>`;
                 kolomInput = `<input type="text" class="input-pengambil" id="pengambil-${index}" placeholder="Ketik nama pengambil..." value="${pengambilLama}">`;
-                tombolSerah = `<button class="btn-serah" onclick="serahkan(${index})">Serah</button>`;
+                
+                // Menampilkan tombol Serah, Cetak, dan Hapus
+                kolomAksi = `
+                    <button class="btn-serah" onclick="serahkan(${index})">Serah</button>
+                    <button class="btn-print" onclick="prosesCetak(${index})">Cetak</button>
+                    <button class="btn-del" onclick="hapusTransaksi(${index})">Hapus</button>
+                `;
             }
 
             html += `<tr>
@@ -81,11 +92,7 @@
                 <td><small>${namaLayanan}</small></td>
                 <td>${statusBadge}</td>
                 <td>${kolomInput}</td>
-                <td>
-                    ${tombolSerah}
-                    <button class="btn-print" onclick="prosesCetak(${index})">Cetak</button>
-                    <button class="btn-del" onclick="hapusTransaksi(${index})">Hapus</button>
-                </td>
+                <td>${kolomAksi}</td>
             </tr>`;
         });
 
@@ -176,7 +183,6 @@
                         position: relative;
                         z-index: 1;
                     }
-                    /* Pencegahan style border tabel warisan halaman utama */
                     .nota-table { width:100%; font-size: 14px; text-align: center; border-collapse: collapse; margin-top: 10px; }
                     .nota-table td { border: none; padding: 5px; text-align: center; }
                 </style>
