@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -168,18 +167,15 @@ body{
 
 <body>
 
-<!-- PROTEKSI AKSES LOGIN -->
 <script>
-    // Cek apakah user sudah login atau belum
+    // Cek status login
     const loginUser = sessionStorage.getItem("loginUser");
     if (!loginUser) {
-        // Jika belum login, paksa kembali ke halaman login.html
         window.location.href = "login.html";
     }
 </script>
 
 <div class="header-box">
-    <!-- Tombol Keluar / Logout -->
     <button class="btn-logout" onclick="logout()">Logout ✕</button>
 
     <img src="logo-az.jpeg" alt="Logo Askara Zayyan" class="logo-dashboard">
@@ -208,7 +204,6 @@ body{
         <h2 id="totTransaksi">0</h2>
     </div>
 
-    <!-- DATA KEUANGAN SENSITIF (BISA OTOMATIS TERSEMBUNYI JIKA PEGAWAI LOGIN) -->
     <div class="card admin-only-card">
         <h3>Total Omzet</h3>
         <h2 id="totOmzet">Rp 0</h2>
@@ -242,7 +237,7 @@ body{
         <a href="kendaraan.html" class="btn-menu">🚗 Kendaraan</a>
         <a href="transaksi.html" class="btn-menu">📝 Transaksi</a>
         <a href="tracking.html" class="btn-menu">🔍 Tracking</a>
-        <a href="pelunasan.html" class="btn-menu">💰 Pelunasan</a>
+        <a href="pelunasan.html" class="btn-menu" id="menuPelunasan">💰 Pelunasan</a>
         <a href="penyerahan_berkas.html" class="btn-menu">📁 Penyerahan</a>
     </div>
 </div>
@@ -253,14 +248,16 @@ function angka(value){
 }
 
 function updateDashboard(){
-    // Menampilkan nama role di header
-    const roleUser = sessionStorage.getItem("loginUser") || "Admin";
+    const roleUser = sessionStorage.getItem("loginUser") || "admin";
     document.getElementById("namaUser").innerText = "Login Sebagai: " + roleUser.toUpperCase();
 
-    // JIKA YANG LOGIN ADALAH PEGAWAI, SEMBUNYIKAN KARTU KEUANGAN
+    // JIKA YANG LOGIN ADALAH PEGAWAI, SEMBUNYIKAN KARTU KEUANGAN & MENU KASIR
     if(roleUser.toLowerCase() === "pegawai") {
         const adminCards = document.querySelectorAll(".admin-only-card");
         adminCards.forEach(card => card.style.display = "none");
+        
+        const menuPelunasan = document.getElementById("menuPelunasan");
+        if(menuPelunasan) menuPelunasan.style.display = "none";
     }
 
     const pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
@@ -310,15 +307,13 @@ function updateDashboard(){
     document.getElementById("berkasSelesai").innerText = selesai;
 }
 
-// FUNGSI LOGOUT (KELUAR)
 function logout() {
     if(confirm("Apakah Anda yakin ingin keluar dari sistem?")) {
-        sessionStorage.removeItem("loginUser"); // Hapus sesi login
-        window.location.href = "login.html"; // Alihkan ke login
+        sessionStorage.clear(); // Bersihkan semua sesi
+        window.location.href = "login.html";
     }
 }
 
-// Jalankan pembaharuan data saat halaman dimuat
 updateDashboard();
 </script>
 
