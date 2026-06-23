@@ -98,17 +98,22 @@
     const pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
     const kendaraan = JSON.parse(localStorage.getItem("dataKendaraan")) || [];
 
-    // Mengisi pilihan pelanggan
+    function proteksiPegawai() {
+        const roleUser = sessionStorage.getItem("loginUser") || "admin";
+        if (roleUser.toLowerCase() === "pegawai") {
+            document.querySelectorAll(".btn-del").forEach(btn => btn.style.display = "none");
+        }
+    }
+
     const selPelanggan = document.getElementById("pilihPelanggan");
     const pelangganTerurut = pelanggan.sort((a, b) => a.nama.localeCompare(b.nama));
-    pelanggaTerurut = pelangganTerurut.forEach(p => {
+    pelangganTerurut.forEach(p => {
         let opt = document.createElement("option");
         opt.value = p.nama;
         opt.textContent = p.nama;
         selPelanggan.appendChild(opt);
     });
 
-    // Penyaringan plat nomor otomatis
     function filterKendaraan() {
         let nama = document.getElementById("pilihPelanggan").value;
         let selKendaraan = document.getElementById("pilihKendaraan");
@@ -148,7 +153,6 @@
             localStorage.setItem("dataTransaksi", JSON.stringify(transaksi));
             alert("Data transaksi berhasil disimpan!");
             
-            // Mengosongkan form input kembali
             document.getElementById("pilihPelanggan").value = "";
             document.getElementById("pilihKendaraan").innerHTML = '<option value="">-- Pilih Kendaraan --</option>';
             document.getElementById("jenisLayanan").value = "";
@@ -165,6 +169,12 @@
     }
 
     function hapusTransaksi(i) {
+        const roleUser = sessionStorage.getItem("loginUser") || "admin";
+        if (roleUser.toLowerCase() === "pegawai") {
+            alert("Akses Ditolak! Pegawai tidak diizinkan menghapus transaksi.");
+            return;
+        }
+
         if(confirm('Apakah Anda yakin ingin menghapus transaksi ini?')) {
             let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
             tr.splice(i, 1);
@@ -183,77 +193,43 @@
     }
 
     function cetakDP(nama, nopol, layanan, dp) {
-    if (parseInt(dp) <= 0) {
-        alert("Tidak ada nominal titipan uang (DP) pada transaksi ini untuk dicetak.");
-        return;
-    }
+        if (parseInt(dp) <= 0) {
+            alert("Tidak ada nominal titipan uang (DP) pada transaksi ini untuk dicetak.");
+            return;
+        }
 
-    let w = window.open('', '_blank');
-    w.document.write(`
-        <html>
-        <head>
-            <title>Kwitansi</title>
-            <style>
-                /* Memastikan warna background ikut tercetak di browser */
-                @media print {
-                    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                }
-                .kwitansi-box { 
-                    border: 2px dashed #333; 
-                    padding: 20px; 
-                    max-width: 400px; 
-                    margin: auto; 
-                    text-align: left; 
-                    position: relative; /* Menjadi acuan posisi logo watermark */
-                    background: #fff;
-                    overflow: hidden;
-                }
-                /* Desain Logo Transparan di Tengah */
-                .bg-logo-watermark {
-                    position: absolute;
-                    top: 55%;
-                    left: 50%;
-                    transform: translate(-50%, -50%) rotate(-15deg); /* Dimiringkan 15 derajat agar estetik */
-                    width: 75%; /* Ukuran logo di background */
-                    opacity: 0.08; /* Transparansi 8% (sangat tipis agar tulisan utama tetap jelas) */
-                    z-index: 0;
-                    pointer-events: none;
-                }
-                .konten-kwitansi {
-                    position: relative;
-                    z-index: 1; /* Mengangkat teks agar berada di depan logo */
-                }
-            </style>
-        </head>
-        <body style="font-family:sans-serif; text-align:center; padding: 20px;" onload="window.print()">
-            
-            <div class="kwitansi-box">
-                <img src="logo-az.jpeg" class="bg-logo-watermark" alt="Logo Watermark">
-                
-                <div class="konten-kwitansi">
-                    <h3 style="text-align:center; margin-bottom: 5px; font-size: 16px; line-height: 1.3;">
-                        ASKARA ZAYYAN BIRO JASA KENDARAAN BERMOTOR
-                    </h3>
-                    <p style="text-align:center; font-size:12px; margin-bottom:20px; color: #555;">Nota Tanda Terima Titipan (DP)</p>
-                    <hr style="border: 1px dashed #333;">
-                    
-                    <p style="margin: 12px 0; font-size: 14px;">Nama Pengurus: <b>${nama}</b></p>
-                    <p style="margin: 12px 0; font-size: 14px;">No. Polisi: <b>${nopol}</b></p>
-                    <p style="margin: 12px 0; font-size: 14px;">Jenis Layanan: <b>${layanan}</b></p>
-                    <p style="margin: 12px 0; font-size: 14px;">Nominal Uang: <b>Rp ${Number(dp).toLocaleString('id-ID')}</b></p>
-                    
-                    <hr style="border: 1px dashed #333; margin-top:20px;">
-                    <p style="text-align:center; font-size: 11px; margin-top: 15px; color: #444; font-style: italic;">
-                        Simpan resi ini sebagai bukti pengambilan berkas.
-                    </p>
+        let w = window.open('', '_blank');
+        w.document.write(`
+            <html>
+            <head>
+                <title>Kwitansi</title>
+                <style>
+                    @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+                    .kwitansi-box { border: 2px dashed #333; padding: 20px; max-width: 400px; margin: auto; text-align: left; position: relative; background: #fff; overflow: hidden; }
+                    .bg-logo-watermark { position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); width: 75%; opacity: 0.08; z-index: 0; pointer-events: none; }
+                    .konten-kwitansi { position: relative; z-index: 1; }
+                </style>
+            </head>
+            <body style="font-family:sans-serif; text-align:center; padding: 20px;" onload="window.print()">
+                <div class="kwitansi-box">
+                    <img src="logo-az.jpeg" class="bg-logo-watermark" alt="Logo Watermark">
+                    <div class="konten-kwitansi">
+                        <h3 style="text-align:center; margin-bottom: 5px; font-size: 16px; line-height: 1.3;">ASKARA ZAYYAN BIRO JASA KENDARAAN BERMOTOR</h3>
+                        <p style="text-align:center; font-size:12px; margin-bottom:20px; color: #555;">Nota Tanda Terima Titipan (DP)</p>
+                        <hr style="border: 1px dashed #333;">
+                        <p style="margin: 12px 0; font-size: 14px;">Nama Pengurus: <b>${nama}</b></p>
+                        <p style="margin: 12px 0; font-size: 14px;">No. Polisi: <b>${nopol}</b></p>
+                        <p style="margin: 12px 0; font-size: 14px;">Jenis Layanan: <b>${layanan}</b></p>
+                        <p style="margin: 12px 0; font-size: 14px;">Nominal Uang: <b>Rp ${Number(dp).toLocaleString('id-ID')}</b></p>
+                        <hr style="border: 1px dashed #333; margin-top:20px;">
+                        <p style="text-align:center; font-size: 11px; margin-top: 15px; color: #444; font-style: italic;">Simpan resi ini sebagai bukti pengambilan berkas.</p>
+                    </div>
                 </div>
-            </div>
-            
-        </body>
-        </html>
-    `);
-    w.document.close();
-}
+            </body>
+            </html>
+        `);
+        w.document.close();
+    }
 
     function tampilkanTabel() {
         let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
@@ -301,6 +277,7 @@
             });
         }
         document.getElementById("bodyTabel").innerHTML = html;
+        proteksiPegawai();
     }
 
     tampilkanTabel();
