@@ -16,6 +16,8 @@
         .btn-del { background-color: #c62828; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-left: 3px; }
         .no-data { text-align: center; color: #888; font-style: italic; }
         .text-piutang { color: #c62828; font-weight: bold; }
+        .text-lunas { color: #333; font-weight: bold; }
+        .badge-lunas { background-color: #e8f5e9; color: #2e7d32; padding: 6px 10px; border-radius: 4px; font-weight: bold; display: inline-block; }
     </style>
 </head>
 <body>
@@ -43,7 +45,12 @@
     function tampilkanPiutang() {
         let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
         let html = "";
-        let adaPiutang = false;
+        
+        if (tr.length === 0) {
+            html = `<tr><td colspan="6" class="no-data">Belum ada data transaksi pencatatan piutang.</td></tr>`;
+            document.getElementById("bodyPelunasan").innerHTML = html;
+            return;
+        }
         
         tr.forEach((t, i) => {
             // Kalkulasi total yang kompatibel dengan data lama maupun data baru (Biaya Berkas + Jasa)
@@ -54,27 +61,33 @@
             let uangMuka = Number(t.dp) || 0;
             let sisa = totalBiaya - uangMuka;
             
+            let namaLayanan = t.layanan || "-";
+            
+            // Atur gaya teks sisa piutang dan tombol aksi berdasarkan status kelunasan
+            let sisaClass = "";
+            let tombolLunas = "";
+            
             if (sisa > 0) {
-                adaPiutang = true;
-                let namaLayanan = t.layanan || "-";
-                html += `<tr>
-                    <td>${t.pengurus}</td>
-                    <td><strong>${t.nopol}</strong></td>
-                    <td><small>${namaLayanan}</small></td>
-                    <td>Rp ${totalBiaya.toLocaleString('id-ID')}</td>
-                    <td class="text-piutang">Rp ${sisa.toLocaleString('id-ID')}</td>
-                    <td>
-                        <button class="btn-lunas" onclick="lunasi(${i})">LUNAS</button>
-                        <button class="btn-print" onclick="cetakLunas('${t.pengurus}', '${t.nopol}', '${namaLayanan}', ${sisa})">Cetak</button>
-                        <button class="btn-del" onclick="hapusTransaksi(${i})">Hapus</button>
-                    </td>
-                </tr>`;
+                sisaClass = "text-piutang"; // Warna Merah jika masih ada piutang
+                tombolLunas = `<button class="btn-lunas" onclick="lunasi(${i})">LUNAS</button>`;
+            } else {
+                sisaClass = "text-lunas"; // Warna Hitam (#333) jika sudah lunas
+                tombolLunas = `<span class="badge-lunas">✓ SELESAI</span>`;
             }
+            
+            html += `<tr>
+                <td>${t.pengurus}</td>
+                <td><strong>${t.nopol}</strong></td>
+                <td><small>${namaLayanan}</small></td>
+                <td>Rp ${totalBiaya.toLocaleString('id-ID')}</td>
+                <td class="${sisaClass}">Rp ${sisa.toLocaleString('id-ID')}</td>
+                <td>
+                    ${tombolLunas}
+                    <button class="btn-print" onclick="cetakLunas('${t.pengurus}', '${t.nopol}', '${namaLayanan}', ${sisa})">Cetak</button>
+                    <button class="btn-del" onclick="hapusTransaksi(${i})">Hapus</button>
+                </td>
+            </tr>`;
         });
-        
-        if (!adaPiutang) {
-            html = `<tr><td colspan="6" class="no-data">Hebat! Tidak ada piutang tersisa atau semua transaksi sudah lunas.</td></tr>`;
-        }
         
         document.getElementById("bodyPelunasan").innerHTML = html;
     }
@@ -88,9 +101,9 @@
                 let jasa = Number(tr[i].biayaJasa) || 0;
                 let totalBiaya = Number(tr[i].total) || (berkas + jasa);
                 
-                tr[i].dp = totalBiaya; // Set nilai DP penuh sebesar total tagihan
+                tr[i].dp = totalBiaya; // Set nilai DP penuh sebesar total tagihan agar sisa menjadi 0
                 localStorage.setItem("dataTransaksi", JSON.stringify(tr));
-                tampilkanPiutang();
+                tampilkanPiutang(); // Segarkan tampilan tabel halaman tanpa menghapus baris
             }
         }
     }
@@ -107,73 +120,71 @@
 
     // FUNGSI CETAK NOTA PELUNASAN
     function cetakLunas(nama, nopol, layanan, sisa) {
-    let w = window.open('', '_blank');
-    w.document.write(`
-        <html>
-        <head>
-            <title>Kwitansi Pelunasan</title>
-            <style>
-                /* Memastikan warna background ikut tercetak di browser */
-                @media print {
-                    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                }
-                .kwitansi-box { 
-                    border: 2px dashed #333; 
-                    padding: 20px; 
-                    max-width: 400px; 
-                    margin: auto; 
-                    text-align: left; 
-                    position: relative; /* Menjadi acuan posisi logo watermark */
-                    background: #fff;
-                    overflow: hidden;
-                }
-                /* Desain Logo Transparan di Tengah */
-                .bg-logo-watermark {
-                    position: absolute;
-                    top: 55%;
-                    left: 50%;
-                    transform: translate(-50%, -50%) rotate(-15deg); /* Dimiringkan 15 derajat agar estetik */
-                    width: 75%; /* Ukuran logo di background */
-                    opacity: 0.08; /* Transparansi 8% (sangat tipis agar tulisan utama tetap jelas) */
-                    z-index: 0;
-                    pointer-events: none;
-                }
-                .konten-kwitansi {
-                    position: relative;
-                    z-index: 1; /* Mengangkat teks agar berada di depan logo */
-                }
-            </style>
-        </head>
-        <body style="font-family:sans-serif; text-align:center; padding: 20px;" onload="window.print()">
-            
-            <div class="kwitansi-box">
-                <img src="logo-az.jpeg" class="bg-logo-watermark" alt="Logo Watermark">
+        let w = window.open('', '_blank');
+        w.document.write(`
+            <html>
+            <head>
+                <title>Kwitansi Pelunasan</title>
+                <style>
+                    @media print {
+                        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                    }
+                    .kwitansi-box { 
+                        border: 2px dashed #333; 
+                        padding: 20px; 
+                        max-width: 400px; 
+                        margin: auto; 
+                        text-align: left; 
+                        position: relative;
+                        background: #fff;
+                        overflow: hidden;
+                    }
+                    .bg-logo-watermark {
+                        position: absolute;
+                        top: 55%;
+                        left: 50%;
+                        transform: translate(-50%, -50%) rotate(-15deg);
+                        width: 75%;
+                        opacity: 0.08;
+                        z-index: 0;
+                        pointer-events: none;
+                    }
+                    .konten-kwitansi {
+                        position: relative;
+                        z-index: 1;
+                    }
+                </style>
+            </head>
+            <body style="font-family:sans-serif; text-align:center; padding: 20px;" onload="window.print()">
                 
-                <div class="konten-kwitansi">
-                    <h3 style="text-align:center; margin-bottom: 5px; font-size: 16px; line-height: 1.3;">
-                        ASKARA ZAYYAN BIRO JASA KENDARAAN BERMOTOR
-                    </h3>
-                    <p style="text-align:center; font-size:12px; margin-bottom:20px; color:#555;">Tanda Terima Pelunasan Sisa Pembayaran</p>
-                    <hr style="border: 1px dashed #333;">
+                <div class="kwitansi-box">
+                    <img src="logo-az.jpeg" class="bg-logo-watermark" alt="Logo Watermark">
                     
-                    <p style="margin: 12px 0; font-size: 14px;">Telah Diterima Dari: <b>${nama}</b></p>
-                    <p style="margin: 12px 0; font-size: 14px;">No. Polisi Kendaraan: <b>${nopol}</b></p>
-                    <p style="margin: 12px 0; font-size: 14px;">Jenis Layanan: <b>${layanan}</b></p>
-                    <p style="margin: 12px 0; font-size: 14px;">Jumlah Pelunasan: <b>Rp ${Number(sisa).toLocaleString('id-ID')}</b></p>
-                    
-                    <hr style="border: 1px dashed #333; margin-top:20px;">
-                    <h3 style="text-align:center; color:#2e7d32; letter-spacing: 2px; margin-bottom: 10px;">STATUS: LUNAS</h3>
-                    <p style="text-align:center; font-size: 11px; color:#555; font-style: italic;">
-                        Terima kasih atas kepercayaan Anda menggunakan layanan kami.
-                    </p>
+                    <div class="konten-kwitansi">
+                        <h3 style="text-align:center; margin-bottom: 5px; font-size: 16px; line-height: 1.3;">
+                            ASKARA ZAYYAN BIRO JASA KENDARAAN BERMOTOR
+                        </h3>
+                        <p style="text-align:center; font-size:12px; margin-bottom:20px; color:#555;">Tanda Terima Pelunasan Sisa Pembayaran</p>
+                        <hr style="border: 1px dashed #333;">
+                        
+                        <p style="margin: 12px 0; font-size: 14px;">Telah Diterima Dari: <b>${nama}</b></p>
+                        <p style="margin: 12px 0; font-size: 14px;">No. Polisi Kendaraan: <b>${nopol}</b></p>
+                        <p style="margin: 12px 0; font-size: 14px;">Jenis Layanan: <b>${layanan}</b></p>
+                        <p style="margin: 12px 0; font-size: 14px;">Jumlah Pelunasan: <b>Rp ${Number(sisa).toLocaleString('id-ID')}</b></p>
+                        
+                        <hr style="border: 1px dashed #333; margin-top:20px;">
+                        <h3 style="text-align:center; color:#2e7d32; letter-spacing: 2px; margin-bottom: 10px;">STATUS: LUNAS</h3>
+                        <p style="text-align:center; font-size: 11px; color:#555; font-style: italic;">
+                            Terima kasih atas kepercayaan Anda menggunakan layanan kami.
+                        </p>
+                    </div>
                 </div>
-            </div>
-            
-        </body>
-        </html>
-    `);
-    w.document.close();
-}
+                
+            </body>
+            </html>
+        `);
+        w.document.close();
+    }
 
     // Load data di awal
     tampilkanPiutang();
