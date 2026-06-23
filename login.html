@@ -1,65 +1,29 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - ASKARA ZAYYAN</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #0d47a1; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-box { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center; width: 100%; max-width: 360px; }
-        .logo { width: 120px; margin-bottom: 15px; }
-        h2 { margin-bottom: 5px; color: #333; font-size: 22px; }
-        p { color: #666; font-size: 14px; margin-bottom: 25px; }
-        .input-group { margin-bottom: 15px; text-align: left; }
-        label { font-size: 13px; font-weight: bold; color: #444; display: block; margin-bottom: 5px; }
-        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
-        .btn-login { width: 100%; padding: 12px; background: #0d47a1; color: white; border: none; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
-        .btn-login:hover { background: #0a377d; }
-    </style>
-</head>
-<body>
+// Ganti bagian data login di file login.html Anda dengan ini:
+const users = {
+    'askara': { 'pass': '090121', 'role': 'admin', 'redirect': 'dashboard.html' },
+    'pegawai': { 'pass': 'pegawai123', 'role': 'pegawai', 'redirect': 'dashboard.html' }
+};
 
-<div class="login-box">
-    <img src="logo-az.jpeg" alt="Logo" class="logo">
-    <h2>ASKARA ZAYYAN</h2>
-    <p>Silakan masuk ke sistem</p>
+const form = document.getElementById('loginForm');
+const errorMsg = document.getElementById('error-msg');
+
+form.addEventListener('submit', function(event) {
+    event.preventDefault(); 
     
-    <div class="input-group">
-        <label>Username</label>
-        <input type="text" id="username" placeholder="Masukkan username...">
-    </div>
-    <div class="input-group">
-        <label>Password</label>
-        <input type="password" id="password" placeholder="Masukkan password...">
-    </div>
+    const userInput = document.getElementById('username').value.trim();
+    const passInput = document.getElementById('password').value.trim();
     
-    <button class="btn-login" onclick="prosesLogin()">MASUK</button>
-</div>
+    errorMsg.style.display = 'none'; 
 
-<script>
-function prosesLogin() {
-    const user = document.getElementById("username").value.trim();
-    const pass = document.getElementById("password").value.trim();
-
-    if(user === "" || pass === "") {
-        alert("Username dan Password tidak boleh kosong!");
-        return;
-    }
-
-    // PENGATURAN USERNAME & PASSWORD AKUN
-    if (user === "OWNWER" && pass === "090121") {
-        // Login sebagai Admin (Bisa lihat omzet & laba)
-        sessionStorage.setItem("loginUser", "admin");
-        window.location.href = "dashboard.html";
-    } else if (user === "pegawai" && pass === "pegawai123") {
-        // Login sebagai Pegawai (Data keuangan disembunyikan otomatis)
-        sessionStorage.setItem("loginUser", "pegawai");
-        window.location.href = "dashboard.html";
+    if (users[userInput]) {
+        if (users[userInput].pass === passInput) {
+            // SET ROLE DISINI SEBELUM REDIRECT
+            sessionStorage.setItem("loginUser", users[userInput].role);
+            window.location.href = users[userInput].redirect;
+        } else {
+            showError();
+        }
     } else {
-        alert("Username atau Password salah! Periksa kembali.");
+        showError();
     }
-}
-</script>
-
-</body>
-</html>
+});
