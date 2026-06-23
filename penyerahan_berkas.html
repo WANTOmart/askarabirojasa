@@ -17,6 +17,7 @@
         .btn-del { background: #c62828; color: white; padding: 8px 12px; border: none; cursor: pointer; border-radius: 4px; font-weight: bold; margin-left: 3px; }
         .badge-ready { background: #e8f5e9; color: #2e7d32; padding: 4px 8px; border-radius: 12px; font-weight: bold; font-size: 12px; }
         .badge-delivered { background: #eceff1; color: #455a64; padding: 4px 8px; border-radius: 12px; font-weight: bold; font-size: 12px; }
+        .badge-process { background: #fff3e0; color: #e65100; padding: 4px 8px; border-radius: 12px; font-weight: bold; font-size: 12px; }
         .no-data { text-align: center; color: #888; font-style: italic; }
     </style>
 </head>
@@ -53,21 +54,22 @@
 
         tr.forEach((t, index) => {
             let namaLayanan = t.layanan || "-";
-            let pengambilLama = t.namaPengambil || ""; // Mengambil nama pengambil jika sebelumnya sudah diisi
+            let pengambilLama = t.namaPengambil || ""; 
             
             let statusBadge = "";
             let kolomInput = "";
             let tombolSerah = "";
 
-            // Atur tampilan berdasarkan status berkas (SELESAI atau DISERAHKAN)
+            // Atur tampilan berdasarkan status berkas (SELESAI, PROSES, atau DISERAHKAN)
             if (t.statusBerkas === "DISERAHKAN") {
                 statusBadge = `<span class="badge-delivered">DISERAHKAN</span>`;
                 kolomInput = `<input type="text" class="input-pengambil" id="pengambil-${index}" value="${pengambilLama}" disabled>`;
                 tombolSerah = `<span style="color:#455a64; font-weight:bold; font-size:13px; margin-right:5px;">✓ Selesai</span>`;
             } else {
-                // Default SELESAI atau PROSES (Kita izinkan isi nama pengambil)
                 let labelStatus = t.statusBerkas || "PROSES";
-                let kelasStatus = t.statusBerkas === "SELESAI" ? "badge-ready" : "badge-delivered" ;
+                // Perbaikan klasifikasi warna badge di sini
+                let kelasStatus = labelStatus === "SELESAI" ? "badge-ready" : "badge-process";
+                
                 statusBadge = `<span class="${kelasStatus}">${labelStatus}</span>`;
                 kolomInput = `<input type="text" class="input-pengambil" id="pengambil-${index}" placeholder="Ketik nama pengambil..." value="${pengambilLama}">`;
                 tombolSerah = `<button class="btn-serah" onclick="serahkan(${index})">Serah</button>`;
@@ -104,7 +106,7 @@
             let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
             if(tr[index]) {
                 tr[index].statusBerkas = "DISERAHKAN";
-                tr[index].namaPengambil = namaInput; // Simpan nama pengambil ke database local
+                tr[index].namaPengambil = namaInput; 
                 localStorage.setItem("dataTransaksi", JSON.stringify(tr));
                 tampilkanPenyerahan();
             }
@@ -116,14 +118,13 @@
         let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
         let namaInput = document.getElementById(`pengambil-${index}`).value.trim();
         
-        // Jika belum diserahkan tapi nama diisi, kita bantu simpan otomatis namanya agar sinkron saat cetak
         if (tr[index]) {
             if (namaInput !== tr[index].namaPengambil) {
                 tr[index].namaPengambil = namaInput;
                 localStorage.setItem("dataTransaksi", JSON.stringify(tr));
             }
             
-            let namaCetak = namaInput || tr[index].pengurus; // Jika kosong, default pakai nama pemilik/pengurus
+            let namaCetak = namaInput || tr[index].pengurus; 
             let namaLayanan = tr[index].layanan || "-";
             
             cetakTandaTerima(tr[index].pengurus, tr[index].nopol, namaLayanan, namaCetak);
@@ -175,6 +176,9 @@
                         position: relative;
                         z-index: 1;
                     }
+                    /* Pencegahan style border tabel warisan halaman utama */
+                    .nota-table { width:100%; font-size: 14px; text-align: center; border-collapse: collapse; margin-top: 10px; }
+                    .nota-table td { border: none; padding: 5px; text-align: center; }
                 </style>
             </head>
             <body style="font-family:Arial, sans-serif; text-align:center; padding: 20px;" onload="window.print()">
@@ -199,7 +203,7 @@
                         
                         <hr style="border: 1px dashed #333; margin-top:20px; margin-bottom:30px;">
                         
-                        <table style="width:100%; font-size: 14px; text-align: center;">
+                        <table class="nota-table">
                             <tr>
                                 <td style="width: 50%;">Yang Menyerahkan,</td>
                                 <td style="width: 50%;">Yang Menerima,</td>
