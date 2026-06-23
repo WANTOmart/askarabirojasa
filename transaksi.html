@@ -7,7 +7,7 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
         body { background: #f4f6f9; padding: 20px; }
-        .container { max-width: 950px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
         h2 { margin-bottom: 20px; color: #0d47a1; }
         .form-container { background: #fcfcfc; padding: 15px; border-radius: 6px; border: 1px solid #eaeaea; margin-bottom: 25px; }
         .form-group { margin-bottom: 15px; }
@@ -46,7 +46,15 @@
             </select>
         </div>
         <div class="form-group">
-            <input type="number" id="total" placeholder="Total Biaya (Rp)">
+            <div class="form-row" style="margin-top: 0; margin-bottom: 10px;">
+                <input type="number" id="total" placeholder="Total Biaya (Rp)">
+                <select id="jenisLayanan">
+                    <option value="">-- Pilih Jenis Layanan --</option>
+                    <option value="PAJAK TAHUNAN">PAJAK TAHUNAN</option>
+                    <option value="MUTASI">MUTASI</option>
+                    <option value="CABUT BERKAS">CABUT BERKAS</option>
+                </select>
+            </div>
             <div class="form-row">
                 <input type="number" id="dp" placeholder="DP (Rp) - Boleh dikosongkan">
                 <select id="statusBerkas">
@@ -59,7 +67,7 @@
     </div>
 
     <div class="search-group">
-        <input type="text" id="cari" class="input-search" placeholder="🔍 Cari transaksi berdasarkan nama pengurus atau nopol..." onkeyup="tampilkanTabel()">
+        <input type="text" id="cari" class="input-search" placeholder="🔍 Cari transaksi berdasarkan nama pengurus, nopol, atau layanan..." onkeyup="tampilkanTabel()">
     </div>
 
     <table>
@@ -67,6 +75,7 @@
             <tr>
                 <th>Pengurus</th>
                 <th>Nopol</th>
+                <th>Layanan</th>
                 <th>Total</th>
                 <th>DP</th>
                 <th>Sisa</th>
@@ -109,14 +118,16 @@
         let pengurus = document.getElementById("pilihPelanggan").value;
         let nopol = document.getElementById("pilihKendaraan").value;
         let total = document.getElementById("total").value;
-        let dp = document.getElementById("dp").value || 0; // Jika kosong, set jadi 0
+        let layanan = document.getElementById("jenisLayanan").value;
+        let dp = document.getElementById("dp").value || 0;
         let statusBerkas = document.getElementById("statusBerkas").value;
         
-        if(pengurus && nopol && total) {
+        if(pengurus && nopol && total && layanan) {
             let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
             transaksi.push({
                 pengurus, 
                 nopol, 
+                layanan,
                 total: parseInt(total), 
                 dp: parseInt(dp), 
                 statusBerkas
@@ -128,13 +139,14 @@
             document.getElementById("pilihPelanggan").value = "";
             document.getElementById("pilihKendaraan").innerHTML = '<option value="">-- Pilih Kendaraan --</option>';
             document.getElementById("total").value = "";
+            document.getElementById("jenisLayanan").value = "";
             document.getElementById("dp").value = "";
             document.getElementById("statusBerkas").value = "PROSES";
             document.getElementById("cari").value = "";
 
             tampilkanTabel();
         } else {
-            alert("Mohon lengkapi Pelanggan, Kendaraan, dan Total Biaya!");
+            alert("Mohon lengkapi Pelanggan, Kendaraan, Jenis Layanan, dan Total Biaya!");
         }
     }
 
@@ -147,7 +159,7 @@
         }
     }
 
-    function cetakDP(nama, nopol, dp) {
+    function cetakDP(nama, nopol, layanan, dp) {
         let w = window.open('', '_blank');
         w.document.write(`
             <html>
@@ -159,6 +171,7 @@
                     <hr style="border: 1px dashed #333;">
                     <p style="margin: 10px 0;">Nama Pengurus: <b>${nama}</b></p>
                     <p style="margin: 10px 0;">No. Polisi: <b>${nopol}</b></p>
+                    <p style="margin: 10px 0;">Jenis Layanan: <b>${layanan}</b></p>
                     <p style="margin: 10px 0;">Nominal Uang: <b>Rp ${Number(dp).toLocaleString('id-ID')}</b></p>
                     <hr style="border: 1px dashed #333; margin-top:20px;">
                     <p style="text-align:center; font-size: 12px; margin-top: 15px;">Simpan resi ini sebagai bukti pengambilan berkas.</p>
@@ -174,34 +187,38 @@
         let kataKunci = document.getElementById("cari").value.toLowerCase();
         let html = "";
         
-        let dataDifilter = tr.filter(t => {
-            return t.pengurus.toLowerCase().includes(kataKunci) || t.nopol.toLowerCase().includes(kataKunci);
-        });
+        // Memfilter data berdasarkan nama, nopol, atau jenis layanan
+        let dataDifilter = tr.map((t, index) => ({...t, indeksAsli: index}))
+                             .filter(t => 
+                                t.pengurus.toLowerCase().includes(kataKunci) || 
+                                t.nopol.toLowerCase().includes(kataKunci) ||
+                                (t.layanan && t.layanan.toLowerCase().includes(kataKunci))
+                             );
 
         if(dataDifilter.length === 0) {
-            html = `<tr><td colspan="7" class="no-data">Data transaksi tidak ditemukan</td></tr>`;
+            html = `<tr><td colspan="8" class="no-data">Data transaksi tidak ditemukan</td></tr>`;
         } else {
-            tr.forEach((t, i) => {
-                if(t.pengurus.toLowerCase().includes(kataKunci) || t.nopol.toLowerCase().includes(kataKunci)) {
-                    let totalBiaya = Number(t.total) || 0;
-                    let uangMuka = Number(t.dp) || 0;
-                    let sisa = totalBiaya - uangMuka;
-                    
-                    let kelasBadge = t.statusBerkas === "SELESAI" ? "selesai" : "proses";
+            dataDifilter.forEach(t => {
+                let totalBiaya = Number(t.total) || 0;
+                let uangMuka = Number(t.dp) || 0;
+                let sisa = totalBiaya - uangMuka;
+                let namaLayanan = t.layanan || "-";
+                
+                let kelasBadge = t.statusBerkas === "SELESAI" ? "selesai" : "proses";
 
-                    html += `<tr>
-                        <td>${t.pengurus}</td>
-                        <td><strong>${t.nopol}</strong></td>
-                        <td>Rp ${totalBiaya.toLocaleString('id-ID')}</td>
-                        <td>Rp ${uangMuka.toLocaleString('id-ID')}</td>
-                        <td>Rp ${sisa.toLocaleString('id-ID')}</td>
-                        <td><span class="badge ${kelasBadge}">${t.statusBerkas}</span></td>
-                        <td>
-                            <button class="btn-print" onclick="cetakDP('${t.pengurus}', '${t.nopol}', ${uangMuka})">Cetak</button>
-                            <button class="btn-del" onclick="hapusTransaksi(${i})">Hapus</button>
-                        </td>
-                    </tr>`;
-                }
+                html += `<tr>
+                    <td>${t.pengurus}</td>
+                    <td><strong>${t.nopol}</strong></td>
+                    <td><small>${namaLayanan}</small></td>
+                    <td>Rp ${totalBiaya.toLocaleString('id-ID')}</td>
+                    <td>Rp ${uangMuka.toLocaleString('id-ID')}</td>
+                    <td>Rp ${sisa.toLocaleString('id-ID')}</td>
+                    <td><span class="badge ${kelasBadge}">${t.statusBerkas}</span></td>
+                    <td>
+                        <button class="btn-print" onclick="cetakDP('${t.pengurus}', '${t.nopol}', '${namaLayanan}', ${uangMuka})">Cetak</button>
+                        <button class="btn-del" onclick="hapusTransaksi(${t.indeksAsli})">Hapus</button>
+                    </td>
+                </tr>`;
             });
         }
         document.getElementById("bodyTabel").innerHTML = html;
