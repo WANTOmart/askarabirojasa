@@ -107,28 +107,73 @@
 
     // FUNGSI CETAK NOTA PELUNASAN
     function cetakLunas(nama, nopol, layanan, sisa) {
-        let w = window.open('', '_blank');
-        w.document.write(`
-            <html>
-            <head><title>Kwitansi Pelunasan</title></head>
-            <body style="font-family:sans-serif; text-align:center; padding: 20px;" onload="window.print()">
-                <div style="border: 2px dashed #333; padding: 20px; max-width: 400px; margin: auto; text-align: left;">
-                    <h2 style="text-align:center; margin-bottom: 5px;">ASKARA ZAYYAN BIRO JASA KENDRAAN BERMOTOR</h2>
-                    <p style="text-align:center; font-size:12px; margin-bottom:20px;">Tanda Terima Pelunasan Sisa Pembayaran</p>
+    let w = window.open('', '_blank');
+    w.document.write(`
+        <html>
+        <head>
+            <title>Kwitansi Pelunasan</title>
+            <style>
+                /* Memastikan warna background ikut tercetak di browser */
+                @media print {
+                    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                }
+                .kwitansi-box { 
+                    border: 2px dashed #333; 
+                    padding: 20px; 
+                    max-width: 400px; 
+                    margin: auto; 
+                    text-align: left; 
+                    position: relative; /* Menjadi acuan posisi logo watermark */
+                    background: #fff;
+                    overflow: hidden;
+                }
+                /* Desain Logo Transparan di Tengah */
+                .bg-logo-watermark {
+                    position: absolute;
+                    top: 55%;
+                    left: 50%;
+                    transform: translate(-50%, -50%) rotate(-15deg); /* Dimiringkan 15 derajat agar estetik */
+                    width: 75%; /* Ukuran logo di background */
+                    opacity: 0.08; /* Transparansi 8% (sangat tipis agar tulisan utama tetap jelas) */
+                    z-index: 0;
+                    pointer-events: none;
+                }
+                .konten-kwitansi {
+                    position: relative;
+                    z-index: 1; /* Mengangkat teks agar berada di depan logo */
+                }
+            </style>
+        </head>
+        <body style="font-family:sans-serif; text-align:center; padding: 20px;" onload="window.print()">
+            
+            <div class="kwitansi-box">
+                <img src="logo-az.jpeg" class="bg-logo-watermark" alt="Logo Watermark">
+                
+                <div class="konten-kwitansi">
+                    <h3 style="text-align:center; margin-bottom: 5px; font-size: 16px; line-height: 1.3;">
+                        ASKARA ZAYYAN BIRO JASA KENDARAAN BERMOTOR
+                    </h3>
+                    <p style="text-align:center; font-size:12px; margin-bottom:20px; color:#555;">Tanda Terima Pelunasan Sisa Pembayaran</p>
                     <hr style="border: 1px dashed #333;">
-                    <p style="margin: 10px 0;">Telah Diterima Dari: <b>${nama}</b></p>
-                    <p style="margin: 10px 0;">No. Polisi Kendaraan: <b>${nopol}</b></p>
-                    <p style="margin: 10px 0;">Jenis Layanan: <b>${layanan}</b></p>
-                    <p style="margin: 10px 0;">Jumlah Pelunasan: <b>Rp ${Number(sisa).toLocaleString('id-ID')}</b></p>
+                    
+                    <p style="margin: 12px 0; font-size: 14px;">Telah Diterima Dari: <b>${nama}</b></p>
+                    <p style="margin: 12px 0; font-size: 14px;">No. Polisi Kendaraan: <b>${nopol}</b></p>
+                    <p style="margin: 12px 0; font-size: 14px;">Jenis Layanan: <b>${layanan}</b></p>
+                    <p style="margin: 12px 0; font-size: 14px;">Jumlah Pelunasan: <b>Rp ${Number(sisa).toLocaleString('id-ID')}</b></p>
+                    
                     <hr style="border: 1px dashed #333; margin-top:20px;">
-                    <h3 style="text-align:center; color:#2e7d32; letter-spacing: 2px;">STATUS: LUNAS</h3>
-                    <p style="text-align:center; font-size: 11px; margin-top: 15px; color:#555;">Terima kasih atas kepercayaan Anda menggunakan layanan kami.</p>
+                    <h3 style="text-align:center; color:#2e7d32; letter-spacing: 2px; margin-bottom: 10px;">STATUS: LUNAS</h3>
+                    <p style="text-align:center; font-size: 11px; color:#555; font-style: italic;">
+                        Terima kasih atas kepercayaan Anda menggunakan layanan kami.
+                    </p>
                 </div>
-            </body>
-            </html>
-        `);
-        w.document.close();
-    }
+            </div>
+            
+        </body>
+        </html>
+    `);
+    w.document.close();
+}
 
     // Load data di awal
     tampilkanPiutang();
