@@ -44,15 +44,19 @@
 <script>
     function tampilkanTracking() {
         let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
+        const roleUser = sessionStorage.getItem("loginUser") || "admin";
         let html = "";
         
+        // Jika pegawai, tambahkan atribut 'disabled' pada select tag
+        let statusAkses = (roleUser.toLowerCase() === "pegawai") ? "disabled" : "";
+
         transaksi.forEach((t, index) => {
             html += `<tr>
                 <td>${t.pengurus}</td>
                 <td>${t.nopol}</td>
                 <td><span class="status-badge ${t.statusBerkas}">${t.statusBerkas}</span></td>
                 <td>
-                    <select onchange="updateStatus(${index}, this.value)">
+                    <select ${statusAkses} onchange="updateStatus(${index}, this.value)">
                         <option value="PROSES" ${t.statusBerkas === 'PROSES' ? 'selected' : ''}>PROSES</option>
                         <option value="SELESAI" ${t.statusBerkas === 'SELESAI' ? 'selected' : ''}>SELESAI</option>
                         <option value="DISERAHKAN" ${t.statusBerkas === 'DISERAHKAN' ? 'selected' : ''}>DISERAHKAN</option>
@@ -64,6 +68,12 @@
     }
 
     function updateStatus(index, statusBaru) {
+        const roleUser = sessionStorage.getItem("loginUser") || "admin";
+        if (roleUser.toLowerCase() === "pegawai") {
+            alert("Akses Ditolak! Pegawai tidak punya izin mengubah status berkas.");
+            return;
+        }
+
         let transaksi = JSON.parse(localStorage.getItem("dataTransaksi"));
         transaksi[index].statusBerkas = statusBaru;
         localStorage.setItem("dataTransaksi", JSON.stringify(transaksi));
