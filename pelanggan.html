@@ -47,6 +47,13 @@
 </div>
 
 <script>
+    function proteksiPegawai() {
+        const roleUser = sessionStorage.getItem("loginUser") || "admin";
+        if (roleUser.toLowerCase() === "pegawai") {
+            document.querySelectorAll(".btn-del").forEach(btn => btn.style.display = "none");
+        }
+    }
+
     function tampilkanPelanggan() {
         let pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
         let html = "";
@@ -59,6 +66,7 @@
             </tr>`;
         });
         document.getElementById("tabelPelanggan").innerHTML = html;
+        proteksiPegawai();
     }
 
     function tambahPelanggan() {
@@ -71,7 +79,6 @@
             pelanggan.push({nama, namaStnk, hp});
             localStorage.setItem("dataPelanggan", JSON.stringify(pelanggan));
             
-            // Bersihkan input
             document.getElementById("nama").value = "";
             document.getElementById("namaStnk").value = "";
             document.getElementById("hp").value = "";
@@ -83,6 +90,12 @@
     }
 
     function hapusPelanggan(index) {
+        const roleUser = sessionStorage.getItem("loginUser") || "admin";
+        if (roleUser.toLowerCase() === "pegawai") {
+            alert("Akses Ditolak! Pegawai tidak diizinkan menghapus data pelanggan.");
+            return;
+        }
+
         if(confirm('Hapus pelanggan ini?')) {
             let pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
             pelanggan.splice(index, 1);
