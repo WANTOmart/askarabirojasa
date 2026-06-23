@@ -54,24 +54,28 @@
 </div>
 
 <script>
-    // Memuat data pelanggan ke dropdown
+    function proteksiPegawai() {
+        const roleUser = sessionStorage.getItem("loginUser") || "admin";
+        if (roleUser.toLowerCase() === "pegawai") {
+            document.querySelectorAll(".btn-del").forEach(btn => btn.style.display = "none");
+        }
+    }
+
     function loadPelangganOptions() {
         let pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
         let select = document.getElementById("pilihPelanggan");
         pelanggan.forEach(p => {
             let opt = document.createElement("option");
-            opt.value = JSON.stringify(p); // Menyimpan objek agar mudah diakses
+            opt.value = JSON.stringify(p);
             opt.innerHTML = p.nama;
             select.appendChild(opt);
         });
     }
 
-    // Mengisi Nama STNK otomatis saat pelanggan dipilih
     function isiOtomatis() {
         let val = document.getElementById("pilihPelanggan").value;
         if(val) {
             let data = JSON.parse(val);
-            // Asumsi di data pelanggan ada field 'namaStnk' atau sesuaikan dengan data Anda
             document.getElementById("namaStnk").value = data.namaStnk || "";
         }
     }
@@ -112,13 +116,22 @@
             </tr>`;
         });
         document.getElementById("tabelKendaraan").innerHTML = html;
+        proteksiPegawai();
     }
 
     function hapus(i) {
-        let k = JSON.parse(localStorage.getItem("dataKendaraan"));
-        k.splice(i, 1);
-        localStorage.setItem("dataKendaraan", JSON.stringify(k));
-        tampilkanKendaraan();
+        const roleUser = sessionStorage.getItem("loginUser") || "admin";
+        if (roleUser.toLowerCase() === "pegawai") {
+            alert("Akses Ditolak! Pegawai tidak diizinkan menghapus data kendaraan.");
+            return;
+        }
+
+        if(confirm('Hapus kendaraan ini?')) {
+            let k = JSON.parse(localStorage.getItem("dataKendaraan"));
+            k.splice(i, 1);
+            localStorage.setItem("dataKendaraan", JSON.stringify(k));
+            tampilkanKendaraan();
+        }
     }
 
     loadPelangganOptions();
