@@ -1,111 +1,70 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manajemen Pelanggan</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Segoe UI, sans-serif; }
-        body { background: #f4f6f9; padding: 20px; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
-        h2 { margin-bottom: 20px; color: #0d47a1; }
-        .form-group { margin-bottom: 15px; }
-        input { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 5px; }
-        button { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
-        .btn-add { background: #2e7d32; color: white; width: 100%; }
-        .btn-back { background: #546e7a; color: white; padding: 8px 15px; display: inline-block; text-decoration: none; border-radius: 5px; margin-bottom: 15px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background: #f5f5f5; }
-        .btn-del { background: #c62828; color: white; padding: 5px 10px; border-radius: 4px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data Pelanggan - ASKARA ZAYYAN</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f1f5f9;margin:0;padding:20px;color:#172033}
+main{max-width:800px;margin:auto;background:white;padding:22px;border-radius:14px}
+h1{color:#075985}input,button{box-sizing:border-box;padding:12px;margin:5px 0;width:100%;border-radius:8px;border:1px solid #cbd5e1}
+button{background:#075985;color:white;cursor:pointer;border:0}
+a{color:#075985}table{width:100%;border-collapse:collapse;margin-top:15px}
+th,td{text-align:left;padding:9px;border-bottom:1px solid #ddd;overflow-wrap:anywhere}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.actions a{padding:10px}
+</style>
 </head>
 <body>
-
-<div class="container">
-    <a href="dashboard.html" class="btn-back">← Kembali ke Dashboard</a>
-    <h2>Data Pelanggan & Nama STNK</h2>
-    
-    <div class="form-group">
-        <input type="text" id="nama" placeholder="Nama Pelanggan (Pengurus)">
-        <input type="text" id="namaStnk" placeholder="Nama Pemilik di STNK Asli">
-        <input type="text" id="hp" placeholder="No. HP Pelanggan">
-        <button class="btn-add" onclick="tambahPelanggan()">Simpan Data Pelanggan</button>
-    </div>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Pelanggan</th>
-                <th>Nama STNK</th>
-                <th>No. HP</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody id="tabelPelanggan"></tbody>
-    </table>
+<main>
+<h1>ASKARA ZAYYAN</h1>
+<h2>Data Pelanggan</h2>
+<form id="form">
+<input id="nama" placeholder="Nama pengurus" required>
+<input id="namaStnk" placeholder="Nama sesuai STNK" required>
+<input id="hp" placeholder="Nomor HP">
+<button type="submit">Simpan Pelanggan</button>
+</form>
+<div class="actions">
+<a href="kendaraan.html">Data Kendaraan</a>
+<a href="transaksi.html">Transaksi</a>
+<a href="dashboard.html">Dashboard</a>
 </div>
-
+<table>
+<thead><tr><th>Nama Pengurus / STNK</th><th>HP</th><th>Aksi</th></tr></thead>
+<tbody id="daftar"></tbody>
+</table>
+</main>
 <script>
-    function proteksiPegawai() {
-        const roleUser = sessionStorage.getItem("loginUser") || "admin";
-        if (roleUser.toLowerCase() === "pegawai") {
-            document.querySelectorAll(".btn-del").forEach(btn => btn.style.display = "none");
-        }
-    }
-
-    function tampilkanPelanggan() {
-        let pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
-        let html = "";
-        pelanggan.forEach((p, index) => {
-            html += `<tr>
-                <td>${p.nama}</td>
-                <td>${p.namaStnk}</td>
-                <td>${p.hp}</td>
-                <td><button class="btn-del" onclick="hapusPelanggan(${index})">Hapus</button></td>
-            </tr>`;
-        });
-        document.getElementById("tabelPelanggan").innerHTML = html;
-        proteksiPegawai();
-    }
-
-    function tambahPelanggan() {
-        let nama = document.getElementById("nama").value;
-        let namaStnk = document.getElementById("namaStnk").value;
-        let hp = document.getElementById("hp").value;
-        
-        if(nama && namaStnk && hp) {
-            let pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
-            pelanggan.push({nama, namaStnk, hp});
-            localStorage.setItem("dataPelanggan", JSON.stringify(pelanggan));
-            
-            document.getElementById("nama").value = "";
-            document.getElementById("namaStnk").value = "";
-            document.getElementById("hp").value = "";
-            
-            tampilkanPelanggan();
-        } else {
-            alert("Harap isi semua kolom!");
-        }
-    }
-
-    function hapusPelanggan(index) {
-        const roleUser = sessionStorage.getItem("loginUser") || "admin";
-        if (roleUser.toLowerCase() === "pegawai") {
-            alert("Akses Ditolak! Pegawai tidak diizinkan menghapus data pelanggan.");
-            return;
-        }
-
-        if(confirm('Hapus pelanggan ini?')) {
-            let pelanggan = JSON.parse(localStorage.getItem("dataPelanggan")) || [];
-            pelanggan.splice(index, 1);
-            localStorage.setItem("dataPelanggan", JSON.stringify(pelanggan));
-            tampilkanPelanggan();
-        }
-    }
-
-    tampilkanPelanggan();
+const KEY="dataPelanggan";
+let data=JSON.parse(localStorage.getItem(KEY)||"[]");
+const form=document.getElementById("form");
+function simpan(){localStorage.setItem(KEY,JSON.stringify(data));tampil()}
+function tampil(){
+daftar.innerHTML="";
+data.forEach((p,i)=>{
+const tr=document.createElement("tr");
+[p.nama+" / "+p.namaStnk,p.hp||"-"].forEach(v=>{
+const td=document.createElement("td");td.textContent=v;tr.appendChild(td)
+});
+const td=document.createElement("td");
+const btn=document.createElement("button");btn.textContent="Hapus";
+btn.onclick=()=>{if(confirm("Hapus pelanggan ini?")){data.splice(i,1);simpan()}};
+td.appendChild(btn);tr.appendChild(td);daftar.appendChild(tr)
+})
+}
+form.onsubmit=e=>{
+e.preventDefault();
+data.push({
+id:crypto.randomUUID(),
+nama:nama.value.trim(),
+namaStnk:namaStnk.value.trim(),
+hp:hp.value.trim()
+});
+simpan();form.reset();alert("Pelanggan tersimpan")
+};
+tampil();
 </script>
-
 </body>
 </html>
+
