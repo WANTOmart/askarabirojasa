@@ -1,97 +1,185 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tracking Status Berkas</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Segoe UI, sans-serif; }
-        body { background: #f4f6f9; padding: 20px; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
-        h2 { margin-bottom: 20px; color: #0d47a1; }
-        .btn-back { background: #546e7a; color: white; padding: 8px 15px; display: inline-block; text-decoration: none; border-radius: 5px; margin-bottom: 15px; }
-        input[type="text"] { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 5px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        th { background: #f5f5f5; }
-        .status-badge { padding: 5px 10px; border-radius: 15px; font-size: 12px; font-weight: bold; }
-        .PROSES { background: #fff3e0; color: #e65100; }
-        .SELESAI { background: #e8f5e9; color: #1b5e20; }
-        .DISERAHKAN { background: #e3f2fd; color: #0d47a1; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tracking Status Berkas - ASKARA ZAYYAN</title>
+<style>
+*{box-sizing:border-box;font-family:"Segoe UI",Arial,sans-serif}
+body{background:#f4f6f9;padding:20px;margin:0;color:#263238}
+.container{max-width:1000px;margin:auto;background:white;padding:20px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+h2{margin:15px 0 20px;color:#0d47a1}
+.btn-back{background:#546e7a;color:white;padding:9px 15px;display:inline-block;text-decoration:none;border-radius:5px;margin-bottom:15px}
+nav{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0 20px}
+nav a{color:#075985}
+input[type=text],select{padding:10px;border:1px solid #ddd;border-radius:5px}
+input[type=text]{width:100%;margin-bottom:20px}
+select{max-width:100%}
+table{width:100%;border-collapse:collapse}
+th,td{border:1px solid #ddd;padding:12px;text-align:left}
+th{background:#f5f5f5}
+.status-badge{padding:5px 10px;border-radius:15px;font-size:12px;font-weight:bold;display:inline-block}
+.PROSES{background:#fff3e0;color:#e65100}
+.SELESAI{background:#e8f5e9;color:#1b5e20}
+.DISERAHKAN{background:#e3f2fd;color:#0d47a1}
+.no-data{text-align:center;color:#888;padding:20px}
+@media(max-width:650px){.container{padding:12px;overflow-x:auto}table{min-width:650px}}
+</style>
 </head>
 <body>
-
 <div class="container">
-    <a href="dashboard.html" class="btn-back">← Kembali</a>
-    <h2>Tracking Berkas Kendaraan</h2>
-    
-    <input type="text" id="search" placeholder="Cari berdasarkan Nopol atau Nama Pelanggan..." onkeyup="filterTabel()">
+<a href="dashboard.html" class="btn-back">← Kembali ke Dashboard</a>
+<h2>ASKARA ZAYYAN — Tracking Berkas Kendaraan</h2>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Pelanggan</th>
-                <th>Nopol</th>
-                <th>Status</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody id="tabelTracking"></tbody>
-    </table>
+<nav>
+<a href="pelanggan.html">Data Pelanggan</a>
+<a href="kendaraan.html">Data Kendaraan</a>
+<a href="transaksi.html">Transaksi</a>
+<a href="pelunasan.html">Pelunasan Piutang</a>
+</nav>
+
+<input type="text" id="search" placeholder="Cari berdasarkan nopol atau nama pelanggan..." oninput="filterTabel()">
+
+<table>
+<thead>
+<tr>
+<th>Pelanggan</th>
+<th>Nopol</th>
+<th>Layanan</th>
+<th>Status Berkas</th>
+<th>Aksi</th>
+</tr>
+</thead>
+<tbody id="tabelTracking"></tbody>
+</table>
 </div>
 
 <script>
-    function tampilkanTracking() {
-        let transaksi = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-        const roleUser = sessionStorage.getItem("loginUser") || "admin";
-        let html = "";
-        
-        // Jika pegawai, tambahkan atribut 'disabled' pada select tag
-        let statusAkses = (roleUser.toLowerCase() === "pegawai") ? "disabled" : "";
+const KEY_BARU="azTransaksi";
+const KEY_LAMA="dataTransaksi";
 
-        transaksi.forEach((t, index) => {
-            html += `<tr>
-                <td>${t.pengurus}</td>
-                <td>${t.nopol}</td>
-                <td><span class="status-badge ${t.statusBerkas}">${t.statusBerkas}</span></td>
-                <td>
-                    <select ${statusAkses} onchange="updateStatus(${index}, this.value)">
-                        <option value="PROSES" ${t.statusBerkas === 'PROSES' ? 'selected' : ''}>PROSES</option>
-                        <option value="SELESAI" ${t.statusBerkas === 'SELESAI' ? 'selected' : ''}>SELESAI</option>
-                        <option value="DISERAHKAN" ${t.statusBerkas === 'DISERAHKAN' ? 'selected' : ''}>DISERAHKAN</option>
-                    </select>
-                </td>
-            </tr>`;
-        });
-        document.getElementById("tabelTracking").innerHTML = html;
-    }
+function bacaTransaksi(){
+const baru=JSON.parse(localStorage.getItem(KEY_BARU)||"[]");
+const lama=JSON.parse(localStorage.getItem(KEY_LAMA)||"[]");
+const hasil=[];
+const ids=new Set();
 
-    function updateStatus(index, statusBaru) {
-        const roleUser = sessionStorage.getItem("loginUser") || "admin";
-        if (roleUser.toLowerCase() === "pegawai") {
-            alert("Akses Ditolak! Pegawai tidak punya izin mengubah status berkas.");
-            return;
-        }
+baru.forEach((t,index)=>{
+hasil.push({...t,_key:KEY_BARU,_index:index});
+if(t.id)ids.add(String(t.id));
+});
 
-        let transaksi = JSON.parse(localStorage.getItem("dataTransaksi"));
-        transaksi[index].statusBerkas = statusBaru;
-        localStorage.setItem("dataTransaksi", JSON.stringify(transaksi));
-        tampilkanTracking();
-    }
+lama.forEach((t,index)=>{
+if(t.id&&ids.has(String(t.id)))return;
+hasil.push({...t,_key:KEY_LAMA,_index:index});
+});
 
-    function filterTabel() {
-        let input = document.getElementById("search").value.toLowerCase();
-        let rows = document.getElementById("tabelTracking").getElementsByTagName("tr");
-        
-        for (let i = 0; i < rows.length; i++) {
-            let text = rows[i].innerText.toLowerCase();
-            rows[i].style.display = text.includes(input) ? "" : "none";
-        }
-    }
+return hasil;
+}
 
-    tampilkanTracking();
+function statusValid(status){
+return ["PROSES","SELESAI","DISERAHKAN"].includes(status)?status:"PROSES";
+}
+
+function tampilkanTracking(){
+const transaksi=bacaTransaksi();
+const role=(sessionStorage.getItem("loginUser")||"admin").toLowerCase();
+const bolehUbah=role!=="pegawai";
+const tbody=document.getElementById("tabelTracking");
+tbody.innerHTML="";
+
+if(transaksi.length===0){
+tbody.innerHTML='<tr><td colspan="5" class="no-data">Belum ada data transaksi. Simpan transaksi terlebih dahulu.</td></tr>';
+return;
+}
+
+transaksi.forEach(t=>{
+const status=statusValid(t.statusBerkas);
+const nama=t.pengurus||t.nama||t.namaStnk||"-";
+const tr=document.createElement("tr");
+
+function buatSel(teks){
+const td=document.createElement("td");
+td.textContent=teks||"-";
+tr.appendChild(td);
+}
+
+buatSel(nama);
+buatSel(t.nopol||"-");
+buatSel(t.layanan||"-");
+
+const tdStatus=document.createElement("td");
+const badge=document.createElement("span");
+badge.className="status-badge "+status;
+badge.textContent=status;
+tdStatus.appendChild(badge);
+tr.appendChild(tdStatus);
+
+const tdAksi=document.createElement("td");
+
+if(bolehUbah){
+const select=document.createElement("select");
+["PROSES","SELESAI","DISERAHKAN"].forEach(s=>{
+const opt=document.createElement("option");
+opt.value=s;
+opt.textContent=s;
+opt.selected=s===status;
+select.appendChild(opt);
+});
+
+select.onchange=()=>updateStatus(t._key,t._index,select.value);
+tdAksi.appendChild(select);
+}else{
+const info=document.createElement("span");
+info.textContent="Hanya lihat";
+tdAksi.appendChild(info);
+}
+
+tr.appendChild(tdAksi);
+tbody.appendChild(tr);
+});
+
+filterTabel();
+}
+
+function updateStatus(key,index,statusBaru){
+const role=(sessionStorage.getItem("loginUser")||"admin").toLowerCase();
+
+if(role==="pegawai"){
+alert("Akses ditolak! Pegawai tidak diizinkan mengubah status berkas.");
+tampilkanTracking();
+return;
+}
+
+if(!["PROSES","SELESAI","DISERAHKAN"].includes(statusBaru)){
+alert("Status tidak valid.");
+return;
+}
+
+const data=JSON.parse(localStorage.getItem(key)||"[]");
+
+if(!data[index]){
+alert("Transaksi tidak ditemukan. Muat ulang halaman.");
+tampilkanTracking();
+return;
+}
+
+data[index]={...data[index],statusBerkas:statusBaru};
+localStorage.setItem(key,JSON.stringify(data));
+tampilkanTracking();
+}
+
+function filterTabel(){
+const input=document.getElementById("search").value.toLowerCase();
+const rows=document.querySelectorAll("#tabelTracking tr");
+
+rows.forEach(row=>{
+row.style.display=row.innerText.toLowerCase().includes(input)?"":"none";
+});
+}
+
+tampilkanTracking();
 </script>
-
 </body>
 </html>
