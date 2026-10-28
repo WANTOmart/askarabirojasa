@@ -1,154 +1,297 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <title>Pelunasan Piutang</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #f4f6f9; }
-        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
-        .btn-back-box { display: inline-block; padding: 10px 20px; border: 2px solid #546e7a; border-radius: 8px; color: #546e7a; text-decoration: none; font-weight: bold; margin-bottom: 20px; }
-        .btn-back-box:hover { background-color: #546e7a; color: white; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        th { background: #f5f5f5; color: #333; }
-        .btn-lunas { background-color: #2e7d32; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .btn-print { background-color: #0288d1; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-left: 3px; }
-        .btn-del { background-color: #c62828; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-left: 3px; }
-        .no-data { text-align: center; color: #888; font-style: italic; }
-        .text-piutang { color: #c62828; font-weight: bold; }
-        .text-lunas { color: #333; font-weight: bold; }
-        .badge-lunas { background-color: #e8f5e9; color: #2e7d32; padding: 6px 10px; border-radius: 4px; font-weight: bold; display: inline-block; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pelunasan Piutang - ASKARA ZAYYAN</title>
+<style>
+body{font-family:'Segoe UI',Arial,sans-serif;padding:20px;background:#f4f6f9;color:#263238}
+.container{max-width:1100px;margin:auto;background:white;padding:20px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.btn-back-box{display:inline-block;padding:10px 20px;border:2px solid #546e7a;border-radius:8px;color:#546e7a;text-decoration:none;font-weight:bold;margin-bottom:20px}
+.btn-back-box:hover{background:#546e7a;color:white}
+nav{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+nav a{color:#075985}
+table{width:100%;border-collapse:collapse;margin-top:20px;font-size:14px}
+th,td{border:1px solid #ddd;padding:10px;text-align:left}
+th{background:#f5f5f5;color:#333}
+button{border:0;padding:8px 12px;border-radius:5px;cursor:pointer;font-weight:bold;margin:2px}
+.btn-lunas{background:#2e7d32;color:white}
+.btn-print{background:#0288d1;color:white}
+.btn-del{background:#c62828;color:white}
+.no-data{text-align:center;color:#888;font-style:italic}
+.text-piutang{color:#c62828;font-weight:bold}
+.text-lunas{color:#2e7d32;font-weight:bold}
+.badge-lunas{background:#e8f5e9;color:#2e7d32;padding:6px 10px;border-radius:4px;font-weight:bold;display:inline-block}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:18px 0}
+.box{background:#f1f5f9;padding:15px;border-radius:8px}
+.box strong{display:block;margin-top:8px;font-size:20px}
+input,select{padding:10px;border:1px solid #ccc;border-radius:6px;max-width:100%;box-sizing:border-box}
+@media(max-width:700px){.container{padding:12px;overflow-x:auto}table{min-width:850px}}
+@media print{.noprint,.btn-back-box,nav{display:none!important}body{background:white;padding:0}.container{box-shadow:none}}
+</style>
 </head>
 <body>
-
 <div class="container">
-    <a href="dashboard.html" class="btn-back-box">← Kembali ke Dashboard</a>
-    <h2>Daftar Piutang Pelanggan</h2>
-    <table id="tabelPelunasan">
-        <thead>
-            <tr>
-                <th>Pelanggan</th>
-                <th>Nopol</th>
-                <th>Layanan</th>
-                <th>Total Biaya</th>
-                <th>Sisa Piutang</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody id="bodyPelunasan"></tbody>
-    </table>
+<a href="dashboard.html" class="btn-back-box">← Kembali ke Dashboard</a>
+
+<h1>ASKARA ZAYYAN</h1>
+<h2>Daftar Piutang Pelanggan</h2>
+
+<nav>
+<a href="pelanggan.html">Data Pelanggan</a>
+<a href="kendaraan.html">Data Kendaraan</a>
+<a href="transaksi.html">Transaksi</a>
+<a href="pelunasan.html">Pelunasan Piutang</a>
+</nav>
+
+<div class="summary">
+<div class="box">Jumlah piutang<strong id="jumlahPiutang">0</strong></div>
+<div class="box">Total sisa piutang<strong id="totalPiutang">Rp0</strong></div>
+<div class="box">Transaksi lunas<strong id="jumlahLunas">0</strong></div>
+</div>
+
+<div class="noprint">
+<input id="cari" placeholder="Cari nama pelanggan atau nopol..." oninput="tampilkanPiutang()">
+<button onclick="location.href='transaksi.html'">+ Buat Transaksi</button>
+<button onclick="window.print()">Cetak Daftar</button>
+</div>
+
+<table>
+<thead>
+<tr>
+<th>Pelanggan</th>
+<th>Nopol</th>
+<th>Layanan</th>
+<th>Total Biaya</th>
+<th>Sudah Dibayar</th>
+<th>Sisa Piutang</th>
+<th>Status</th>
+<th class="noprint">Aksi</th>
+</tr>
+</thead>
+<tbody id="bodyPelunasan"></tbody>
+</table>
 </div>
 
 <script>
-    function proteksiPegawai() {
-        const roleUser = sessionStorage.getItem("loginUser") || "admin";
-        if (roleUser.toLowerCase() === "pegawai") {
-            document.querySelectorAll(".btn-del").forEach(btn => btn.style.display = "none");
-        }
-    }
+const KEY_BARU="azTransaksi";
+const KEY_LAMA="dataTransaksi";
 
-    function tampilkanPiutang() {
-        let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-        let html = "";
-        
-        if (tr.length === 0) {
-            html = `<tr><td colspan="6" class="no-data">Belum ada data transaksi pencatatan piutang.</td></tr>`;
-            document.getElementById("bodyPelunasan").innerHTML = html;
-            return;
-        }
-        
-        tr.forEach((t, i) => {
-            let berkas = Number(t.biayaBerkas) || 0;
-            let jasa = Number(t.biayaJasa) || 0;
-            let totalBiaya = Number(t.total) || (berkas + jasa);
-            let uangMuka = Number(t.dp) || 0;
-            let sisa = totalBiaya - uangMuka;
-            let namaLayanan = t.layanan || "-";
-            
-            let sisaClass = "";
-            let tombolLunas = "";
-            
-            if (sisa > 0) {
-                sisaClass = "text-piutang";
-                tombolLunas = `<button class="btn-lunas" onclick="lunasi(${i})">LUNAS</button>`;
-            } else {
-                sisaClass = "text-lunas";
-                tombolLunas = `<span class="badge-lunas">✓ SELESAI</span>`;
-            }
-            
-            html += `<tr>
-                <td>${t.pengurus}</td>
-                <td><strong>${t.nopol}</strong></td>
-                <td><small>${namaLayanan}</small></td>
-                <td>Rp ${totalBiaya.toLocaleString('id-ID')}</td>
-                <td class="${sisaClass}">Rp ${sisa.toLocaleString('id-ID')}</td>
-                <td>
-                    ${tombolLunas}
-                    <button class="btn-print" onclick="cetakLunas('${t.pengurus}', '${t.nopol}', '${namaLayanan}', ${sisa})">Cetak</button>
-                    <button class="btn-del" onclick="hapusTransaksi(${i})">Hapus</button>
-                </td>
-            </tr>`;
-        });
-        
-        document.getElementById("bodyPelunasan").innerHTML = html;
-        proteksiPegawai();
-    }
+function bacaData(){
+const baru=JSON.parse(localStorage.getItem(KEY_BARU)||"[]");
+const lama=JSON.parse(localStorage.getItem(KEY_LAMA)||"[]");
+const hasil=[];
+const idTerpakai=new Set();
 
-    function lunasi(i) {
-        if(confirm('Apakah Anda yakin ingin mengubah status transaksi ini menjadi LUNAS?')) {
-            let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-            if(tr[i]) {
-                let berkas = Number(tr[i].biayaBerkas) || 0;
-                let jasa = Number(tr[i].biayaJasa) || 0;
-                tr[i].dp = Number(tr[i].total) || (berkas + jasa); 
-                localStorage.setItem("dataTransaksi", JSON.stringify(tr));
-                tampilkanPiutang();
-            }
-        }
-    }
+baru.forEach((t,i)=>{
+hasil.push({...t,_sumber:KEY_BARU,_index:i});
+if(t.id) idTerpakai.add(String(t.id));
+});
 
-    function hapusTransaksi(i) {
-        const roleUser = sessionStorage.getItem("loginUser") || "admin";
-        if (roleUser.toLowerCase() === "pegawai") {
-            alert("Akses Ditolak! Pegawai tidak diizinkan menghapus rekam piutang.");
-            return;
-        }
+lama.forEach((t,i)=>{
+if(t.id && idTerpakai.has(String(t.id)))return;
+hasil.push({...t,_sumber:KEY_LAMA,_index:i});
+});
 
-        if(confirm('Hapus transaksi piutang ini?')) {
-            let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-            tr.splice(i, 1);
-            localStorage.setItem("dataTransaksi", JSON.stringify(tr));
-            tampilkanPiutang();
-        }
-    }
+return hasil;
+}
 
-    function cetakLunas(nama, nopol, layanan, sisa) {
-        let statusBayar = sisa <= 0 ? "PELUNASAN LUNAS" : "SISA PIUTANG TAGIHAN";
-        let w = window.open('', '_blank');
-        w.document.write(`
-            <html>
-            <head><title>Kwitansi Tagihan</title></head>
-            <body style="font-family:sans-serif; padding:20px; text-align:center;" onload="window.print()">
-                <div style="border:2px dashed #333; padding:20px; max-width:400px; margin:auto; text-align:left;">
-                    <h3 style="text-align:center;">ASKARA ZAYYAN BIRO JASA</h3>
-                    <p style="text-align:center; font-size:12px; color:#555;">${statusBayar}</p>
-                    <hr style="border:1px dashed #333;">
-                    <p>Pelanggan: <b>${nama}</b></p>
-                    <p>No. Polisi: <b>${nopol}</b></p>
-                    <p>Layanan: <b>${layanan}</b></p>
-                    <p>Nilai Rujukan: <b>Rp ${Number(sisa).toLocaleString('id-ID')}</b></p>
-                    <hr style="border:1px dashed #333; margin-top:20px;">
-                    <p style="text-align:center; font-size:11px; font-style:italic;">Biro Jasa Askara Zayyan - Amanah & Terpercaya</p>
-                </div>
-            </body>
-            </html>
-        `);
-        w.document.close();
-    }
+function uang(n){
+return new Intl.NumberFormat("id-ID",{
+style:"currency",currency:"IDR",maximumFractionDigits:0
+}).format(Number(n)||0);
+}
 
-    tampilkanPiutang();
+function angka(n){return Math.max(0,Number(n)||0)}
+
+function rincian(t){
+const total=angka(t.total || (angka(t.biayaBerkas)+angka(t.biayaJasa)) || (angka(t.biayaResmi)+angka(t.jasa)));
+const dibayar=angka(t.dp);
+const sisa=Math.max(0,total-dibayar);
+const status=(t.statusBayar==="LUNAS"||t.statusPembayaran==="LUNAS"||t.status==="SELESAI"||sisa===0)?"LUNAS":"BELUM LUNAS";
+return {total,dibayar,sisa,status};
+}
+
+function simpanBaris(item,perubahan){
+const key=item._sumber;
+const data=JSON.parse(localStorage.getItem(key)||"[]");
+const i=item._index;
+if(!data[i])return false;
+data[i]={...data[i],...perubahan};
+localStorage.setItem(key,JSON.stringify(data));
+return true;
+}
+
+function tampilkanPiutang(){
+const data=bacaData();
+const tbody=document.getElementById("bodyPelunasan");
+const q=(document.getElementById("cari").value||"").toLowerCase();
+tbody.innerHTML="";
+
+let jmlPiutang=0,totalPiutang=0,jmlLunas=0,jmlDitampilkan=0;
+
+data.forEach(t=>{
+const r=rincian(t);
+if(r.status==="LUNAS")jmlLunas++;
+else {jmlPiutang++;totalPiutang+=r.sisa}
+
+const nama=t.pengurus||t.nama||t.namaStnk||"-";
+const nopol=t.nopol||"-";
+const layanan=t.layanan||"-";
+
+if(!(nama+" "+nopol+" "+layanan).toLowerCase().includes(q))return;
+jmlDitampilkan++;
+
+const tr=document.createElement("tr");
+function td(teks,kelas){
+const el=document.createElement("td");
+el.textContent=teks;
+if(kelas)el.className=kelas;
+tr.appendChild(el);
+}
+td(nama);
+td(nopol);
+td(layanan);
+td(uang(r.total));
+td(uang(r.dibayar));
+td(uang(r.sisa),r.sisa>0?"text-piutang":"text-lunas");
+td(r.status==="LUNAS"?"✓ LUNAS":"BELUM LUNAS",r.status==="LUNAS"?"text-lunas":"text-piutang");
+
+const aksi=document.createElement("td");
+aksi.className="noprint";
+
+if(r.sisa>0){
+const lunas=document.createElement("button");
+lunas.className="btn-lunas";
+lunas.textContent="LUNAS";
+lunas.onclick=()=>lunasi(t);
+aksi.appendChild(lunas);
+}else{
+const badge=document.createElement("span");
+badge.className="badge-lunas";
+badge.textContent="✓ SELESAI";
+aksi.appendChild(badge);
+}
+
+const cetak=document.createElement("button");
+cetak.className="btn-print";
+cetak.textContent="Cetak";
+cetak.onclick=()=>cetakLunas(t);
+aksi.appendChild(cetak);
+
+const role=(sessionStorage.getItem("loginUser")||"admin").toLowerCase();
+if(role!=="pegawai"){
+const hapus=document.createElement("button");
+hapus.className="btn-del";
+hapus.textContent="Hapus";
+hapus.onclick=()=>hapusTransaksi(t);
+aksi.appendChild(hapus);
+}
+tr.appendChild(aksi);
+tbody.appendChild(tr);
+});
+
+if(jmlDitampilkan===0){
+const tr=document.createElement("tr");
+const td=document.createElement("td");
+td.colSpan=8;
+td.className="no-data";
+td.textContent="Belum ada transaksi yang cocok.";
+tr.appendChild(td);
+tbody.appendChild(tr);
+}
+
+document.getElementById("jumlahPiutang").textContent=jmlPiutang;
+document.getElementById("totalPiutang").textContent=uang(totalPiutang);
+document.getElementById("jumlahLunas").textContent=jmlLunas;
+}
+
+function lunasi(t){
+const r=rincian(t);
+if(r.sisa<=0)return alert("Transaksi ini sudah lunas.");
+
+if(!confirm("Tandai transaksi ini sebagai LUNAS?"))return;
+
+const berhasil=simpanBaris(t,{
+dp:r.total,
+statusBayar:"LUNAS",
+statusPembayaran:"LUNAS",
+status:"SELESAI",
+tanggalPelunasan:new Date().toLocaleString("id-ID")
+});
+
+if(berhasil){
+t.dp=r.total;
+t.statusBayar="LUNAS";
+t.status="SELESAI";
+t.statusPembayaran="LUNAS";
+cetakLunas(t,true);
+tampilkanPiutang();
+}else{
+alert("Transaksi tidak ditemukan. Silakan muat ulang halaman.");
+}
+}
+
+function hapusTransaksi(t){
+const role=(sessionStorage.getItem("loginUser")||"admin").toLowerCase();
+if(role==="pegawai"){
+alert("Akses ditolak. Pegawai tidak diizinkan menghapus transaksi.");
+return;
+}
+if(!confirm("Hapus transaksi ini secara permanen dari penyimpanan browser?"))return;
+const data=JSON.parse(localStorage.getItem(t._sumber)||"[]");
+data.splice(t._index,1);
+localStorage.setItem(t._sumber,JSON.stringify(data));
+tampilkanPiutang();
+}
+
+function aman(v){
+return String(v??"-").replace(/[&<>"']/g,c=>({
+"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[c]));
+}
+
+function cetakLunas(t,baruLunas=false){
+const r=rincian(t);
+const nama=t.pengurus||t.nama||t.namaStnk||"-";
+const status=r.sisa===0?"BUKTI PELUNASAN LUNAS":"BUKTI SISA PIUTANG";
+const nilai=status.includes("LUNAS")?r.total:r.sisa;
+const w=window.open("","_blank");
+if(!w){alert("Izinkan pop-up browser agar bukti dapat dicetak.");return;}
+
+w.document.write(`
+<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8">
+<title>Kwitansi ASKARA ZAYYAN</title>
+<style>
+body{font-family:Arial,sans-serif;padding:25px}
+.kwitansi{border:2px dashed #333;padding:20px;max-width:450px;margin:auto}
+h2,p{text-align:center}
+.detail{text-align:left;line-height:1.8}
+@media print{button{display:none}}
+</style></head><body>
+<div class="kwitansi">
+<h2>ASKARA ZAYYAN BIRO JASA</h2>
+<p><b>${aman(status)}</b></p><hr>
+<div class="detail">
+<p>Pelanggan: <b>${aman(nama)}</b></p>
+<p>No. Polisi: <b>${aman(t.nopol)}</b></p>
+<p>Layanan: <b>${aman(t.layanan)}</b></p>
+<p>Total biaya: <b>${uang(r.total)}</b></p>
+<p>Total dibayar: <b>${uang(r.dibayar)}</b></p>
+<p>Sisa piutang: <b>${uang(r.sisa)}</b></p>
+<p>Nilai bukti ini: <b>${uang(nilai)}</b></p>
+<p>Tanggal: ${aman(new Date().toLocaleString("id-ID"))}</p>
+</div><hr>
+<p><i>Amanah & Terpercaya</i></p>
+</div>
+<script>window.onload=()=>window.print();<\/script>
+</body></html>`);
+w.document.close();
+}
+
+tampilkanPiutang();
 </script>
-
 </body>
 </html>
+
