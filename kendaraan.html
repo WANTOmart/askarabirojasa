@@ -4,66 +4,71 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Data Pelanggan - ASKARA ZAYYAN</title>
+<title>Data Kendaraan - ASKARA ZAYYAN</title>
 <style>
 body{font-family:Arial,sans-serif;background:#f1f5f9;margin:0;padding:20px;color:#172033}
-main{max-width:800px;margin:auto;background:white;padding:22px;border-radius:14px}
-h1{color:#075985}input,button{box-sizing:border-box;padding:12px;margin:5px 0;width:100%;border-radius:8px;border:1px solid #cbd5e1}
-button{background:#075985;color:white;cursor:pointer;border:0}
+main{max-width:850px;margin:auto;background:white;padding:22px;border-radius:14px}
+h1{color:#075985}input,select,button{box-sizing:border-box;width:100%;padding:12px;margin:5px 0;border:1px solid #cbd5e1;border-radius:8px}
+button{background:#075985;color:white;border:0;cursor:pointer}
 a{color:#075985}table{width:100%;border-collapse:collapse;margin-top:15px}
 th,td{text-align:left;padding:9px;border-bottom:1px solid #ddd;overflow-wrap:anywhere}
-.actions{display:flex;gap:8px;flex-wrap:wrap}.actions a{padding:10px}
 </style>
 </head>
 <body>
 <main>
 <h1>ASKARA ZAYYAN</h1>
-<h2>Data Pelanggan</h2>
+<h2>Data Kendaraan</h2>
 <form id="form">
-<input id="nama" placeholder="Nama pengurus" required>
-<input id="namaStnk" placeholder="Nama sesuai STNK" required>
-<input id="hp" placeholder="Nomor HP">
-<button type="submit">Simpan Pelanggan</button>
+<select id="pelanggan" required><option value="">-- Pilih pelanggan --</option></select>
+<input id="nopol" placeholder="Nomor polisi" required>
+<input id="merk" placeholder="Merek / tipe kendaraan">
+<input id="norangka" placeholder="Nomor rangka">
+<input id="nomesin" placeholder="Nomor mesin">
+<button type="submit">Simpan Kendaraan</button>
 </form>
-<div class="actions">
-<a href="kendaraan.html">Data Kendaraan</a>
-<a href="transaksi.html">Transaksi</a>
-<a href="dashboard.html">Dashboard</a>
-</div>
+<p><a href="pelanggan.html">Data Pelanggan</a> | <a href="transaksi.html">Transaksi</a> | <a href="dashboard.html">Dashboard</a></p>
 <table>
-<thead><tr><th>Nama Pengurus / STNK</th><th>HP</th><th>Aksi</th></tr></thead>
+<thead><tr><th>Pemilik/Pengurus</th><th>Nopol</th><th>Kendaraan</th><th>Aksi</th></tr></thead>
 <tbody id="daftar"></tbody>
 </table>
 </main>
 <script>
-const KEY="dataPelanggan";
-let data=JSON.parse(localStorage.getItem(KEY)||"[]");
-const form=document.getElementById("form");
-function simpan(){localStorage.setItem(KEY,JSON.stringify(data));tampil()}
+const PK="dataPelanggan",KK="dataKendaraan";
+let pelangganData=JSON.parse(localStorage.getItem(PK)||"[]");
+let kendaraanData=JSON.parse(localStorage.getItem(KK)||"[]");
+function muatPelanggan(){
+pelanggan.innerHTML='<option value="">-- Pilih pelanggan --</option>';
+pelangganData.forEach(p=>{
+const o=document.createElement("option");o.value=p.id||p.nama+"|"+p.namaStnk;
+o.textContent=p.nama+" - "+p.namaStnk;pelanggan.appendChild(o)
+})
+}
+function simpan(){localStorage.setItem(KK,JSON.stringify(kendaraanData));tampil()}
 function tampil(){
 daftar.innerHTML="";
-data.forEach((p,i)=>{
+kendaraanData.forEach((k,i)=>{
 const tr=document.createElement("tr");
-[p.nama+" / "+p.namaStnk,p.hp||"-"].forEach(v=>{
+[k.pengurus+" / "+k.namaStnk,k.nopol,k.merk||"-"].forEach(v=>{
 const td=document.createElement("td");td.textContent=v;tr.appendChild(td)
 });
-const td=document.createElement("td");
-const btn=document.createElement("button");btn.textContent="Hapus";
-btn.onclick=()=>{if(confirm("Hapus pelanggan ini?")){data.splice(i,1);simpan()}};
-td.appendChild(btn);tr.appendChild(td);daftar.appendChild(tr)
+const td=document.createElement("td"),b=document.createElement("button");
+b.textContent="Hapus";b.onclick=()=>{if(confirm("Hapus kendaraan?")){kendaraanData.splice(i,1);simpan()}};
+td.appendChild(b);tr.appendChild(td);daftar.appendChild(tr)
 })
 }
 form.onsubmit=e=>{
 e.preventDefault();
-data.push({
-id:crypto.randomUUID(),
-nama:nama.value.trim(),
-namaStnk:namaStnk.value.trim(),
-hp:hp.value.trim()
+const p=pelangganData.find(x=>(x.id||x.nama+"|"+x.namaStnk)===pelanggan.value);
+if(!p)return alert("Pilih pelanggan terlebih dahulu.");
+kendaraanData.push({
+id:crypto.randomUUID(),pengurus:p.nama,namaStnk:p.namaStnk,
+nopol:nopol.value.trim().toUpperCase(),merk:merk.value.trim(),
+norangka:norangka.value.trim(),nomesin:nomesin.value.trim()
 });
-simpan();form.reset();alert("Pelanggan tersimpan")
+simpan();form.reset();alert("Kendaraan tersimpan")
 };
-tampil();
+muatPelanggan();tampil();
 </script>
 </body>
 </html>
+
