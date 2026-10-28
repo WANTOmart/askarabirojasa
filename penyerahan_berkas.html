@@ -1,238 +1,300 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <title>Penyerahan Berkas</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #f4f6f9; }
-        .container { max-width: 1100px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
-        .btn-back-box { display: inline-block; padding: 10px 20px; border: 2px solid #546e7a; border-radius: 8px; color: #546e7a; text-decoration: none; font-weight: bold; margin-bottom: 20px; transition: 0.3s; }
-        .btn-back-box:hover { background-color: #546e7a; color: white; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        th { background: #f5f5f5; color: #333; }
-        input.input-pengambil { width: 100%; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        .btn-serah { background: #0288d1; color: white; padding: 8px 12px; border: none; cursor: pointer; border-radius: 4px; font-weight: bold; }
-        .btn-print { background: #388e3c; color: white; padding: 8px 12px; border: none; cursor: pointer; border-radius: 4px; font-weight: bold; margin-left: 3px; }
-        .btn-del { background: #c62828; color: white; padding: 8px 12px; border: none; cursor: pointer; border-radius: 4px; font-weight: bold; margin-left: 3px; }
-        .badge-ready { background: #e8f5e9; color: #2e7d32; padding: 4px 8px; border-radius: 12px; font-weight: bold; font-size: 12px; }
-        .badge-delivered { background: #eceff1; color: #455a64; padding: 4px 8px; border-radius: 12px; font-weight: bold; font-size: 12px; }
-        .badge-process { background: #fff3e0; color: #e65100; padding: 4px 8px; border-radius: 12px; font-weight: bold; font-size: 12px; }
-        .no-data { text-align: center; color: #888; font-style: italic; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Penyerahan Berkas - ASKARA ZAYYAN</title>
+<style>
+*{box-sizing:border-box;font-family:"Segoe UI",Arial,sans-serif}
+body{padding:20px;background:#f4f6f9;margin:0;color:#263238}
+.container{max-width:1100px;margin:auto;background:white;padding:20px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.btn-back-box{display:inline-block;padding:10px 20px;border:2px solid #546e7a;border-radius:8px;color:#546e7a;text-decoration:none;font-weight:bold;margin-bottom:20px}
+.btn-back-box:hover{background:#546e7a;color:white}
+nav{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+nav a{color:#075985}
+table{width:100%;border-collapse:collapse;margin-top:20px;font-size:14px}
+th,td{border:1px solid #ddd;padding:12px;text-align:left}
+th{background:#f5f5f5;color:#333}
+input.input-pengambil{width:100%;padding:8px;border:1px solid #ccc;border-radius:4px}
+button{padding:8px 12px;border:0;cursor:pointer;border-radius:4px;font-weight:bold;margin:2px}
+.btn-serah{background:#0288d1;color:white}
+.btn-print{background:#388e3c;color:white}
+.btn-del{background:#c62828;color:white}
+.badge-ready{background:#e8f5e9;color:#2e7d32;padding:4px 8px;border-radius:12px;font-weight:bold;font-size:12px}
+.badge-delivered{background:#eceff1;color:#455a64;padding:4px 8px;border-radius:12px;font-weight:bold;font-size:12px}
+.badge-process{background:#fff3e0;color:#e65100;padding:4px 8px;border-radius:12px;font-weight:bold;font-size:12px}
+.no-data{text-align:center;color:#888;font-style:italic}
+@media(max-width:700px){.container{padding:12px;overflow-x:auto}table{min-width:950px}}
+@media print{.noprint,nav,.btn-back-box{display:none!important}body{background:white}}
+</style>
 </head>
 <body>
-
 <div class="container">
-    <a href="dashboard.html" class="btn-back-box">← Kembali ke Dashboard</a>
-    <h2>Penyerahan Berkas Kendaraan</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Pelanggan</th>
-                <th>Nopol</th>
-                <th>Layanan</th>
-                <th>Status Berkas</th>
-                <th style="width: 200px;">Nama Pengambil Berkas</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody id="tabelPenyerahan"></tbody>
-    </table>
+<a href="dashboard.html" class="btn-back-box">← Kembali ke Dashboard</a>
+<h1>ASKARA ZAYYAN</h1>
+<h2>Penyerahan Berkas Kendaraan</h2>
+
+<nav>
+<a href="pelanggan.html">Pelanggan</a>
+<a href="kendaraan.html">Kendaraan</a>
+<a href="transaksi.html">Transaksi</a>
+<a href="tracking.html">Tracking Berkas</a>
+<a href="pelunasan.html">Pelunasan Piutang</a>
+</nav>
+
+<table>
+<thead>
+<tr>
+<th>Pelanggan</th>
+<th>Nopol</th>
+<th>Layanan</th>
+<th>Status Berkas</th>
+<th style="width:200px">Nama Pengambil Berkas</th>
+<th>Aksi</th>
+</tr>
+</thead>
+<tbody id="tabelPenyerahan"></tbody>
+</table>
 </div>
 
 <script>
-    function tampilkanPenyerahan() {
-        let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-        let html = "";
-        
-        if (tr.length === 0) {
-            html = `<tr><td colspan="6" class="no-data">Belum ada data transaksi masuk.</td></tr>`;
-            document.getElementById("tabelPenyerahan").innerHTML = html;
-            return;
-        }
+const KEY_BARU="azTransaksi";
+const KEY_LAMA="dataTransaksi";
 
-        tr.forEach((t, index) => {
-            let namaLayanan = t.layanan || "-";
-            let pengambilLama = t.namaPengambil || ""; 
-            
-            let statusBadge = "";
-            let kolomInput = "";
-            let kolomAksi = ""; // Variabel baru untuk menampung tombol dinamis
+function bacaTransaksi(){
+const baru=JSON.parse(localStorage.getItem(KEY_BARU)||"[]");
+const lama=JSON.parse(localStorage.getItem(KEY_LAMA)||"[]");
+const hasil=[];
+const ids=new Set();
 
-            // JIKA STATUS DISERAHKAN (TOMBOL HAPUS DIHILANGKAN)
-            if (t.statusBerkas === "DISERAHKAN") {
-                statusBadge = `<span class="badge-delivered">DISERAHKAN</span>`;
-                kolomInput = `<input type="text" class="input-pengambil" id="pengambil-${index}" value="${pengambilLama}" disabled>`;
-                
-                // Hanya menampilkan teks Selesai dan tombol Cetak saja
-                kolomAksi = `
-                    <span style="color:#455a64; font-weight:bold; font-size:13px; margin-right:5px;">✓ Selesai</span>
-                    <button class="btn-print" onclick="prosesCetak(${index})">Cetak</button>
-                `;
-            } else {
-                // JIKA BELUM DISERAHKAN (PROSES / SELESAI)
-                let labelStatus = t.statusBerkas || "PROSES";
-                let kelasStatus = labelStatus === "SELESAI" ? "badge-ready" : "badge-process";
-                
-                statusBadge = `<span class="${kelasStatus}">${labelStatus}</span>`;
-                kolomInput = `<input type="text" class="input-pengambil" id="pengambil-${index}" placeholder="Ketik nama pengambil..." value="${pengambilLama}">`;
-                
-                // Menampilkan tombol Serah, Cetak, dan Hapus
-                kolomAksi = `
-                    <button class="btn-serah" onclick="serahkan(${index})">Serah</button>
-                    <button class="btn-print" onclick="prosesCetak(${index})">Cetak</button>
-                    <button class="btn-del" onclick="hapusTransaksi(${index})">Hapus</button>
-                `;
-            }
+baru.forEach((t,i)=>{
+hasil.push({...t,_key:KEY_BARU,_index:i});
+if(t.id)ids.add(String(t.id));
+});
 
-            html += `<tr>
-                <td>${t.pengurus}</td>
-                <td><strong>${t.nopol}</strong></td>
-                <td><small>${namaLayanan}</small></td>
-                <td>${statusBadge}</td>
-                <td>${kolomInput}</td>
-                <td>${kolomAksi}</td>
-            </tr>`;
-        });
+lama.forEach((t,i)=>{
+if(t.id&&ids.has(String(t.id)))return;
+hasil.push({...t,_key:KEY_LAMA,_index:i});
+});
 
-        document.getElementById("tabelPenyerahan").innerHTML = html;
-    }
+return hasil;
+}
 
-    // FUNGSI UNTUK MENYIMPAN NAMA PENGAMBIL DAN MENGUBAH STATUS MENJADI DISERAHKAN
-    function serahkan(index) {
-        let namaInput = document.getElementById(`pengambil-${index}`).value.trim();
-        
-        if (namaInput === "") {
-            alert("Mohon isi dahulu 'Nama Pengambil Berkas' sebelum menyerahkan berkas!");
-            document.getElementById(`pengambil-${index}`).focus();
-            return;
-        }
+function statusValid(s){
+return ["PROSES","SELESAI","DISERAHKAN"].includes(s)?s:"PROSES";
+}
 
-        if(confirm(`Apakah Anda yakin ingin menyerahkan berkas kepada ${namaInput}?`)) {
-            let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-            if(tr[index]) {
-                tr[index].statusBerkas = "DISERAHKAN";
-                tr[index].namaPengambil = namaInput; 
-                localStorage.setItem("dataTransaksi", JSON.stringify(tr));
-                tampilkanPenyerahan();
-            }
-        }
-    }
+function tampilkanPenyerahan(){
+const data=bacaTransaksi();
+const tbody=document.getElementById("tabelPenyerahan");
+const role=(sessionStorage.getItem("loginUser")||"admin").toLowerCase();
+tbody.innerHTML="";
 
-    // FUNGSI UNTUK JALUR CETAK (OTOMATIS SAVE INPUT JIKA ADA PERUBAHAN)
-    function prosesCetak(index) {
-        let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-        let namaInput = document.getElementById(`pengambil-${index}`).value.trim();
-        
-        if (tr[index]) {
-            if (namaInput !== tr[index].namaPengambil) {
-                tr[index].namaPengambil = namaInput;
-                localStorage.setItem("dataTransaksi", JSON.stringify(tr));
-            }
-            
-            let namaCetak = namaInput || tr[index].pengurus; 
-            let namaLayanan = tr[index].layanan || "-";
-            
-            cetakTandaTerima(tr[index].pengurus, tr[index].nopol, namaLayanan, namaCetak);
-        }
-    }
+if(data.length===0){
+tbody.innerHTML='<tr><td colspan="6" class="no-data">Belum ada data transaksi. Simpan transaksi terlebih dahulu.</td></tr>';
+return;
+}
 
-    // FUNGSI HAPUS TRANSAKSI
-    function hapusTransaksi(index) {
-        if(confirm('Apakah Anda yakin ingin menghapus data transaksi ini?')) {
-            let tr = JSON.parse(localStorage.getItem("dataTransaksi")) || [];
-            tr.splice(index, 1);
-            localStorage.setItem("dataTransaksi", JSON.stringify(tr));
-            tampilkanPenyerahan();
-        }
-    }
+data.forEach(t=>{
+const status=statusValid(t.statusBerkas);
+const nama=t.pengurus||t.nama||t.namaStnk||"-";
+const pengambil=t.namaPengambil||"";
+const tr=document.createElement("tr");
 
-    // FUNGSI TEMPLATE NOTA CETAK DENGAN WATERMARK BACKGROUND LOGO
-    function cetakTandaTerima(nama, nopol, layanan, namaPengambil) {
-        let w = window.open('', '_blank');
-        w.document.write(`
-            <html>
-            <head>
-                <title>Tanda Terima Berkas</title>
-                <style>
-                    @media print {
-                        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                    }
-                    .nota-box { 
-                        border: 2px dashed #333; 
-                        padding: 25px; 
-                        max-width: 500px; 
-                        margin: auto; 
-                        text-align: left; 
-                        position: relative;
-                        background: #fff;
-                        overflow: hidden;
-                    }
-                    .bg-logo-watermark {
-                        position: absolute;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%) rotate(-15deg);
-                        width: 75%;
-                        opacity: 0.08;
-                        z-index: 0;
-                        pointer-events: none;
-                    }
-                    .konten {
-                        position: relative;
-                        z-index: 1;
-                    }
-                    .nota-table { width:100%; font-size: 14px; text-align: center; border-collapse: collapse; margin-top: 10px; }
-                    .nota-table td { border: none; padding: 5px; text-align: center; }
-                </style>
-            </head>
-            <body style="font-family:Arial, sans-serif; text-align:center; padding: 20px;" onload="window.print()">
-                
-                <div class="nota-box">
-                    <img src="logo-az.jpeg" class="bg-logo-watermark" alt="Logo Watermark">
-                    
-                    <div class="konten">
-                        <h3 style="text-align:center; margin-bottom: 5px; font-size: 16px; line-height: 1.3;">
-                            ASKARA ZAYYAN BIRO JASA KENDARAAN BERMOTOR
-                        </h3>
-                        <p style="text-align:center; font-size:12px; margin-bottom:20px; color:#555;">Bukti Penyerahan Dokumen Kendaraan</p>
-                        <hr style="border: 1px dashed #333;">
-                        
-                        <div style="margin: 15px 0; font-size: 14px; line-height: 1.6;">
-                            <p>Telah diserahkan kembali berkas asli kepada pelanggan dengan rincian berikut:</p>
-                            <p style="margin-left: 10px;">Nama Pelanggan: <b>${nama}</b></p>
-                            <p style="margin-left: 10px;">No. Polisi Kendaraan: <b>${nopol}</b></p>
-                            <p style="margin-left: 10px;">Jenis Layanan: <b>${layanan}</b></p>
-                            <p style="margin-left: 10px;">Tanggal Ambil: ${new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                        </div>
-                        
-                        <hr style="border: 1px dashed #333; margin-top:20px; margin-bottom:30px;">
-                        
-                        <table class="nota-table">
-                            <tr>
-                                <td style="width: 50%;">Yang Menyerahkan,</td>
-                                <td style="width: 50%;">Yang Menerima,</td>
-                            </tr>
-                            <tr style="height:70px;">
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>( ASKARA ZAYYAN )</td>
-                                <td>( <b>${namaPengambil}</b> )</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-                
-            </body>
-            </html>
-        `);
-        w.document.close();
-    }
+function sel(teks){
+const td=document.createElement("td");
+td.textContent=teks||"-";
+tr.appendChild(td);
+}
+sel(nama);
+sel(t.nopol||"-");
+sel(t.layanan||"-");
 
-    tampilkanPenyerahan();
+const tdStatus=document.createElement("td");
+const badge=document.createElement("span");
+badge.className=status==="DISERAHKAN"?"badge-delivered":status==="SELESAI"?"badge-ready":"badge-process";
+badge.textContent=status;
+tdStatus.appendChild(badge);
+tr.appendChild(tdStatus);
+
+const tdInput=document.createElement("td");
+const input=document.createElement("input");
+input.type="text";
+input.className="input-pengambil";
+input.id="pengambil-"+t._key+"-"+t._index;
+input.placeholder="Nama pengambil...";
+input.value=pengambil;
+input.disabled=status==="DISERAHKAN"||role==="pegawai";
+tdInput.appendChild(input);
+tr.appendChild(tdInput);
+
+const tdAksi=document.createElement("td");
+
+if(status==="DISERAHKAN"){
+const selesai=document.createElement("span");
+selesai.textContent="✓ Selesai ";
+selesai.style.fontWeight="bold";
+tdAksi.appendChild(selesai);
+}else if(role!=="pegawai"){
+const serah=document.createElement("button");
+serah.className="btn-serah";
+serah.textContent="Serahkan";
+serah.onclick=()=>serahkan(t._key,t._index,input.id);
+tdAksi.appendChild(serah);
+}
+
+const cetak=document.createElement("button");
+cetak.className="btn-print";
+cetak.textContent="Cetak";
+cetak.onclick=()=>prosesCetak(t._key,t._index,input.id);
+tdAksi.appendChild(cetak);
+
+if(role!=="pegawai"&&status!=="DISERAHKAN"){
+const hapus=document.createElement("button");
+hapus.className="btn-del";
+hapus.textContent="Hapus";
+hapus.onclick=()=>hapusTransaksi(t._key,t._index);
+tdAksi.appendChild(hapus);
+}
+tr.appendChild(tdAksi);
+tbody.appendChild(tr);
+});
+}
+
+function simpanPerubahan(key,index,perubahan){
+const data=JSON.parse(localStorage.getItem(key)||"[]");
+if(!data[index])return false;
+data[index]={...data[index],...perubahan};
+localStorage.setItem(key,JSON.stringify(data));
+return true;
+}
+
+function serahkan(key,index,inputId){
+const role=(sessionStorage.getItem("loginUser")||"admin").toLowerCase();
+if(role==="pegawai"){
+alert("Akses ditolak. Pegawai tidak diizinkan menyerahkan atau mengubah status berkas.");
+return;
+}
+
+const input=document.getElementById(inputId);
+const namaInput=input.value.trim();
+if(!namaInput){
+alert("Mohon isi nama pengambil berkas terlebih dahulu.");
+input.focus();
+return;
+}
+
+if(!confirm("Serahkan berkas kepada "+namaInput+"?"))return;
+
+if(simpanPerubahan(key,index,{
+statusBerkas:"DISERAHKAN",
+namaPengambil:namaInput,
+tanggalPenyerahan:new Date().toLocaleString("id-ID")
+})){
+tampilkanPenyerahan();
+}else{
+alert("Data transaksi tidak ditemukan. Muat ulang halaman.");
+}
+}
+
+function prosesCetak(key,index,inputId){
+const data=JSON.parse(localStorage.getItem(key)||"[]");
+const t=data[index];
+if(!t)return alert("Transaksi tidak ditemukan.");
+
+const role=(sessionStorage.getItem("loginUser")||"admin").toLowerCase();
+const input=document.getElementById(inputId);
+const namaInput=input?input.value.trim():"";
+let namaCetak=namaInput||t.namaPengambil||t.pengurus||t.nama||"-";
+
+if(role!=="pegawai"&&namaInput!==String(t.namaPengambil||"")){
+simpanPerubahan(key,index,{namaPengambil:namaInput});
+}
+
+cetakTandaTerima(
+t.pengurus||t.nama||t.namaStnk||"-",
+t.nopol||"-",
+t.layanan||"-",
+namaCetak,
+t.statusBerkas||"PROSES",
+t.tanggalPenyerahan||""
+);
+}
+
+function hapusTransaksi(key,index){
+const role=(sessionStorage.getItem("loginUser")||"admin").toLowerCase();
+if(role==="pegawai"){
+alert("Akses ditolak. Pegawai tidak diizinkan menghapus transaksi.");
+return;
+}
+if(!confirm("Hapus transaksi ini dari penyimpanan browser?"))return;
+
+const data=JSON.parse(localStorage.getItem(key)||"[]");
+data.splice(index,1);
+localStorage.setItem(key,JSON.stringify(data));
+tampilkanPenyerahan();
+}
+
+function aman(v){
+return String(v??"-").replace(/[&<>"']/g,c=>({
+"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[c]));
+}
+
+function cetakTandaTerima(nama,nopol,layanan,namaPengambil,status,tanggalPenyerahan){
+const w=window.open("","_blank");
+if(!w){
+alert("Izinkan pop-up browser untuk mencetak tanda terima.");
+return;
+}
+
+const tanggal=tanggalPenyerahan||new Date().toLocaleDateString("id-ID",{
+weekday:"long",year:"numeric",month:"long",day:"numeric"
+});
+
+w.document.write(`
+<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8">
+<title>Tanda Terima Berkas</title>
+<style>
+@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+body{font-family:Arial,sans-serif;padding:20px}
+.nota-box{border:2px dashed #333;padding:25px;max-width:500px;margin:auto;position:relative;overflow:hidden;background:#fff}
+.bg-logo-watermark{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-15deg);width:75%;opacity:.08;z-index:0;pointer-events:none}
+.konten{position:relative;z-index:1}
+.nota-table{width:100%;font-size:14px;text-align:center;border-collapse:collapse;margin-top:10px}
+.nota-table td{border:none;padding:5px;text-align:center}
+</style></head>
+<body>
+<div class="nota-box">
+<img src="logo-az.jpeg" class="bg-logo-watermark" alt="" onerror="this.style.display='none'">
+<div class="konten">
+<h3 style="text-align:center;font-size:16px">ASKARA ZAYYAN BIRO JASA KENDARAAN BERMOTOR</h3>
+<p style="text-align:center;font-size:12px;color:#555">BUKTI PENYERAHAN DOKUMEN KENDARAAN</p>
+<hr style="border:1px dashed #333">
+<div style="font-size:14px;line-height:1.6">
+<p>Telah dilakukan penyerahan berkas kendaraan dengan rincian:</p>
+<p>Nama Pelanggan: <b>${aman(nama)}</b></p>
+<p>No. Polisi: <b>${aman(nopol)}</b></p>
+<p>Jenis Layanan: <b>${aman(layanan)}</b></p>
+<p>Status Berkas: <b>${aman(status)}</b></p>
+<p>Nama Pengambil: <b>${aman(namaPengambil)}</b></p>
+<p>Tanggal Penyerahan: ${aman(tanggal)}</p>
+</div>
+<hr style="border:1px dashed #333;margin:20px 0">
+<table class="nota-table">
+<tr><td style="width:50%">Yang Menyerahkan,</td><td style="width:50%">Yang Menerima,</td></tr>
+<tr style="height:70px"><td></td><td></td></tr>
+<tr><td>( ASKARA ZAYYAN )</td><td>( <b>${aman(namaPengambil)}</b> )</td></tr>
+</table>
+</div></div>
+<script>window.onload=()=>window.print();<\/script>
+</body></html>`);
+w.document.close();
+}
+
+tampilkanPenyerahan();
 </script>
 </body>
 </html>
+
