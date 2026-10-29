@@ -1,220 +1,178 @@
 
-function cetakTransaksi(t) {
-    const w = window.open("", "_blank");
 
-    if (!w) {
-        alert("Izinkan pop-up browser untuk mencetak bukti transaksi.");
+function cetakTransaksi(t) {
+    if (!t) {
+        alert("Data transaksi tidak ditemukan.");
         return;
     }
 
-    const logo = new URL("logo-az.jpeg", window.location.href).href;
+    const rupiah = angka => "Rp " +
+        (Number(angka) || 0).toLocaleString("id-ID");
 
-    w.document.open();
-    w.document.write(`<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<title>Bukti Transaksi ASKARA ZAYYAN</title>
-<style>
-* { box-sizing: border-box; }
-body {
-    font-family: Arial, sans-serif;
-    color: #172033;
-    padding: 20px;
-    margin: 0;
-    background: #fff;
-}
-.nota {
-    max-width: 720px;
-    margin: auto;
-    padding: 25px;
-    border: 1px solid #cbd5e1;
-    position: relative;
-    overflow: hidden;
-    background: white;
-}
-.watermark {
-    position: absolute;
-    width: 75%;
-    max-height: 380px;
-    object-fit: contain;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    opacity: 0.06;
-    z-index: 0;
-    pointer-events: none;
-}
-.konten {
-    position: relative;
-    z-index: 1;
-}
-.header {
-    text-align: center;
-    border-bottom: 2px solid #075985;
-    padding-bottom: 12px;
-}
-.logo {
-    width: 85px;
-    height: 85px;
-    object-fit: contain;
-    display: block;
-    margin: 0 auto 8px;
-}
-h1 {
-    color: #075985;
-    font-size: 23px;
-    margin: 5px 0;
-}
-h2 {
-    font-size: 17px;
-    text-align: center;
-    margin: 18px 0 5px;
-}
-.tanggal {
-    text-align: center;
-    font-size: 12px;
-    margin-bottom: 18px;
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
-}
-.identitas td {
-    padding: 5px 3px;
-    vertical-align: top;
-}
-.identitas td:first-child {
-    width: 160px;
-}
-.rincian th, .rincian td {
-    border: 1px solid #cbd5e1;
-    padding: 8px;
-}
-.rincian th {
-    background: #e0f2fe;
-    text-align: left;
-}
-.uang {
-    text-align: right;
-    white-space: nowrap;
-}
-.total {
-    font-weight: bold;
-    background: #e0f2fe;
-}
-.sisa {
-    font-weight: bold;
-    background: #dbeafe;
-    font-size: 14px;
-}
-.info {
-    margin-top: 15px;
-    font-size: 12px;
-    line-height: 1.7;
-}
-.footer {
-    text-align: center;
-    margin-top: 25px;
-    font-size: 12px;
-}
-.tombol {
-    display: block;
-    margin: 15px auto;
-    padding: 10px 20px;
-    background: #075985;
-    color: white;
-    border: 0;
-    cursor: pointer;
-}
-@media print {
-    body { padding: 0; }
-    .nota {
-        max-width: none;
-        border: none;
-        padding: 10px;
+    const aman = teks => String(teks ?? "-")
+        .replace(/[&<>"']/g, karakter => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[karakter]);
+
+    const sisa = Math.max(
+        0,
+        (Number(t.total) || 0) - (Number(t.dp) || 0)
+    );
+
+    const rincian = [
+        ["PKB", t.pkb],
+        ["Opsen PKB", t.opsenPkb],
+        ["SWDKLLJ", t.swdkllj],
+        ["Denda PKB", t.dendaPkb],
+        ["Denda SWDKLLJ", t.dendaSwdkllj],
+        ["BBNKB", t.bbnkb],
+        ["Opsen BBNKB", t.opsenBbnkb],
+        ["PNBP", t.pnbp],
+        ["Biaya resmi lainnya", t.biayaResmiLainnya],
+        ["Biaya resmi", t.biayaResmi],
+        ["Jasa biro", t.biayaJasa ?? t.jasa],
+        ["TOTAL TAGIHAN", t.total],
+        ["DP / Uang muka", t.dp],
+        ["SISA PEMBAYARAN", sisa]
+    ];
+
+    const barisRincian = rincian.map(([label, nilai]) => `
+        <tr class="${label === "TOTAL TAGIHAN" ||
+                    label === "SISA PEMBAYARAN" ? "tebal" : ""}">
+            <td>${aman(label)}</td>
+            <td class="uang">${rupiah(nilai)}</td>
+        </tr>
+    `).join("");
+
+    const tanggal = t.tanggal
+        ? new Date(t.tanggal).toLocaleString("id-ID")
+        : new Date().toLocaleString("id-ID");
+
+    const halaman = `
+    <!DOCTYPE html>
+    <html lang="id">
+    <head>
+        <meta charset="UTF-8">
+        <title>Bukti Transaksi ASKARA ZAYYAN</title>
+        <style>
+            * { box-sizing: border-box; }
+            body {
+                font-family: Arial, sans-serif;
+                font-size: 12px;
+                color: #111;
+                margin: 0;
+                padding: 15px;
+            }
+            .nota {
+                max-width: 700px;
+                margin: auto;
+            }
+            h1 {
+                font-size: 22px;
+                margin: 0;
+                text-align: center;
+            }
+            .subjudul, .tanggal {
+                text-align: center;
+                margin: 5px 0;
+            }
+            h2 {
+                text-align: center;
+                font-size: 16px;
+                border-top: 1px solid #222;
+                border-bottom: 1px solid #222;
+                padding: 8px 0;
+                margin-top: 15px;
+            }
+            .identitas {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 12px;
+            }
+            .identitas td {
+                padding: 4px;
+                vertical-align: top;
+            }
+            .identitas td:first-child { width: 160px; }
+            table.rincian {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            .rincian th, .rincian td {
+                border: 1px solid #bbb;
+                padding: 7px;
+            }
+            .rincian th {
+                background: #eee;
+                text-align: left;
+            }
+            .uang { text-align: right; white-space: nowrap; }
+            .tebal { font-weight: bold; }
+            .terima-kasih {
+                text-align: center;
+                margin-top: 22px;
+            }
+            .tombol {
+                display: block;
+                margin: 15px auto;
+                padding: 10px 22px;
+                cursor: pointer;
+            }
+            @media print {
+                body { padding: 0; }
+                .tombol { display: none; }
+                .nota { max-width: none; }
+                tr { page-break-inside: avoid; }
+            }
+        </style>
+    </head>
+    <body>
+      <div class="nota">
+        <h1>ASKARA ZAYYAN</h1>
+        <div class="subjudul">Biro Jasa Kendaraan Bermotor</div>
+        <h2>BUKTI TRANSAKSI</h2>
+        <div class="tanggal">Tanggal: ${aman(tanggal)}</div>
+
+        <table class="identitas">
+          <tr><td>Layanan</td><td>: ${aman(t.layanan)}</td></tr>
+          <tr><td>Jenis kendaraan</td><td>: ${aman(t.jenisKendaraan)}</td></tr>
+          <tr><td>Nama pengurus</td><td>: ${aman(t.namaPengurus)}</td></tr>
+          <tr><td>Nama STNK</td><td>: ${aman(t.namaStnk)}</td></tr>
+          <tr><td>Nomor polisi</td><td>: ${aman(t.nopol)}</td></tr>
+          <tr><td>Merek kendaraan</td><td>: ${aman(t.merek)}</td></tr>
+          <tr><td>Wilayah STNK</td><td>: ${aman(t.wilayah)}</td></tr>
+        </table>
+
+        <table class="rincian">
+          <thead>
+            <tr><th>Rincian biaya</th><th class="uang">Jumlah</th></tr>
+          </thead>
+          <tbody>${barisRincian}</tbody>
+        </table>
+
+        <p><b>Status:</b> ${aman(t.statusBerkas || t.status || "PROSES")}</p>
+        <p><b>Catatan:</b> ${aman(t.catatan || "-")}</p>
+        <div class="terima-kasih">
+          Terima kasih telah menggunakan jasa kami.
+        </div>
+        <button class="tombol" onclick="window.print()">CETAK BUKTI TRANSAKSI</button>
+      </div>
+    </body>
+    </html>`;
+
+    const jendela = window.open("", "_blank");
+
+    if (!jendela) {
+        alert("Jendela cetak diblokir. Izinkan pop-up untuk situs ini, lalu coba lagi.");
+        return;
     }
-    .tombol { display: none; }
-    .watermark {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-    tr { page-break-inside: avoid; }
+
+    jendela.document.open();
+    jendela.document.write(halaman);
+    jendela.document.close();
 }
-</style>
-</head>
-<body>
-<div class="nota">
-<img class="watermark" src="${aman(logo)}" alt="">
-<div class="konten">
 
-<div class="header">
-    <img class="logo" src="${aman(logo)}"
-         alt="Logo ASKARA ZAYYAN"
-         onerror="this.style.display='none'">
-    <h1>ASKARA ZAYYAN</h1>
-    <div>Biro Jasa Kendaraan Bermotor</div>
-</div>
-
-<h2>BUKTI TRANSAKSI</h2>
-<div class="tanggal">Tanggal: ${aman(t.tanggal)}</div>
-
-<table class="identitas">
-<tr><td>Layanan</td><td>: ${aman(t.layanan)}</td></tr>
-<tr><td>Jenis kendaraan</td><td>: ${aman(t.jenisKendaraan || "-")}</td></tr>
-<tr><td>Nama pengurus</td><td>: ${aman(t.nama)}</td></tr>
-<tr><td>Nama STNK</td><td>: ${aman(t.namaStnk)}</td></tr>
-<tr><td>Nomor polisi</td><td>: ${aman(t.nopol)}</td></tr>
-<tr><td>Merek kendaraan</td><td>: ${aman(t.merk)}</td></tr>
-<tr><td>Wilayah STNK</td><td>: ${aman(t.wilayah || "-")}</td></tr>
-<tr><td>Jatuh tempo</td><td>: ${aman(t.bulan || "-")} ${aman(t.tahun || "")}</td></tr>
-</table>
-
-<br>
-
-<table class="rincian">
-<thead>
-<tr><th>Rincian biaya</th><th class="uang">Jumlah</th></tr>
-</thead>
-<tbody>
-<tr><td>PKB pokok</td><td class="uang">${rupiah(t.pkb)}</td></tr>
-<tr><td>Opsen PKB</td><td class="uang">${rupiah(t.opsenPkb)}</td></tr>
-<tr><td>SWDKLLJ</td><td class="uang">${rupiah(t.swdkllj)}</td></tr>
-<tr><td>Denda PKB</td><td class="uang">${rupiah(t.dendaPkb)}</td></tr>
-<tr><td>Denda SWDKLLJ</td><td class="uang">${rupiah(t.dendaSwdkllj)}</td></tr>
-<tr><td>BBNKB</td><td class="uang">${rupiah(t.bbnkb)}</td></tr>
-<tr><td>Opsen BBNKB</td><td class="uang">${rupiah(t.opsenBbnkb)}</td></tr>
-<tr><td>PNBP</td><td class="uang">${rupiah(t.pnbp)}</td></tr>
-<tr><td>Biaya resmi lainnya</td><td class="uang">${rupiah(t.lainResmi)}</td></tr>
-<tr class="total"><td>Total biaya resmi</td><td class="uang">${rupiah(t.biayaResmi)}</td></tr>
-<tr><td>Jasa biro</td><td class="uang">${rupiah(t.jasa)}</td></tr>
-<tr class="total"><td>TOTAL TAGIHAN</td><td class="uang">${rupiah(t.total)}</td></tr>
-<tr><td>DP / Uang muka</td><td class="uang">${rupiah(t.dp)}</td></tr>
-<tr class="sisa"><td>SISA PEMBAYARAN</td><td class="uang">${rupiah(t.sisa)}</td></tr>
-</tbody>
-</table>
-
-<div class="info">
-    <b>Status:</b> ${aman(t.status || "PROSES")}<br>
-    <b>Catatan:</b> ${aman(t.catatan || "-")}
-</div>
-
-<div class="footer">
-    Terima kasih telah menggunakan jasa kami.
-    <br><br>
-    <b>ASKARA ZAYYAN</b>
-</div>
-</div>
-</div>
-
-<button class="tombol" onclick="window.print()">CETAK BUKTI TRANSAKSI</button>
-<script>
-window.onload = function() {
-    setTimeout(function() { window.print(); }, 500);
-};
-<\/script>
-</body>
-</html>`);
-    w.document.close();
-}
