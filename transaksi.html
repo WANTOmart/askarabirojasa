@@ -519,31 +519,14 @@ function cetakTransaksi(t){
   alert("Izinkan pop-up untuk mencetak bukti transaksi.");
   return;
  }
-const tanggal=tanggalPenyerahan||new Date().toLocaleDateString("id-ID",{
-weekday:"long",year:"numeric",month:"long",day:"numeric"
-});
-
-w.document.write(`
-<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8">
-<title>Tanda Terima Berkas</title>
-<style>
-@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
-body{font-family:Arial,sans-serif;padding:20px}
-.nota-box{border:2px dashed #333;padding:25px;max-width:500px;margin:auto;position:relative;overflow:hidden;background:#fff}
-.bg-logo-watermark{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-15deg);width:75%;opacity:.08;z-index:0;pointer-events:none}
-.konten{position:relative;z-index:1}
-.nota-table{width:100%;font-size:14px;text-align:center;border-collapse:collapse;margin-top:10px}
-.nota-table td{border:none;padding:5px;text-align:center}
-</style></head>
-<body>
-<div class="nota-box">
-<img src="logo-az.jpeg" class="bg-logo-watermark" alt="" onerror="this.style.display='none'">
-<div class="konten">
-<h3 style="text-align:center;font-size:16px">ASKARA ZAYYAN BIRO JASA KENDARAAN BERMOTOR</h3>
-<p style="text-align:center;font-size:12px;color:#555">BUKTI PENYERAHAN DOKUMEN KENDARAAN</p>
-<hr style="border:1px dashed #333">
-<div style="font-size:14px;line-height:1.6">
-<p>Telah dilakukan transaksi kendaraan dengan rincian:</p>
+ w.document.write(`<!DOCTYPE html>
+ <html lang="id"><head><meta charset="UTF-8">
+ <title>Bukti Transaksi ASKARA ZAYYAN</title>
+ <style>body{font-family:Arial;padding:25px;line-height:1.7}
+ h2{color:#075985}hr{border:0;border-top:1px solid #aaa}</style>
+ </head><body>
+ <h2>ASKARA ZAYYAN</h2>
+ <p>Biro Jasa Kendaraan Bermotor</p>
  <h3>Bukti Transaksi</h3><hr>
  <p>Tanggal: ${aman(t.tanggal)}</p>
  <p>Layanan: ${aman(t.layanan)}</p>
