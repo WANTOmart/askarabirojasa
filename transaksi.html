@@ -525,37 +525,6 @@ function cetakTransaksi(t){
  <style>body{font-family:Arial;padding:25px;line-height:1.7}
  h2{color:#075985}hr{border:0;border-top:1px solid #aaa}</style>
  </head><body>
- function cetakTandaTerima(nama,nopol,layanan,namaPengambil,status,tanggalPenyerahan){
-const w=window.open("","_blank");
-if(!w){
-alert("Izinkan pop-up browser untuk mencetak tanda terima.");
-return;
-}
-
-const tanggal=tanggaltransaksi||new Date().toLocaleDateString("id-ID",{
-weekday:"long",year:"numeric",month:"long",day:"numeric"
-});
-
-w.document.write(`
-<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8">
-<title>Tanda Terima Berkas</title>
-<style>
-@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
-body{font-family:Arial,sans-serif;padding:20px}
-.nota-box{border:2px dashed #333;padding:25px;max-width:500px;margin:auto;position:relative;overflow:hidden;background:#fff}
-.bg-logo-watermark{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-15deg);width:75%;opacity:.08;z-index:0;pointer-events:none}
-.konten{position:relative;z-index:1}
-.nota-table{width:100%;font-size:14px;text-align:center;border-collapse:collapse;margin-top:10px}
-.nota-table td{border:none;padding:5px;text-align:center}
-</style></head>
-<body>
-<div class="nota-box">
-<img src="logo-az.jpeg" class="bg-logo-watermark" alt="" onerror="this.style.display='none'">
-<div class="konten">
-<h3 style="text-align:center;font-size:16px">ASKARA ZAYYAN BIRO JASA KENDARAAN BERMOTOR</h3>
-<p style="text-align:center;font-size:12px;color:#555">BUKTI TRANSAKSI DOKUMEN KENDARAAN</p>
-<hr style="border:1px dashed #333">
-<div style="font-size:14px;line-height:1.6">
  <h2>ASKARA ZAYYAN</h2>
  <p>Biro Jasa Kendaraan Bermotor</p>
  <h3>Bukti Transaksi</h3><hr>
@@ -567,6 +536,17 @@ body{font-family:Arial,sans-serif;padding:20px}
  <p>Nomor polisi: ${aman(t.nopol)}</p>
  <p>Merek kendaraan: ${aman(t.merk)}</p>
  <p>Wilayah STNK: ${aman(t.wilayah||"-")}</p>
+ <p>PKB: ${rupiah(t.pkb)}</p>
+ <p>Opsen PKB: ${rupiah(t.opsenPkb)}</p>
+ <p>SWDKLLJ: ${rupiah(t.swdkllj)}</p>
+ <p>Denda PKB: ${rupiah(t.dendaPkb)}</p>
+ <p>Denda SWDKLLJ: ${rupiah(t.dendaSwdkllj)}</p>
+ <p>BBNKB: ${rupiah(t.bbnkb)}</p>
+ <p>Opsen BBNKB: ${rupiah(t.opsenBbnkb)}</p>
+ <p>PNBP: ${rupiah(t.pnbp)}</p>
+ <p>Biaya resmi lainnya: ${rupiah(t.lainResmi)}</p><hr>
+ <p>Biaya resmi: ${rupiah(t.biayaResmi)}</p>
+ <p>Jasa biro: ${rupiah(t.jasa)}</p>
  <h3>Total tagihan: ${rupiah(t.total)}</h3>
  <p>DP: ${rupiah(t.dp)}</p>
  <h3>Sisa pembayaran: ${rupiah(t.sisa)}</h3>
