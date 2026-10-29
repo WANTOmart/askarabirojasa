@@ -1,178 +1,610 @@
 
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Transaksi - ASKARA ZAYYAN</title>
+<style>
+*{box-sizing:border-box}
+body{font-family:Arial,sans-serif;background:#f1f5f9;margin:0;padding:15px;color:#172033}
+main{max-width:1100px;margin:auto;background:white;padding:22px;border-radius:14px}
+h1{color:#075985;margin-bottom:5px}
+h2{font-size:21px}
+h3{margin-top:25px;color:#075985;border-bottom:1px solid #ddd;padding-bottom:8px}
+label{display:block;font-weight:bold;margin-top:10px;font-size:14px}
+input,select,textarea,button{width:100%;padding:11px;margin:5px 0;border:1px solid #cbd5e1;border-radius:8px;font-size:14px}
+button{background:#075985;color:white;border:0;cursor:pointer;font-weight:bold}
+button:hover{background:#0369a1}
+a{color:#075985}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.result{background:#e0f2fe;padding:16px;border-radius:10px;margin:15px 0;line-height:1.9;overflow-wrap:anywhere}
+.notice{background:#fff7ed;border:1px solid #fed7aa;padding:12px;border-radius:8px;font-size:13px;line-height:1.6}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;margin-top:15px;font-size:13px}
+th,td{text-align:left;padding:8px;border-bottom:1px solid #ddd;white-space:nowrap}
+th{background:#e0f2fe}
+.smallbtn{padding:7px;font-size:12px;margin:2px}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.actions button{width:auto}
+input[readonly]{background:#f1f5f9}
+@media print{
+ .noprint,form,.nav{display:none!important}
+ body{background:white;padding:0}
+ main{max-width:none;padding:0}
+ .tablewrap{overflow:visible}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>ASKARA ZAYYAN</h1>
+<h2>Kalkulator Pajak & Transaksi Biro Jasa</h2>
 
-function cetakTransaksi(t) {
-    if (!t) {
-        alert("Data transaksi tidak ditemukan.");
-        return;
-    }
+<p class="nav">
+<a href="dashboard.html">Dashboard</a> |
+<a href="pelanggan.html">Pelanggan</a> |
+<a href="kendaraan.html">Kendaraan</a>
+</p>
 
-    const rupiah = angka => "Rp " +
-        (Number(angka) || 0).toLocaleString("id-ID");
+<div class="notice">
+<b>Informasi perhitungan:</b><br>
+Opsen PKB dan Opsen BBNKB dihitung otomatis sebesar 66% dari nilai dasar pajak yang dimasukkan. Pastikan nilai dasar berasal dari STNK atau pengecekan Samsat. Nilai denda, PKB, SWDKLLJ, dan PNBP belum terhubung langsung ke database Samsat. Hasil kalkulator bukan penetapan tagihan resmi.
+</div>
 
-    const aman = teks => String(teks ?? "-")
-        .replace(/[&<>"']/g, karakter => ({
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#39;"
-        })[karakter]);
+<form id="form">
+<h3>1. Data Layanan</h3>
+<div class="grid">
+<div>
+<label>Jenis kendaraan</label>
+<select id="jenisKendaraan">
+<option value="MOTOR">Motor</option>
+<option value="MOBIL">Mobil</option>
+</select>
+</div>
+<div>
+<label>Jenis layanan</label>
+<select id="layanan" required>
+<option>Perpanjang 1 Tahun</option>
+<option>Perpanjang 5 Tahun / Ganti Plat</option>
+<option>Balik Nama</option>
+<option>Mutasi Balik Nama</option>
+<option>Mutasi Cabut / Keluar</option>
+<option>Mutasi Masuk</option>
+<option>STNK Hilang</option>
+<option>BPKB Hilang</option>
+<option>Ganti Nopol / Nopil</option>
+<option>Rubah Bentuk / Warna</option>
+<option>Blokir STNK</option>
+<option>Cek Fisik Bantuan</option>
+<option>Jasa Biro / Proses Pajak</option>
+<option>Jemput Antar Dokumen</option>
+</select>
+</div>
+<div>
+<label>Wilayah STNK</label>
+<select id="wilayah">
+<option value="">-- Pilih wilayah --</option>
+<option>DKI Jakarta</option>
+<option>Tangerang Kota</option>
+<option>Tangerang Selatan</option>
+<option>Tangerang Kabupaten</option>
+<option>Bekasi Kota</option>
+<option>Bekasi Kabupaten</option>
+<option>Depok</option>
+<option>Bogor Kota</option>
+<option>Bogor Kabupaten</option>
+<option>Jawa Tengah</option>
+<option>Jawa Barat</option>
+<option>Jawa Timur</option>
+<option>Luar Jawa</option>
+</select>
+</div>
+<div>
+<label>Bulan jatuh tempo</label>
+<select id="bulan">
+<option value="">-- Pilih bulan --</option>
+<option>Januari</option><option>Februari</option>
+<option>Maret</option><option>April</option>
+<option>Mei</option><option>Juni</option>
+<option>Juli</option><option>Agustus</option>
+<option>September</option><option>Oktober</option>
+<option>November</option><option>Desember</option>
+</select>
+</div>
+<div>
+<label>Tahun jatuh tempo</label>
+<select id="tahun">
+<option value="">-- Pilih tahun --</option>
+</select>
+</div>
+<div>
+<label>Kode IP (opsional)</label>
+<input id="kodeIP" placeholder="Masukkan kode jika ada">
+</div>
+<div>
+<label>Asal mutasi (jika ada)</label>
+<input id="asal" placeholder="Contoh: Banyuwangi">
+</div>
+<div>
+<label>Tujuan mutasi (jika ada)</label>
+<input id="tujuan" placeholder="Contoh: Bondowoso">
+</div>
+</div>
 
-    const sisa = Math.max(
-        0,
-        (Number(t.total) || 0) - (Number(t.dp) || 0)
-    );
+<h3>2. Pelanggan dan Kendaraan</h3>
+<div class="grid">
+<div>
+<label>Pilih pelanggan</label>
+<select id="pilihPelanggan" required>
+<option value="">-- Pilih pelanggan --</option>
+</select>
+</div>
+<div>
+<label>Pilih kendaraan</label>
+<select id="pilihKendaraan" required>
+<option value="">-- Pilih kendaraan --</option>
+</select>
+</div>
+<div>
+<label>Nama pengurus</label>
+<input id="nama" readonly>
+</div>
+<div>
+<label>Nama sesuai STNK</label>
+<input id="namaStnk" readonly>
+</div>
+<div>
+<label>Nomor polisi</label>
+<input id="nopol" readonly>
+</div>
+<div>
+<label>Merek kendaraan</label>
+<input id="merk" readonly>
+</div>
+</div>
 
-    const rincian = [
-        ["PKB", t.pkb],
-        ["Opsen PKB", t.opsenPkb],
-        ["SWDKLLJ", t.swdkllj],
-        ["Denda PKB", t.dendaPkb],
-        ["Denda SWDKLLJ", t.dendaSwdkllj],
-        ["BBNKB", t.bbnkb],
-        ["Opsen BBNKB", t.opsenBbnkb],
-        ["PNBP", t.pnbp],
-        ["Biaya resmi lainnya", t.biayaResmiLainnya],
-        ["Biaya resmi", t.biayaResmi],
-        ["Jasa biro", t.biayaJasa ?? t.jasa],
-        ["TOTAL TAGIHAN", t.total],
-        ["DP / Uang muka", t.dp],
-        ["SISA PEMBAYARAN", sisa]
-    ];
+<h3>3. Pajak dan Biaya Resmi</h3>
+<div class="grid">
+<div>
+<label>PKB pokok (Rp)</label>
+<input id="pkb" type="number" min="0" value="0">
+</div>
+<div>
+<label>Opsen PKB 66% (otomatis)</label>
+<input id="opsenPkb" type="number" value="0" readonly>
+</div>
+<div>
+<label>SWDKLLJ (Rp)</label>
+<input id="swdkllj" type="number" min="0" value="0">
+</div>
+<div>
+<label>Denda PKB (Rp)</label>
+<input id="dendaPkb" type="number" min="0" value="0">
+</div>
+<div>
+<label>Denda SWDKLLJ (Rp)</label>
+<input id="dendaSwdkllj" type="number" min="0" value="0">
+</div>
+<div>
+<label>BBNKB terutang (Rp)</label>
+<input id="bbnkb" type="number" min="0" value="0">
+</div>
+<div>
+<label>Opsen BBNKB 66% (otomatis)</label>
+<input id="opsenBbnkb" type="number" value="0" readonly>
+</div>
+<div>
+<label>PNBP STNK/TNKB/BPKB (Rp)</label>
+<input id="pnbp" type="number" min="0" value="0">
+</div>
+<div>
+<label>Biaya resmi lainnya (Rp)</label>
+<input id="lainResmi" type="number" min="0" value="0">
+</div>
+</div>
 
-    const barisRincian = rincian.map(([label, nilai]) => `
-        <tr class="${label === "TOTAL TAGIHAN" ||
-                    label === "SISA PEMBAYARAN" ? "tebal" : ""}">
-            <td>${aman(label)}</td>
-            <td class="uang">${rupiah(nilai)}</td>
-        </tr>
-    `).join("");
+<h3>4. Jasa dan Pembayaran</h3>
+<div class="grid">
+<div>
+<label>Jasa biro (Rp)</label>
+<input id="jasa" type="number" min="0" value="0">
+</div>
+<div>
+<label>Biaya operasional biro (Rp)</label>
+<input id="operasional" type="number" min="0" value="0">
+</div>
+<div>
+<label>Uang muka / DP (Rp)</label>
+<input id="dp" type="number" min="0" value="0">
+</div>
+</div>
 
-    const tanggal = t.tanggal
-        ? new Date(t.tanggal).toLocaleString("id-ID")
-        : new Date().toLocaleString("id-ID");
+<label>Catatan transaksi</label>
+<textarea id="catatan" rows="3" placeholder="Catatan tambahan atau dokumen yang kurang"></textarea>
 
-    const halaman = `
-    <!DOCTYPE html>
-    <html lang="id">
-    <head>
-        <meta charset="UTF-8">
-        <title>Bukti Transaksi ASKARA ZAYYAN</title>
-        <style>
-            * { box-sizing: border-box; }
-            body {
-                font-family: Arial, sans-serif;
-                font-size: 12px;
-                color: #111;
-                margin: 0;
-                padding: 15px;
-            }
-            .nota {
-                max-width: 700px;
-                margin: auto;
-            }
-            h1 {
-                font-size: 22px;
-                margin: 0;
-                text-align: center;
-            }
-            .subjudul, .tanggal {
-                text-align: center;
-                margin: 5px 0;
-            }
-            h2 {
-                text-align: center;
-                font-size: 16px;
-                border-top: 1px solid #222;
-                border-bottom: 1px solid #222;
-                padding: 8px 0;
-                margin-top: 15px;
-            }
-            .identitas {
-                width: 100%;
-                border-collapse: collapse;
-                margin-bottom: 12px;
-            }
-            .identitas td {
-                padding: 4px;
-                vertical-align: top;
-            }
-            .identitas td:first-child { width: 160px; }
-            table.rincian {
-                width: 100%;
-                border-collapse: collapse;
-            }
-            .rincian th, .rincian td {
-                border: 1px solid #bbb;
-                padding: 7px;
-            }
-            .rincian th {
-                background: #eee;
-                text-align: left;
-            }
-            .uang { text-align: right; white-space: nowrap; }
-            .tebal { font-weight: bold; }
-            .terima-kasih {
-                text-align: center;
-                margin-top: 22px;
-            }
-            .tombol {
-                display: block;
-                margin: 15px auto;
-                padding: 10px 22px;
-                cursor: pointer;
-            }
-            @media print {
-                body { padding: 0; }
-                .tombol { display: none; }
-                .nota { max-width: none; }
-                tr { page-break-inside: avoid; }
-            }
-        </style>
-    </head>
-    <body>
-      <div class="nota">
-        <h1>ASKARA ZAYYAN</h1>
-        <div class="subjudul">Biro Jasa Kendaraan Bermotor</div>
-        <h2>BUKTI TRANSAKSI</h2>
-        <div class="tanggal">Tanggal: ${aman(tanggal)}</div>
+<div class="actions noprint">
+<button type="button" onclick="hitung()">Hitung Total</button>
+<button type="submit">Simpan Transaksi</button>
+<button type="button" onclick="resetForm()">Kosongkan Form</button>
+</div>
+</form>
 
-        <table class="identitas">
-          <tr><td>Layanan</td><td>: ${aman(t.layanan)}</td></tr>
-          <tr><td>Jenis kendaraan</td><td>: ${aman(t.jenisKendaraan)}</td></tr>
-          <tr><td>Nama pengurus</td><td>: ${aman(t.namaPengurus)}</td></tr>
-          <tr><td>Nama STNK</td><td>: ${aman(t.namaStnk)}</td></tr>
-          <tr><td>Nomor polisi</td><td>: ${aman(t.nopol)}</td></tr>
-          <tr><td>Merek kendaraan</td><td>: ${aman(t.merek)}</td></tr>
-          <tr><td>Wilayah STNK</td><td>: ${aman(t.wilayah)}</td></tr>
-        </table>
+<div class="result" id="hasil">
+<b>Rincian transaksi</b><br>
+Biaya resmi: Rp0<br>
+Jasa biro: Rp0<br>
+Total tagihan: Rp0<br>
+DP: Rp0<br>
+Sisa pembayaran: Rp0
+</div>
 
-        <table class="rincian">
-          <thead>
-            <tr><th>Rincian biaya</th><th class="uang">Jumlah</th></tr>
-          </thead>
-          <tbody>${barisRincian}</tbody>
-        </table>
+<div class="noprint">
+<h3>5. Riwayat Transaksi</h3>
+<div class="grid">
+<div>
+<label>Cari transaksi</label>
+<input id="cari" placeholder="Nama pelanggan atau nopol" oninput="tampil()">
+</div>
+<div>
+<label>Filter status</label>
+<select id="filterStatus" onchange="tampil()">
+<option value="">Semua status</option>
+<option>PROSES</option>
+<option>SELESAI</option>
+<option>DISERAHKAN</option>
+</select>
+</div>
+</div>
+<div class="actions">
+<button type="button" onclick="window.print()">Cetak Halaman</button>
+<button type="button" onclick="ekspor()">Ekspor CSV</button>
+</div>
+</div>
 
-        <p><b>Status:</b> ${aman(t.statusBerkas || t.status || "PROSES")}</p>
-        <p><b>Catatan:</b> ${aman(t.catatan || "-")}</p>
-        <div class="terima-kasih">
-          Terima kasih telah menggunakan jasa kami.
-        </div>
-        <button class="tombol" onclick="window.print()">CETAK BUKTI TRANSAKSI</button>
-      </div>
-    </body>
-    </html>`;
+<div class="tablewrap">
+<table>
+<thead>
+<tr>
+<th>Tanggal</th><th>Layanan</th><th>Pelanggan</th><th>Nopol</th>
+<th>Biaya Resmi</th><th>Jasa</th><th>Total</th><th>DP</th>
+<th>Sisa</th><th>Status</th><th class="noprint">Aksi</th>
+</tr>
+</thead>
+<tbody id="daftar"></tbody>
+</table>
+</div>
+</main>
 
-    const jendela = window.open("", "_blank");
+<script>
+const $=id=>document.getElementById(id);
+const ambil=k=>{
+ try{return JSON.parse(localStorage.getItem(k)||"[]")}
+ catch(e){return []}
+};
+const rupiah=n=>new Intl.NumberFormat("id-ID",{
+ style:"currency",currency:"IDR",maximumFractionDigits:0
+}).format(Number(n)||0);
+const nilai=id=>Math.max(0,Number($(id).value)||0);
 
-    if (!jendela) {
-        alert("Jendela cetak diblokir. Izinkan pop-up untuk situs ini, lalu coba lagi.");
-        return;
-    }
+let pelangganData=[];
+let kendaraanData=[];
+let transaksi=ambil("azTransaksi");
 
-    jendela.document.open();
-    jendela.document.write(halaman);
-    jendela.document.close();
+const idsBiaya=[
+ "pkb","opsenPkb","swdkllj","dendaPkb","dendaSwdkllj",
+ "bbnkb","opsenBbnkb","pnbp","lainResmi"
+];
+
+for(let y=2030;y>=2000;y--){
+ const o=document.createElement("option");
+ o.value=y;
+ o.textContent=y;
+ $("tahun").appendChild(o);
 }
 
+// Opsen dihitung otomatis dari nilai dasar yang dimasukkan.
+function hitungOpsen(){
+ $("opsenPkb").value=Math.round(nilai("pkb")*0.66);
+ $("opsenBbnkb").value=Math.round(nilai("bbnkb")*0.66);
+}
+
+function refreshData(){
+ pelangganData=ambil("dataPelanggan");
+ kendaraanData=ambil("dataKendaraan");
+ $("pilihPelanggan").innerHTML='<option value="">-- Pilih pelanggan --</option>';
+
+ pelangganData.forEach((p,i)=>{
+  const o=document.createElement("option");
+  o.value=String(i);
+  o.textContent=(p.nama||"Tanpa nama")+" - "+(p.namaStnk||"-");
+  $("pilihPelanggan").appendChild(o);
+ });
+ isiKendaraan();
+}
+
+function isiKendaraan(){
+ $("pilihKendaraan").innerHTML='<option value="">-- Pilih kendaraan --</option>';
+ const index=$("pilihPelanggan").value;
+ if(index==="")return;
+ const p=pelangganData[Number(index)];
+ if(!p)return;
+
+ kendaraanData.forEach((k,i)=>{
+  if(k.namaStnk===p.namaStnk && k.pengurus===p.nama){
+   const o=document.createElement("option");
+   o.value=String(i);
+   o.textContent=(k.nopol||"-")+" - "+(k.merk||"Kendaraan");
+   $("pilihKendaraan").appendChild(o);
+  }
+ });
+}
+
+$("pilihPelanggan").addEventListener("change",()=>{
+ const index=$("pilihPelanggan").value;
+ const p=index===""?null:pelangganData[Number(index)];
+ $("nama").value=p?.nama||"";
+ $("namaStnk").value=p?.namaStnk||"";
+ $("nopol").value="";
+ $("merk").value="";
+ isiKendaraan();
+});
+
+$("pilihKendaraan").addEventListener("change",()=>{
+ const index=$("pilihKendaraan").value;
+ const k=index===""?null:kendaraanData[Number(index)];
+ if(!k)return;
+ $("nopol").value=k.nopol||"";
+ $("merk").value=k.merk||"";
+ if(k.jenis){
+  $("jenisKendaraan").value=/mobil|roda.?4/i.test(k.jenis)?"MOBIL":"MOTOR";
+ }
+});
+
+function totalResmi(){
+ return idsBiaya.reduce((sum,id)=>sum+nilai(id),0);
+}
+
+function hitung(){
+ hitungOpsen();
+ const resmi=totalResmi();
+ const jasa=nilai("jasa");
+ const operasional=nilai("operasional");
+ const dp=nilai("dp");
+ const total=resmi+jasa;
+ const sisa=Math.max(0,total-dp);
+ const laba=jasa-operasional;
+
+ $("hasil").innerHTML=
+  "<b>Jenis kendaraan:</b> "+$("jenisKendaraan").value+"<br>"+
+  "<b>Layanan:</b> "+$("layanan").value+"<br>"+
+  "<b>Wilayah STNK:</b> "+($("wilayah").value||"-")+"<br>"+
+  "<b>Jatuh tempo:</b> "+($("bulan").value||"-")+" "+($("tahun").value||"")+"<hr>"+
+  "<b>PKB pokok:</b> "+rupiah(nilai("pkb"))+"<br>"+
+  "<b>Opsen PKB:</b> "+rupiah(nilai("opsenPkb"))+"<br>"+
+  "<b>SWDKLLJ:</b> "+rupiah(nilai("swdkllj"))+"<br>"+
+  "<b>Denda PKB:</b> "+rupiah(nilai("dendaPkb"))+"<br>"+
+  "<b>Denda SWDKLLJ:</b> "+rupiah(nilai("dendaSwdkllj"))+"<br>"+
+  "<b>BBNKB:</b> "+rupiah(nilai("bbnkb"))+"<br>"+
+  "<b>Opsen BBNKB:</b> "+rupiah(nilai("opsenBbnkb"))+"<br>"+
+  "<b>PNBP dan biaya resmi lain:</b> "+rupiah(nilai("pnbp")+nilai("lainResmi"))+"<hr>"+
+  "<b>Total biaya resmi:</b> "+rupiah(resmi)+"<br>"+
+  "<b>Jasa biro:</b> "+rupiah(jasa)+"<br>"+
+  "<b>Total tagihan:</b> "+rupiah(total)+"<br>"+
+  "<b>DP:</b> "+rupiah(dp)+"<br>"+
+  "<b>Sisa pembayaran:</b> "+rupiah(sisa)+"<br>"+
+  "<b>Perkiraan laba jasa setelah operasional:</b> "+rupiah(laba);
+
+ return {resmi,jasa,operasional,dp,total,sisa,laba};
+}
+
+$("form").addEventListener("submit",e=>{
+ e.preventDefault();
+ if(!$("nama").value||!$("nopol").value){
+  alert("Pilih pelanggan dan kendaraan terlebih dahulu.");
+  return;
+ }
+
+ const t=hitung();
+ const id=(crypto.randomUUID?crypto.randomUUID():String(Date.now()));
+
+ transaksi.unshift({
+  id,
+  tanggal:new Date().toLocaleString("id-ID"),
+  layanan:$("layanan").value,
+  jenisKendaraan:$("jenisKendaraan").value,
+  bulan:$("bulan").value,
+  tahun:$("tahun").value,
+  kodeIP:$("kodeIP").value,
+  wilayah:$("wilayah").value,
+  nama:$("nama").value,
+  namaStnk:$("namaStnk").value,
+  nopol:$("nopol").value,
+  merk:$("merk").value,
+  asal:$("asal").value,
+  tujuan:$("tujuan").value,
+  pkb:nilai("pkb"),
+  opsenPkb:nilai("opsenPkb"),
+  swdkllj:nilai("swdkllj"),
+  dendaPkb:nilai("dendaPkb"),
+  dendaSwdkllj:nilai("dendaSwdkllj"),
+  bbnkb:nilai("bbnkb"),
+  opsenBbnkb:nilai("opsenBbnkb"),
+  pnbp:nilai("pnbp"),
+  lainResmi:nilai("lainResmi"),
+  biayaResmi:t.resmi,
+  jasa:t.jasa,
+  operasional:t.operasional,
+  dp:t.dp,
+  total:t.total,
+  sisa:t.sisa,
+  laba:t.laba,
+  catatan:$("catatan").value,
+  status:"PROSES"
+ });
+
+ simpanTransaksi();
+ alert("Transaksi berhasil disimpan.");
+});
+
+function simpanTransaksi(){
+ localStorage.setItem("azTransaksi",JSON.stringify(transaksi));
+ tampil();
+}
+
+function tampil(){
+ $("daftar").innerHTML="";
+ const q=($("cari").value||"").toLowerCase();
+ const filter=$("filterStatus").value;
+
+ transaksi.forEach((t,i)=>{
+  const teks=((t.nama||"")+" "+(t.nopol||"")+" "+(t.layanan||"")).toLowerCase();
+  if(!teks.includes(q))return;
+  if(filter&&(t.status||"PROSES")!==filter)return;
+
+  const tr=document.createElement("tr");
+  [
+   t.tanggal,t.layanan,t.nama,t.nopol,
+   rupiah(t.biayaResmi),rupiah(t.jasa),rupiah(t.total),
+   rupiah(t.dp),rupiah(t.sisa),t.status||"PROSES"
+  ].forEach(v=>{
+   const td=document.createElement("td");
+   td.textContent=v??"";
+   tr.appendChild(td);
+  });
+
+  const td=document.createElement("td");
+  td.className="noprint";
+
+  const cetak=document.createElement("button");
+  cetak.className="smallbtn";
+  cetak.textContent="Cetak";
+  cetak.onclick=()=>cetakTransaksi(t);
+
+  const status=document.createElement("button");
+  status.className="smallbtn";
+  status.textContent="Ubah Status";
+  status.onclick=()=>{
+   const urutan=["PROSES","SELESAI","DISERAHKAN"];
+   const sekarang=urutan.indexOf(t.status||"PROSES");
+   transaksi[i].status=urutan[(sekarang+1)%urutan.length];
+   simpanTransaksi();
+  };
+
+  const hapus=document.createElement("button");
+  hapus.className="smallbtn";
+  hapus.textContent="Hapus";
+  hapus.onclick=()=>{
+   if(confirm("Hapus transaksi ini?")){
+    transaksi.splice(i,1);
+    simpanTransaksi();
+   }
+  };
+
+  td.append(cetak,status,hapus);
+  tr.appendChild(td);
+  $("daftar").appendChild(tr);
+ });
+}
+
+function aman(v){
+ return String(v??"").replace(/[&<>"']/g,c=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+ }[c]));
+}
+
+function cetakTransaksi(t){
+ const w=window.open("","_blank");
+ if(!w){
+  alert("Izinkan pop-up untuk mencetak bukti transaksi.");
+  return;
+ }
+ w.document.write(`<!DOCTYPE html>
+ <html lang="id"><head><meta charset="UTF-8">
+ <title>Bukti Transaksi ASKARA ZAYYAN</title>
+ <style>body{font-family:Arial;padding:25px;line-height:1.7}
+ h2{color:#075985}hr{border:0;border-top:1px solid #aaa}</style>
+ </head><body>
+ <h2>ASKARA ZAYYAN</h2>
+ <p>Biro Jasa Kendaraan Bermotor</p>
+ <h3>Bukti Transaksi</h3><hr>
+ <p>Tanggal: ${aman(t.tanggal)}</p>
+ <p>Layanan: ${aman(t.layanan)}</p>
+ <p>Jenis kendaraan: ${aman(t.jenisKendaraan||"-")}</p>
+ <p>Nama pengurus: ${aman(t.nama)}</p>
+ <p>Nama STNK: ${aman(t.namaStnk)}</p>
+ <p>Nomor polisi: ${aman(t.nopol)}</p>
+ <p>Merek kendaraan: ${aman(t.merk)}</p>
+ <p>Wilayah STNK: ${aman(t.wilayah||"-")}</p>
+ <p>PKB: ${rupiah(t.pkb)}</p>
+ <p>Opsen PKB: ${rupiah(t.opsenPkb)}</p>
+ <p>SWDKLLJ: ${rupiah(t.swdkllj)}</p>
+ <p>Denda PKB: ${rupiah(t.dendaPkb)}</p>
+ <p>Denda SWDKLLJ: ${rupiah(t.dendaSwdkllj)}</p>
+ <p>BBNKB: ${rupiah(t.bbnkb)}</p>
+ <p>Opsen BBNKB: ${rupiah(t.opsenBbnkb)}</p>
+ <p>PNBP: ${rupiah(t.pnbp)}</p>
+ <p>Biaya resmi lainnya: ${rupiah(t.lainResmi)}</p><hr>
+ <p>Biaya resmi: ${rupiah(t.biayaResmi)}</p>
+ <p>Jasa biro: ${rupiah(t.jasa)}</p>
+ <h3>Total tagihan: ${rupiah(t.total)}</h3>
+ <p>DP: ${rupiah(t.dp)}</p>
+ <h3>Sisa pembayaran: ${rupiah(t.sisa)}</h3>
+ <p>Status: ${aman(t.status)}</p>
+ <p>Catatan: ${aman(t.catatan||"-")}</p>
+ <hr><p>Terima kasih telah menggunakan jasa kami.</p>
+ <script>window.onload=()=>window.print()<\/script>
+ </body></html>`);
+ w.document.close();
+}
+
+function ekspor(){
+ const rows=[[
+  "Tanggal","Layanan","Jenis Kendaraan","Wilayah","Nama","Nama STNK",
+  "Nopol","PKB","Opsen PKB","SWDKLLJ","Denda PKB","Denda SWDKLLJ",
+  "BBNKB","Opsen BBNKB","PNBP","Biaya Resmi Lain","Total Biaya Resmi",
+  "Jasa","Operasional","Total Tagihan","DP","Sisa","Laba","Status"
+ ],...transaksi.map(t=>[
+  t.tanggal,t.layanan,t.jenisKendaraan,t.wilayah,t.nama,t.namaStnk,
+  t.nopol,t.pkb,t.opsenPkb,t.swdkllj,t.dendaPkb,t.dendaSwdkllj,
+  t.bbnkb,t.opsenBbnkb,t.pnbp,t.lainResmi,t.biayaResmi,
+  t.jasa,t.operasional,t.total,t.dp,t.sisa,t.laba,t.status
+ ])];
+
+ const csv=rows.map(r=>r.map(v=>
+  '"'+String(v??"").replace(/"/g,'""')+'"'
+ ).join(",")).join("\r\n");
+
+ const url=URL.createObjectURL(new Blob(["\ufeff"+csv],{
+  type:"text/csv;charset=utf-8;"
+ }));
+ const a=document.createElement("a");
+ a.href=url;
+ a.download="transaksi-askara-zayyan.csv";
+ a.click();
+ URL.revokeObjectURL(url);
+}
+
+function resetForm(){
+ if(!confirm("Kosongkan isian form?"))return;
+ $("form").reset();
+ $("nama").value="";
+ $("namaStnk").value="";
+ $("nopol").value="";
+ $("merk").value="";
+ hitungOpsen();
+ isiKendaraan();
+ hitung();
+}
+
+idsBiaya.concat(["jasa","operasional","dp"]).forEach(id=>{
+ $(id).addEventListener("input",hitung);
+});
+
+refreshData();
+hitungOpsen();
+tampil();
+hitung();
+</script>
+</body>
+</html>
